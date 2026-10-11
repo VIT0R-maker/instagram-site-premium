@@ -1,0 +1,178 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "2.0"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^(?!assets/|lib/)(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_-]+\\.(html|css|js|svg)$",
+            "maxLength": 160
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180000
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 16,
+      "minItems": 2
+    },
+    "interactions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "page": {
+            "type": "string",
+            "pattern": "^(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_-]+\\.html$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "menu",
+              "gallery",
+              "lightbox",
+              "accordion",
+              "tabs",
+              "card",
+              "custom"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "minWidth": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "maxWidth": {
+            "type": "integer",
+            "maximum": 4000
+          },
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "enum": [
+                    "keyboard",
+                    "pointer",
+                    "touch"
+                  ]
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "click",
+                          "tap",
+                          "press",
+                          "hover",
+                          "focus",
+                          "scroll",
+                          "check"
+                        ]
+                      },
+                      "selector": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "expect": {
+                        "type": "object",
+                        "properties": {
+                          "selector": {
+                            "type": "string"
+                          },
+                          "condition": {
+                            "type": "string",
+                            "enum": [
+                              "visible",
+                              "hidden",
+                              "attribute",
+                              "text",
+                              "focused",
+                              "changed"
+                            ]
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "selector",
+                          "condition",
+                          "name",
+                          "value"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "selector",
+                      "value",
+                      "expect"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 16,
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "input",
+                "steps"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "id",
+          "page",
+          "kind",
+          "description",
+          "minWidth",
+          "maxWidth",
+          "paths"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 16
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "files",
+    "interactions"
+  ],
+  "additionalProperties": false
+}

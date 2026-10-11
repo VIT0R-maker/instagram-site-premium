@@ -1,0 +1,2240 @@
+{
+  "id": "IGPremiumSingleClaudeV1",
+  "name": "Instagram → Site Premium v2 | fotos reais + criação única + revisão visual",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "aa77de8d-da64-4e4b-b36b-68424ec4580e",
+      "name": "Telegram — receber perfil",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "48738ba0-6097-4ea3-a531-1d44e9f5bc2a"
+    },
+    {
+      "parameters": {
+        "jsCode": "if ($input.all().length !== 1) throw new Error('Esperado um evento Telegram por execução.');\nconst event = $input.item.json;\n// Altere somente esta URL. n8n Cloud precisa de HTTPS acessível; localhost aponta para o próprio n8n.\nconst workerBaseUrl = 'http://host.docker.internal:8787';\nreturn [{ json: { event, workerBaseUrl } }];"
+      },
+      "id": "07100bda-0ba7-4b6d-aa70-6e7d5c8dc7bc",
+      "name": "Contexto — um evento por execução",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($('Contexto — um evento por execução').item.json.event) }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "34117fea-eee5-4cd1-9db6-4810bee5dd4e",
+      "name": "Worker — autorizar e recuperar job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "298fba5b-953b-4f77-93f6-ab01929d2f6b",
+              "leftValue": "={{ $json.accepted === true && typeof $json.jobId === 'string' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "114cae0e-ccbb-4071-a485-4ffb5fc93d3b",
+      "name": "Trabalho autorizado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b48cba3c-f87a-48f6-bd0c-75f4d2cd1068",
+              "leftValue": "={{ $json.notify === true && typeof $json.chatId === 'string' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d6fa1954-aa6b-4d88-a429-3e4b8bd75839",
+      "name": "Responder entrada inválida?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "c8ce2035-8bdf-4770-b1fc-32ff51f237f8",
+      "name": "Telegram — entrada inválida",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        340
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/preflight' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "2925241e-4b35-4765-b2be-ac6d677c2dc2",
+      "name": "Validar configuração e publicação",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        0
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'preflight', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
+      },
+      "id": "705532e5-232d-406c-91a6-eca28e170fd2",
+      "name": "Contexto preflight",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "467a030e-d8c3-4f49-be9d-be5afc823bf9",
+              "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4b11239a-7ad3-4a5f-91bb-5c79a3173357",
+      "name": "Falhou preflight?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bc2dd025-7b0c-4383-a453-7d168e903af7",
+              "leftValue": "={{ $json.state === 'done' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "488ff98a-95dd-4eac-b59e-e6d6250b076d",
+      "name": "Concluiu preflight?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1670,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "3faacfb1-7897-45f8-a4ea-d027e99c1f3f",
+      "name": "Aguardar preflight",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1670,
+        260
+      ],
+      "webhookId": "63d39a0d-0343-4e15-8fad-7adf3afc54df"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/preflight' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "61d725dd-ce47-44bc-86b5-b689ca4bf16e",
+      "name": "Consultar preflight",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        260
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "c6726f2b-975c-4095-a9dc-a2418760e84f",
+      "name": "Progresso preflight",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1020,
+        -240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/collect' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "dc6bff6f-1554-4ed3-8e3d-5c62f4692cf9",
+      "name": "Coletar e processar imagens",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2200,
+        0
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'collect', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
+      },
+      "id": "284c4128-43f7-4127-a7df-9cece8f18870",
+      "name": "Contexto collect",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f959a1f0-64b5-42f5-b26a-2347352d9a44",
+              "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "64ee164a-d537-4410-b52e-85a8cc02658b",
+      "name": "Falhou collect?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2640,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "423db51e-31a7-4a4f-85dd-b4824bce6ab9",
+              "leftValue": "={{ $json.state === 'done' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f6ab16f1-497b-4f99-b713-041e1467f910",
+      "name": "Concluiu collect?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2850,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "79f2b26b-fc9a-4b04-8c61-b4077b28d094",
+      "name": "Aguardar collect",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2850,
+        260
+      ],
+      "webhookId": "0804a99e-4a9f-409a-a2ae-e0bcc67a4eee"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/collect' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "cfbbed11-dd2d-4cc2-bff0-9a79294c485f",
+      "name": "Consultar collect",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        260
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "c4a936e1-38ac-439e-8940-20442a510c7b",
+      "name": "Progresso collect",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2200,
+        -240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/curate' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "c9306f42-7cc0-4d8c-84dd-f34facc7177f",
+      "name": "Gemini — curadoria visual",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3380,
+        0
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'curate', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
+      },
+      "id": "1331eec0-8a6b-47e4-b719-10ce645e309b",
+      "name": "Contexto curate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "61eb8848-e499-40e4-9939-9fe0d29ec805",
+              "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8ac2e319-1b03-4ef7-bace-05fd45d4ace6",
+      "name": "Falhou curate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3820,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dbcc3947-5756-4626-942d-5271129056e6",
+              "leftValue": "={{ $json.state === 'done' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c3fabdb0-6ab4-4da9-952f-a2540795a06e",
+      "name": "Concluiu curate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4030,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "ef6e1fb5-75e9-4ed3-8216-1f9303788144",
+      "name": "Aguardar curate",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4030,
+        260
+      ],
+      "webhookId": "cb85adb4-4156-4c4a-b9e3-a903bf76bb0d"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/curate' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "3fa7d34a-0b7d-46bf-acca-cb96b479158d",
+      "name": "Consultar curate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3820,
+        260
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "46d3f079-03e8-4a96-a00a-93ae53532d23",
+      "name": "Progresso curate",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3380,
+        -240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/brief' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "56813183-3b19-4e87-927b-283397d27caa",
+      "name": "Gemini — direção, copy e briefing",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4560,
+        0
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'brief', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
+      },
+      "id": "96f9f780-ec1d-48f8-8492-b593a4f29c26",
+      "name": "Contexto brief",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cf0d3caa-048b-459e-a257-25f33dc206bc",
+              "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "27f1a152-ef40-4f87-8fd7-82f4ec7d34da",
+      "name": "Falhou brief?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5000,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "12afa398-bdd5-45ce-8af5-5e90bb8d39df",
+              "leftValue": "={{ $json.state === 'done' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "72177039-c133-44f4-b489-6c150f387ac1",
+      "name": "Concluiu brief?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5210,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "bb19320d-51a5-46c7-a9b3-9c5bcb35191d",
+      "name": "Aguardar brief",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5210,
+        260
+      ],
+      "webhookId": "8edb06ea-ad00-441f-9043-87ef640432bd"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/brief' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "90d3d484-0be4-48c1-8415-9586c685ef4f",
+      "name": "Consultar brief",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5000,
+        260
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "b314b20a-4072-4034-867f-0a64307d69c7",
+      "name": "Progresso brief",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4560,
+        -240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/generate' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "bf826687-2c58-4b98-abc7-b99ee2e93ff8",
+      "name": "Claude — geração única protegida",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5740,
+        0
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'generate', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
+      },
+      "id": "fc5dfa8b-7058-4a27-8761-fc6c43e0b55a",
+      "name": "Contexto generate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "485b5e5e-b1f4-473f-b1e2-2b6d1aa8ac29",
+              "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "940f0f09-9213-4247-9856-c5593e78e743",
+      "name": "Falhou generate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        6180,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3dc35c29-d2db-45f8-bc63-2a5cd8d0ec4a",
+              "leftValue": "={{ $json.state === 'done' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "aff84b7d-5ce2-46e2-9adf-a1ad8bbcfd8f",
+      "name": "Concluiu generate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        6390,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "e91bc40f-3761-4810-93fd-48166b2c77a9",
+      "name": "Aguardar generate",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        6390,
+        260
+      ],
+      "webhookId": "0b00be2d-834e-4e3f-bdfc-b8471c34b69a"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/generate' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "22b97c28-ffbd-4386-9d2e-3346e98fb448",
+      "name": "Consultar generate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6180,
+        260
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "6bcb14a3-8cac-4490-801b-0f09e219e1bd",
+      "name": "Progresso generate",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        5740,
+        -240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/audit' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "b1a52cfa-a9b6-4c95-8471-5c8a752be5ce",
+      "name": "Gemini — auditoria renderizada",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6920,
+        0
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'audit', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
+      },
+      "id": "e303e37a-b3dc-468e-aee6-ed4b874e770c",
+      "name": "Contexto audit",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7140,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "905f9101-1650-45ff-a1bd-64aa158845fe",
+              "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "11bf0e89-13ce-4d53-862e-621f0344c11e",
+      "name": "Falhou audit?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        7360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a91e55f9-87f3-4c28-aaf5-8893e280622e",
+              "leftValue": "={{ $json.state === 'done' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4801db5e-6d87-443b-a4fb-043176d9899d",
+      "name": "Concluiu audit?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        7570,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "bcc2f7a8-628b-4fb1-ac61-a04fb86b8a17",
+      "name": "Aguardar audit",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        7570,
+        260
+      ],
+      "webhookId": "9f0bd209-8d36-435c-8280-7c80048d732f"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/audit' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "ec43762a-86bc-4824-bdfc-1051c7f59138",
+      "name": "Consultar audit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7360,
+        260
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "7a25aca0-c2df-4589-8b6c-9d93ab76f440",
+      "name": "Progresso audit",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        6920,
+        -240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/publish' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "88fca33e-cd1b-442e-9658-be3c60202653",
+      "name": "GitHub — commit e Pages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8100,
+        0
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'publish', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
+      },
+      "id": "4f49858f-ec32-4eed-967b-a75b65c0268d",
+      "name": "Contexto publish",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8320,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f4f0a9d5-866d-42c5-869a-995ccb9f3e63",
+              "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cac6b0cd-025a-4f1c-81b5-3c5b5da467c9",
+      "name": "Falhou publish?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        8540,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "95bd6f19-7373-445e-9c8e-8be701aad138",
+              "leftValue": "={{ $json.state === 'done' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f9e293bc-9730-4fca-82f2-1a97ae8682af",
+      "name": "Concluiu publish?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        8750,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "e21bf61b-a1cc-4255-adde-7687df08024c",
+      "name": "Aguardar publish",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        8750,
+        260
+      ],
+      "webhookId": "c90160d8-c394-4828-b92b-8586f68df536"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/publish' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "fcaacea6-6890-4905-8bbf-f83c1363c18b",
+      "name": "Consultar publish",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8540,
+        260
+      ],
+      "retryOnFail": false,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_WORKER_HEADER_AUTH",
+          "name": "Premium Worker — Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "3b2deb33-2890-4a61-9738-4018e8d5ea86",
+      "name": "Progresso publish",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        8100,
+        -240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ 'Não foi possível concluir. Etapa: ' + $json.stage + '\\n' + $json.message + '\\nJob: ' + $json.jobId + '\\nRecuperação: /retomar ' + $json.jobId }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "8a3f6cbe-8653-4c2f-b5db-1013a7a94e75",
+      "name": "Telegram — diagnóstico",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4400,
+        600
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "5ee3e5eb-cd2e-48fc-8e6d-a92901cc9921",
+      "name": "Telegram — resultado verificado",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        9500,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YRNI2jg5IlS3D55N",
+          "name": "Telegram account"
+        }
+      },
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "content": "## Versão 2 — qualidade visual\nFotografias reais do Apify. Gemini cura os pixels e aprova o briefing. Claude recebe fotos + manifesto e cria uma única vez; trava SQLite persiste entre retomadas. HTML/CSS/JS/SVG autorais, fontes locais e biblioteca opcional preparada. Auditoria normal + reduced motion em 320/390/768/1440, cenários de teclado/mouse/toque e patches delimitados. SEO finalizado antes do hash.\n\nInstale o worker 2.0 e o renderer conforme README. Configure URL do worker no nó Contexto, credencial Authorization: Bearer TOKEN e Telegram. JSON não é autossuficiente. Não deixe o fluxo antigo ativo com o mesmo bot. /retomar JOB recupera o trabalho sem repetir Claude. Ver VALIDACAO.md para testes e limitações desta entrega.",
+        "height": 420,
+        "width": 900
+      },
+      "id": "0a29bfa2-44ad-419f-9976-c9b3c3a46bd2",
+      "name": "Leia antes de ativar",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -400
+      ]
+    }
+  ],
+  "connections": {
+    "Telegram — receber perfil": {
+      "main": [
+        [
+          {
+            "node": "Contexto — um evento por execução",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto — um evento por execução": {
+      "main": [
+        [
+          {
+            "node": "Worker — autorizar e recuperar job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Worker — autorizar e recuperar job": {
+      "main": [
+        [
+          {
+            "node": "Trabalho autorizado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trabalho autorizado?": {
+      "main": [
+        [
+          {
+            "node": "Validar configuração e publicação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder entrada inválida?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responder entrada inválida?": {
+      "main": [
+        [
+          {
+            "node": "Telegram — entrada inválida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar configuração e publicação": {
+      "main": [
+        [
+          {
+            "node": "Contexto preflight",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Progresso preflight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto preflight": {
+      "main": [
+        [
+          {
+            "node": "Falhou preflight?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falhou preflight?": {
+      "main": [
+        [
+          {
+            "node": "Telegram — diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Concluiu preflight?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concluiu preflight?": {
+      "main": [
+        [
+          {
+            "node": "Coletar e processar imagens",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aguardar preflight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar preflight": {
+      "main": [
+        [
+          {
+            "node": "Consultar preflight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar preflight": {
+      "main": [
+        [
+          {
+            "node": "Contexto preflight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coletar e processar imagens": {
+      "main": [
+        [
+          {
+            "node": "Contexto collect",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Progresso collect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto collect": {
+      "main": [
+        [
+          {
+            "node": "Falhou collect?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falhou collect?": {
+      "main": [
+        [
+          {
+            "node": "Telegram — diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Concluiu collect?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concluiu collect?": {
+      "main": [
+        [
+          {
+            "node": "Gemini — curadoria visual",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aguardar collect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar collect": {
+      "main": [
+        [
+          {
+            "node": "Consultar collect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar collect": {
+      "main": [
+        [
+          {
+            "node": "Contexto collect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini — curadoria visual": {
+      "main": [
+        [
+          {
+            "node": "Contexto curate",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Progresso curate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto curate": {
+      "main": [
+        [
+          {
+            "node": "Falhou curate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falhou curate?": {
+      "main": [
+        [
+          {
+            "node": "Telegram — diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Concluiu curate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concluiu curate?": {
+      "main": [
+        [
+          {
+            "node": "Gemini — direção, copy e briefing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aguardar curate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar curate": {
+      "main": [
+        [
+          {
+            "node": "Consultar curate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar curate": {
+      "main": [
+        [
+          {
+            "node": "Contexto curate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini — direção, copy e briefing": {
+      "main": [
+        [
+          {
+            "node": "Contexto brief",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Progresso brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto brief": {
+      "main": [
+        [
+          {
+            "node": "Falhou brief?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falhou brief?": {
+      "main": [
+        [
+          {
+            "node": "Telegram — diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Concluiu brief?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concluiu brief?": {
+      "main": [
+        [
+          {
+            "node": "Claude — geração única protegida",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aguardar brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar brief": {
+      "main": [
+        [
+          {
+            "node": "Consultar brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar brief": {
+      "main": [
+        [
+          {
+            "node": "Contexto brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude — geração única protegida": {
+      "main": [
+        [
+          {
+            "node": "Contexto generate",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Progresso generate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto generate": {
+      "main": [
+        [
+          {
+            "node": "Falhou generate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falhou generate?": {
+      "main": [
+        [
+          {
+            "node": "Telegram — diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Concluiu generate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concluiu generate?": {
+      "main": [
+        [
+          {
+            "node": "Gemini — auditoria renderizada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aguardar generate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar generate": {
+      "main": [
+        [
+          {
+            "node": "Consultar generate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar generate": {
+      "main": [
+        [
+          {
+            "node": "Contexto generate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini — auditoria renderizada": {
+      "main": [
+        [
+          {
+            "node": "Contexto audit",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Progresso audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto audit": {
+      "main": [
+        [
+          {
+            "node": "Falhou audit?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falhou audit?": {
+      "main": [
+        [
+          {
+            "node": "Telegram — diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Concluiu audit?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concluiu audit?": {
+      "main": [
+        [
+          {
+            "node": "GitHub — commit e Pages",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aguardar audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar audit": {
+      "main": [
+        [
+          {
+            "node": "Consultar audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar audit": {
+      "main": [
+        [
+          {
+            "node": "Contexto audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub — commit e Pages": {
+      "main": [
+        [
+          {
+            "node": "Contexto publish",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Progresso publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto publish": {
+      "main": [
+        [
+          {
+            "node": "Falhou publish?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falhou publish?": {
+      "main": [
+        [
+          {
+            "node": "Telegram — diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Concluiu publish?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concluiu publish?": {
+      "main": [
+        [
+          {
+            "node": "Telegram — resultado verificado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aguardar publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar publish": {
+      "main": [
+        [
+          {
+            "node": "Consultar publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar publish": {
+      "main": [
+        [
+          {
+            "node": "Contexto publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "executionTimeout": 4200,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "saveExecutionProgress": true,
+    "timezone": "America/Sao_Paulo"
+  },
+  "pinData": {},
+  "versionId": "682c9e29-3480-4f3a-ab98-8555ad9126a1",
+  "tags": []
+}

@@ -1,0 +1,168 @@
+{
+  "type": "object",
+  "properties": {
+    "directions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "concept": {
+            "type": "string"
+          },
+          "desktopHero": {
+            "type": "string"
+          },
+          "mobileHero": {
+            "type": "string"
+          },
+          "textImageRelation": {
+            "type": "string"
+          },
+          "grid": {
+            "type": "string"
+          },
+          "typography": {
+            "type": "string"
+          },
+          "spacing": {
+            "type": "string"
+          },
+          "imageTreatment": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          },
+          "header": {
+            "type": "string"
+          },
+          "motion": {
+            "type": "string"
+          },
+          "antiPatterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          },
+          "fonts": {
+            "type": "object",
+            "properties": {
+              "heading": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "heading",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "library": {
+            "type": "string",
+            "enum": [
+              "native",
+              "animejs"
+            ]
+          },
+          "libraryReason": {
+            "type": "string"
+          },
+          "scores": {
+            "type": "object",
+            "properties": {
+              "brand": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "hero": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "mobile": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "clarity": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "feasibility": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "distinctiveness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "brand",
+              "hero",
+              "mobile",
+              "clarity",
+              "feasibility",
+              "distinctiveness"
+            ],
+            "additionalProperties": false
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "concept",
+          "desktopHero",
+          "mobileHero",
+          "textImageRelation",
+          "grid",
+          "typography",
+          "spacing",
+          "imageTreatment",
+          "details",
+          "header",
+          "motion",
+          "antiPatterns",
+          "fonts",
+          "library",
+          "libraryReason",
+          "scores",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 3,
+      "minItems": 3
+    },
+    "chosenId": {
+      "type": "string"
+    },
+    "acceptable": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "directions",
+    "chosenId",
+    "acceptable",
+    "reason"
+  ],
+  "additionalProperties": false
+}

@@ -52,7 +52,7 @@
     1440
   ],
   "auditImageMaxEdge": 1600,
-  "maxDetailShots": 4,
+  "maxDetailShots": 12,
   "maxTemporalShots": 2,
   "maxPatchFraction": 0.25,
   "maxCumulativePatchFraction": 0.45

@@ -1,0 +1,190 @@
+{
+  "type": "object",
+  "properties": {
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "rubric": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "composition": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "spacing": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "typography": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "images": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "responsiveness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "identity",
+        "composition",
+        "spacing",
+        "typography",
+        "images",
+        "responsiveness"
+      ],
+      "additionalProperties": false
+    },
+    "semanticReview": {
+      "type": "object",
+      "properties": {
+        "approved": {
+          "type": "boolean"
+        },
+        "unsupportedClaims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "equivalentCopy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "approved",
+        "unsupportedClaims",
+        "equivalentCopy"
+      ],
+      "additionalProperties": false
+    },
+    "observedImprovements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "viewport": {
+            "type": "string"
+          },
+          "component": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "fix": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "viewport",
+          "component",
+          "evidence",
+          "description",
+          "fix"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 100
+    },
+    "patches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "pattern": "^(?!assets/|lib/)(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_-]+\\.(html|css|js|svg)$",
+            "maxLength": 160
+          },
+          "expectedHash": {
+            "type": "string"
+          },
+          "find": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 3000
+          },
+          "replace": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "expectedHash",
+          "find",
+          "replace",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 12
+    }
+  },
+  "required": [
+    "score",
+    "rubric",
+    "semanticReview",
+    "observedImprovements",
+    "issues",
+    "patches"
+  ],
+  "additionalProperties": false
+}

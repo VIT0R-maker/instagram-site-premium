@@ -1,75 +1,21 @@
-# Instagram → site premium → GitHub Pages
+# Instagram → Site Premium — versão 2
 
-Esta entrega contém o workflow `../workflow_instagram_site_premium.json` e o worker que ele chama. O JSON depende deste worker: importar o workflow sozinho não instala Sharp, Chromium, o armazenamento persistente nem os validadores.
+Workflow n8n e worker revisados para priorizar a qualidade do site: fotografias reais selecionadas pelos pixels, direção de arte, uma criação multimodal Claude, inspeção no navegador e correções locais antes da publicação. O JSON depende deste worker e do renderer; importá-lo sozinho não instala a solução.
 
-O caminho implementado é: Telegram → autorização/idempotência → preflight → Apify → processamento e curadoria Gemini → três direções/copy/briefing → uma geração Claude → renderização e revisão Gemini → commit coerente → Pages verificado → Telegram. Não há subworkflows a importar.
+**Não houve execução com suas contas nem geração paga nesta revisão.** O alcance dos testes e o bloqueio atual do Docker estão em [VALIDACAO.md](VALIDACAO.md). A justificativa dos componentes está em [ARQUITETURA.md](ARQUITETURA.md). A matriz de atendimento está em [REQUISITOS.md](REQUISITOS.md).
 
-## O que foi validado nesta entrega
+## Fluxo
 
-- Importação real em contêiner descartável **n8n 2.41.6**.
-- Execução real desse n8n com **Telegram e HTTP simulados**: sete etapas, polling e pareamento de itens. Não é uma execução contra suas contas.
-- **26 testes** de contratos, segurança, retomada, imagens, publicações simuladas e concorrência.
-- Chromium isolado: 360×844, 390×844, 768×900 e 1440×900; oito screenshots reais de uma fixture, menu/teclado/âncoras/CTA/overflow e axe; teste adicional sem JavaScript.
-- Construção das imagens Docker de worker e renderer; dependências npm fixadas em lockfile, sem vulnerabilidades reportadas pelo `npm audit` na instalação testada.
+Telegram → autorização/idempotência → preflight → Apify → Sharp → Gemini (fatos, lotes visuais, seleção global, direções, briefing) → **uma criação Claude com as fotos selecionadas** → finalização SEO → navegador + Gemini → patches delimitados e nova inspeção → hash aprovado → GitHub + Pages verificado → Telegram.
 
-Nenhuma chamada real de geração Claude/Gemini, coleta Apify, envio Telegram ou criação de repositório na sua conta foi realizada nesta sessão. A disponibilidade dos modelos e permissões é confirmada pelo preflight **com suas credenciais**, antes da geração. Veja `VALIDACAO.md` para o alcance exato dos testes.
+As fotografias de produção vêm exclusivamente do acervo Apify aprovado. Não existe geração de fotografias, fundos raster ou logo por IA. SVG, máscaras, gradientes e decoração em código são permitidos. Não há fallback para fotos rejeitadas. Um acervo insuficiente pode resultar em composição tipográfica ou interrupção fundamentada.
 
-## 1. Requisitos de implantação
+## Instalação
 
-- Docker Engine/Desktop com contêineres Linux; reserve aproximadamente 4 GB de RAM para worker e renderer, além do n8n.
-- Acesso HTTPS de saída para `api.github.com`, `api.apify.com`, `generativelanguage.googleapis.com`, `api.anthropic.com`, CDNs públicas do Instagram e o domínio Pages retornado.
-- Volume Docker **local e persistente**. Não use OneDrive, NFS ou uma pasta sincronizada para `jobs.sqlite`.
-- Uma instância de worker por volume. O processo usa bloqueio de inicialização e o ledger SQLite usa WAL + `synchronous=FULL`. Não escale réplicas independentes, não clone o volume para servidores simultâneos e não restaure um backup anterior a chamadas já feitas.
-- Para n8n Cloud, publique o worker por HTTPS com proxy reverso e a credencial Bearer. `host.docker.internal` é apenas uma configuração inicial para Docker Desktop. O proxy **não deve repetir POSTs upstream**. A API do worker não deve ficar exposta sem autenticação/TLS.
-
-O worker confiável recebe o socket Docker para iniciar os renderers. Esse socket confere controle do daemon: dedique o host ao serviço ou isole-o em uma VM. **O navegador que executa a página não recebe socket, segredos, diretórios do host ou rede**. Seu contêiner tem filesystem somente leitura, tmpfs limitado, usuário sem privilégios, capabilities removidas e limites de memória, CPU, PIDs e duração.
-
-## 2. Configurar o worker
-
-No diretório desta pasta:
-
-```powershell
-node scripts/init-env.mjs
-```
-
-O comando cria `.env` com dois segredos aleatórios, sem imprimi-los. Abra o arquivo no editor e preencha:
-
-| Variável | Configuração |
-|---|---|
-| `WORKER_TOKEN` | Já gerado; use o mesmo valor na credencial Header Auth do n8n. |
-| `JOB_HMAC_KEY` | Já gerado; mantenha estável com o banco. Sua troca altera a identidade dos eventos. |
-| `ALLOWED_CHAT_IDS` | IDs exatos dos chats Telegram autorizados, separados por vírgula. Vazio não autoriza ninguém. |
-| `TELEGRAM_BOT_ID` | ID numérico do bot usado no trigger; confirme na resposta autenticada `getMe`. Não é o token. |
-| `GEMINI_API_KEY` | Chave da conta Gemini com os modelos configurados disponíveis. |
-| `ANTHROPIC_API_KEY` | Chave Anthropic com acesso ao modelo configurado. |
-| `APIFY_TOKEN` | Token com acesso ao Actor `apify/instagram-scraper` e crédito suficiente. |
-| `GITHUB_TOKEN` | PAT **clássico** da sua conta pessoal com `public_repo` (ou `repo`). |
-| `GITHUB_PROBE_REPO` | Repositório público descartável de prova, explicado abaixo. |
-| `NVIDIA_API_KEY` | Opcional; pode ficar vazio com Nemotron desligado. |
-
-As referências Telegram do arquivo original foram preservadas no JSON. As chaves Gemini/Anthropic/Apify/GitHub passam a ser segredos do worker; um export de workflow contém referências de credenciais, não os valores descriptografados que permitiriam migrá-las automaticamente.
-
-### Prova de permissão GitHub antes do Claude
-
-Nesta edição, o modo suportado é conta pessoal + PAT clássico. Tokens fine-grained, GitHub Apps e repositórios de organizações não são tratados como equivalentes: o preflight os bloqueia em vez de supor que têm permissão para criar novos repositórios e Pages.
-
-Crie uma vez um repositório **descartável**, público, inicializado com README e descrição exata:
-
-```text
-instagram-site-premium permission probe
-```
-
-Exemplo com GitHub CLI já autenticado:
-
-```powershell
-gh repo create site-permission-probe --public --add-readme --description "instagram-site-premium permission probe"
-```
-
-Defina `GITHUB_PROBE_REPO=site-permission-probe`. Cada preflight confere `/user`, escopos, proprietário e permissões; escreve `permission-check.txt` e cria/atualiza a configuração Pages nesse repositório. Isso comprova escrita de conteúdo e administração de Pages sem criar o repositório definitivo antes da aprovação. **Não indique um repositório importante**. O marcador de descrição é exigido para evitar a escrita acidental.
-
-Não existe dry-run universal para criação de repositório. Escopos e a prova anterior reduzem o risco; suspensão da conta, limite de repositórios ou mudanças posteriores de permissão ainda podem causar publicação parcial.
-
-### Subir os serviços
+1. Use Docker Engine/Desktop com contêineres Linux e cerca de 4 GB disponíveis, além dos recursos do n8n. O ambiente de referência do workflow é n8n 2.41.6, com somente nós nativos.
+2. Nesta pasta, execute `node scripts/init-env.mjs`. O comando cria `.env` e segredos locais sem imprimi-los. Abra o arquivo e configure as integrações abaixo.
+3. Prepare o repositório descartável de prova de permissões GitHub.
+4. Construa e inicie os serviços:
 
 ```powershell
 docker compose --profile build build renderer-image worker
@@ -77,134 +23,98 @@ docker compose up -d worker
 docker compose logs --tail 30 worker
 ```
 
-A porta padrão é 8787, vinculada ao localhost do host. O n8n em Docker Desktop pode usar `http://host.docker.internal:8787`. Para n8n em outro servidor ou Cloud, configure uma URL HTTPS realmente acessível. Não publique diretamente o Docker socket.
+5. Importe [workflow_instagram_site_premium.json](workflow_instagram_site_premium.json). No nó **Contexto — um evento por execução**, ajuste `workerBaseUrl`. O padrão `http://host.docker.internal:8787` atende Docker Desktop; outro host/n8n Cloud precisa de HTTPS acessível.
+6. Crie **Header Auth**, Name `Authorization`, Value `Bearer <WORKER_TOKEN>`, e selecione-a nos nós HTTP. Confira a credencial Telegram no trigger e nos nós de mensagens. Desative o fluxo antigo que usa o mesmo bot antes de ativar este.
+7. Envie somente o link HTTPS de um perfil público. Use `/retomar JOB` para recuperar um trabalho existente.
 
-`GET /healthz` confirma que o processo está disponível; não testa contas/modelos. O preflight de cada job testa essas integrações. `restart: "no"` é intencional: uma queda exige examinar o ledger, remover um lock de processo obsoleto somente após confirmar que não existe outro worker, e então reiniciar.
-
-## 3. Importar e configurar o n8n
-
-1. Importe `workflow_instagram_site_premium.json` pelo editor. Na importação CLI, o ID estável é `IGPremiumSingleClaudeV1`; reimportar pelo CLI atualiza esse workflow.
-2. No nó **Contexto — um evento por execução**, ajuste `workerBaseUrl`.
-3. Crie uma credencial **Header Auth**: Name=`Authorization`, Value=`Bearer <WORKER_TOKEN>`. Selecione-a nos nós HTTP do worker; a referência inicial é `Premium Worker — Authorization`.
-4. Confira a credencial Telegram do trigger e dos nós de mensagem. A referência original pode ser resolvida na mesma instância; em outra instância, selecione a credencial existente.
-5. Desative o workflow antigo antes de ativar este se ambos usam o mesmo bot/webhook.
-6. Envie **somente** um link HTTPS de perfil público. Parâmetros de compartilhamento são removidos. Links de posts/reels, domínio parecido, credenciais na URL e perfil privado não são aceitos.
-
-O trigger recebe um único evento por execução, condição checada em código. O contexto de trabalho vem do worker; ramos Telegram de progresso são terminais e não substituem o payload. Cada etapa tem seu próprio loop **somente de consulta de status**. Nenhum caminho retorna ao nó de geração.
-
-## 4. Configuração e limites
-
-Edite `config.json` e reconstrua/reinicie o worker. Não altere a configuração de um trabalho no meio da execução.
-
-| Parâmetro | Padrão e efeito |
+| Variável em `.env` | Uso |
 |---|---|
-| `postsLimit` / `expandedPostsLimit` | 40 / 80 posts. Perfil é uma consulta `details`; posts vêm de `posts`. |
-| `maxCandidateImages` / `expandedCandidateImages` | 60 / 100 mídias, uma expansão se o primeiro acervo útil for insuficiente. |
-| `analysisBatchSize` | Até 10 imagens; o lote também é reduzido pelo tamanho base64 serializado. Não é limite universal do Gemini. |
-| `maxFinalists` / `maxSiteImages` | 20 finalistas revistos globalmente / 10 imagens exibidas. |
-| `geminiPayloadBytes` | 16 MB por requisição, abaixo do teto documentado de inline data. Payload excessivo bloqueia; não é enviado parcialmente. |
-| `geminiMaxCalls` / `apiAttempts` | 90 reservas de tentativa / até 3 tentativas para Gemini. Reserva conservadora contabiliza o pior caso mesmo quando a primeira tentativa funciona. |
-| `maxBriefReviewRounds` / `maxAuditRounds` | Até 2 correções após a revisão inicial em cada fase. |
-| `maxJobDuration` | 3600 s por janela de execução; `/retomar` abre outra janela preservando reservas/checkpoints. |
-| `maxActiveJobs` / `downloadConcurrency` | 2 jobs / 4 downloads por job. Saturação exige retomada; não existe fila ilimitada oculta. |
-| `claudeMaxOutputTokens` | 24000, validado contra Models API antes da geração. |
-| `claudeInputBytes` | 120000 bytes para a requisição; briefing recebe margem para o system prompt. |
-| `claudeTimeoutMs` | 300000 ms; timeout é ambíguo e **não** provoca retry. |
-| `qualityThreshold` | Média mínima 85 da rubrica, mais testes determinísticos aprovados e nenhum issue high/critical. |
-| `pagesPollingDeadline` | 600 s; depois disso há sucesso parcial do repositório, sem declarar site no ar. |
-| `retentionDays` | 14 dias para arquivos privados/modelos; o tombstone de identidade e a reserva Claude não expiram. |
+| `WORKER_TOKEN` | Autenticação n8n → worker; gerado pelo script. |
+| `JOB_HMAC_KEY` | Identidade estável de eventos; conserve junto do banco. |
+| `ALLOWED_CHAT_IDS` | Chats autorizados, separados por vírgula. |
+| `TELEGRAM_BOT_ID` | ID numérico do bot, não seu token. |
+| `GEMINI_API_KEY` | Curadoria, briefing e auditoria. |
+| `ANTHROPIC_API_KEY` | Models API, contagem de tokens e única criação. |
+| `APIFY_TOKEN` | Actor `apify/instagram-scraper`. |
+| `GITHUB_TOKEN` | PAT clássico pessoal com `public_repo` ou `repo`. |
+| `GITHUB_PROBE_REPO` | Nome do repositório público descartável de prova. |
+| `NVIDIA_API_KEY` | Somente se Nemotron for habilitado. |
 
-Os modelos iniciais preservam os IDs do arquivo recebido: `gemini-3.8-flash`, `claude-sonnet-5-5` e, opcionalmente, `nvidia/nemotron-3-super-120b-a12b`. As APIs de modelos são consultadas em runtime; modelos ausentes, método incompatível ou limites não confirmados bloqueiam antes do Claude. Nenhuma troca silenciosa é feita.
+O repositório de prova deve pertencer ao usuário do PAT, ter branch inicial e descrição exata `instagram-site-premium permission probe`. Cada preflight escreve `permission-check.txt` e configura Pages nele para confirmar permissões antes do Claude. Não use um repositório importante. Conta de organização, GitHub App e PAT fine-grained não estão implementados nesta edição. A prova reduz falhas previsíveis; não garante que permissões/serviços continuarão disponíveis até publicar.
 
-Nemotron inicia desligado. Quando habilitado, a lista do provedor precisa conter o ID configurado; no máximo uma chamada textual curta é feita, e Gemini pode rejeitar todo o rascunho. Não foi confirmada disponibilidade contratada da referência Ultra 550B; ela não substituiu o modelo existente.
+O JSON preserva referências de credenciais Telegram do arquivo original. Referências não contêm os segredos descriptografados; confirme a associação na sua instância. O ID CLI `IGPremiumSingleClaudeV1` foi conservado para reimportação, embora o conteúdo seja v2. Não há subworkflows adicionais.
 
-Geração complementar por IA **não está implementada nem é necessária para o caminho padrão**. `enableAiDecorativeImages=false` e `geminiImageModel=null`. Se a flag for habilitada, o briefing registra a indisponibilidade e continua com fotos reais e decoração CSS. Não existe endpoint fictício. A predominância de imagens reais é 100% nesta edição.
+## Configuração de qualidade
 
-## 5. Contratos, fatos e imagem
-
-Os schemas versionados estão em `src/contracts.mjs`; Ajv faz validação local completa. O schema enviado ao Gemini é adaptado ao subconjunto da API. As etapas não transportam base64 no n8n: HTTP retorna apenas IDs/estado/contexto curto; bytes ficam no volume privado.
-
-- Perfil, bio/categoria e legendas são fontes distintas. Uma afirmação contém ID, tipo, original, normalizado, fonte, trecho contíguo exato, data e estado. Contatos conflitantes são omitidos. Nenhum número é formado juntando evidências.
-- `normalized` permite apenas capitalização/normalização Unicode, sem reinterpretar o fato. Há uma revisão semântica Gemini adicional: correspondência textual não prova por si só uma alegação comercial.
-- WhatsApp exige link `wa.me`/`api.whatsapp.com` válido, ou indicação explícita com número internacional completo. País/DDD não são adivinhados. Sem comprovação, o CTA permanece **Conversar pelo Instagram**. Sites externos arbitrários não são seguidos.
-- IDs de assets são derivados da identidade da mídia, nunca da posição após downloads. Carrosséis não têm corte em três filhos. A amostra alterna períodos recentes/antigos dentro dos posts consultados.
-- Sharp decodifica, identifica MIME/dimensões e limita pixels. Não há descarte por “menos de 4 KB”. Hash exato elimina cópias; dHash agrupa possíveis semelhantes **sem eliminar automaticamente ângulos distintos**.
-- Originais privados, JPEGs de análise e variantes AVIF/WebP/JPEG ou PNG são separados. Não há upscale; hero vai até 2400 px de largura, outras fotos até 1600, respeitando a fonte. Esta edição não impõe 4K.
-- Todas as imagens aceitas para análise são vistas em lotes. Finalistas são vistas novamente juntas, com IDs, restrições de corte, foco, alt e identidade. Uma imagem rejeitada nunca é promovida a hero. Sem hero adequado, é usado briefing tipográfico.
-- Fontes locais DM Sans, Lora e Space Grotesk possuem versões fixadas, suporte latino/latino estendido, `font-display: swap` e OFL incluída no pacote público.
-
-## 6. Política do código e qualidade
-
-Claude gera `index.html` e `styles.css` em envelope JSON completo. A implementação pode compor livremente grid, tipografia, cores, detalhes CSS e hierarquia dentro do briefing. Um `runtime.js` confiável, entregue aqui e validado por hash, implementa menu não modal com Escape/`aria-expanded`/retorno de foco.
-
-Esta escolha limita interações a menu, âncoras e links reais. Não há lightbox, formulário, agendamento fictício, JavaScript arbitrário gerado, CDN Tailwind, embeds ou frameworks com build. Imagens usam `<img>/<picture>` e fontes são os únicos recursos carregáveis por CSS. SVG arbitrário e escapes CSS estão fora do contrato; decoração pode usar gradientes e formas CSS.
-
-parse5 e CSSTree validam estrutura/referências e políticas; regex não é usada como “sanitizador universal”. Não há tentativa de fechar HTML truncado. Copy visível, metadata, CTAs, assets e runtime são conferidos. Segredos/IDs privados são bloqueados no pacote público. DNS é resolvido e fixado por requisição; IPs privados/reservados e redirects para hosts não permitidos são rejeitados.
-
-O renderer usa subcaminho `/nome-do-repo/`, rede Docker `none`, CSP restrita e bloqueio de requisições externas no navegador. Screenshots e testes são obrigatórios. Gemini recebe pixels reais e deve descrever gravidade, componente, viewport e evidência; notas são indicadores subjetivos, não certificados. Não foi implementado Lighthouse; os testes executados são axe e verificações Playwright descritas no relatório, sem alegação de Core Web Vitals reais.
-
-Patches precisam de arquivo, hash da versão auditada e trecho exato único. Há limites de tamanho por patch e por arquivo. Depois de cada patch, parsing/renderização/screenshots/revisão são repetidos. Se a nota piora, a versão anterior é restaurada e a publicação é bloqueada. Resultado incompleto não é reconstruído por Gemini.
-
-## 7. Como a chamada única do Claude é protegida
-
-1. `jobId` é HMAC(bot ID, chat ID, message ID). Reentrega do mesmo evento mantém o job; nova mensagem intencional cria outro.
-2. O único nó de geração chama `/stages/generate`. O único POST Anthropic de geração fica em `Providers.claude()`.
-3. `INSERT OR IGNORE` em `claude(job PRIMARY KEY, calls CHECK(calls=1))` reserva o direito antes de qualquer envio; o banco confirma a operação durável.
-4. O estado passa de `reserved` para `sent` antes do POST. HTTPS nativo não faz retry nem segue redirecionamento. Não há SDK ou proxy Anthropic configurado.
-5. Resposta bruta, status e request ID são salvos transacionalmente antes de parsing/validação.
-6. Se a resposta já existe, ela é reutilizada. Sem resposta persistida, uma reserva existente é **ambígua e irrevogável**; não há nova geração.
-
-Isso é **no máximo uma requisição de geração**, não “exatamente uma”. Uma queda entre reserva e envio pode consumir a oportunidade sem entregar site. O teste cobre 40 concorrentes e oito processos reais usando um provedor simulado. A garantia depende de preservar o volume/ledger e a chave HMAC; apagá-los ou restaurar uma versão antiga invalida a garantia.
-
-Consultas **GET** ao catálogo de modelos Anthropic no preflight não são chamadas de geração nem usam Claude para preparar/auditar conteúdo.
-
-## 8. Recuperação e publicação
-
-Envie `/retomar JOB_ID` ao mesmo bot, no chat autorizado. Jobs concluídos atravessam as etapas usando checkpoints. Falhas de auditoria/publicação recomeçam na etapa pendente; o endpoint de geração devolve sua conclusão existente. A recuperação de uma resposta persistida nunca chama Claude novamente.
-
-Se o estado Claude for `reserved`/`sent` sem resposta, o bot explica o bloqueio. Nem a retomada nem apagar uma execução n8n liberam uma segunda geração. Se desejar uma nova tentativa intencional paga, envie o perfil em **nova mensagem**, ciente de que é um novo job.
-
-O repositório final recebe username + sufixo estável. Um marcador aleatório de propriedade permite reconciliar criação com resposta perdida e recusa colisões. A inicialização GitHub produz um commit inicial; **todos os arquivos do site aprovado entram em um único commit subsequente** via blobs/tree/commit/ref. Não há publicação por PUT individual de cada arquivo. Nenhum force push é usado.
-
-Pages é habilitado somente depois desse commit. O fluxo confere commit do build, status e SHA-256 dos arquivos públicos essenciais. Um HTTP 200 com conteúdo antigo não basta. O teste público é de download/integridade; o navegador renderiza o mesmo pacote validado sob subcaminho isolado, sem acesso direto à internet. Domínio personalizado não é suportado nesta versão.
-
-Se Pages falhar, o bot entrega a URL do repositório e o diagnóstico, sem afirmar que o site está disponível. A URL de site só aparece como publicada depois da verificação. Interrupção do Telegram no último envio pode ser resolvida com `/retomar`: o resultado já publicado é reapresentado.
-
-Após queda do worker, confirme que não há outra instância, pare o serviço e remova **somente** `/data/worker.lock` no volume antes de reiniciar. Nunca remova `jobs.sqlite`, `jobs.sqlite-wal` ou os registros Claude para “destravar”. Logs públicos contêm apenas erros sanitizados; `lastFailure` no SQLite armazena diagnóstico privado com valores do ambiente redigidos.
-
-Backups consistentes devem incluir banco/WAL e arquivos do job. Restauração exige conciliar reservas mais recentes; não há protocolo distribuído para restaurar backups antigos sem risco. Retenção remove artefatos após 14 dias, mas mantém tombstones. Um job expirado não será regenerado pela retomada.
-
-## 9. Contrato HTTP
-
-Todas as rotas `/v1/*` exigem `Authorization: Bearer <WORKER_TOKEN>`; limite de corpo 24 KB. O cliente não informa chaves/modelos/destinos de download arbitrários.
-
-| Rota | Corpo/resposta |
+| Parâmetro | Padrão |
 |---|---|
-| `GET /healthz` | `{ok,version}`; não revela configuração nem segredos. |
-| `POST /v1/jobs` | Update Telegram com `message.chat.id`, `message.message_id`, `message.text`; cria/recupera job, ou processa `/retomar ID`. |
-| `POST /v1/jobs/:id/stages/:stage` | `{}`; inicia uma etapa elegível e retorna rapidamente seu estado. |
-| `GET /v1/jobs/:id/stages/:stage` | Consulta; não gera site, não publica nem reinicia etapa. |
+| Posts inicial / ampliado | 40 / 80 |
+| Candidatos inicial / ampliado | 60 / 100 |
+| Lote visual / finalistas globais / assets no site | 10 / 20 / 10 |
+| Revisões de briefing / patches de auditoria após inspeção inicial | 2 / 4 |
+| Rodadas consecutivas sem progresso | 2 |
+| `qualityThreshold` | 85, além dos gates técnicos e semânticos |
+| Viewports | 320, 390, 768 e 1440 px, em movimento normal e reduzido |
+| `claudeInputBytes` | 120.000 bytes de briefing textual |
+| `claudeRequestBytes` | 24 MB do corpo multimodal serializado |
+| Referência visual Claude | Até 1280 px; pode reduzir até 768 px para caber |
+| Imagens por criação / base64 por imagem | Até 20 / 8 MB |
+| Saída Claude / timeout | 24.000 tokens / 300 s, sem retry |
+| Gemini | 16 MB por corpo; até 90 reservas de tentativa, incluindo retries |
+| Patches | Até 25% por arquivo por rodada e 45% acumulados, com pequenos pisos absolutos; nunca substituição integral |
+| Janela do job / retenção privada | 3600 s / 14 dias |
 
-Etapas: `preflight`, `collect`, `curate`, `brief`, `generate`, `audit`, `publish`. Resposta curta: `jobId`, `chatId`, `stage`, `state`, `message`, `code`, `repoUrl`, `siteUrl`, `claudeState`. Estados: `pending`, `running`, `done`, `failed`, `interrupted`. Segredos, evidências, pixels e respostas dos modelos nunca retornam nessas rotas.
+Os valores são limites operacionais configuráveis, não metas de encher o contexto. IDs de modelos permanecem configuráveis. Antes de criar, o preflight confirma disponibilidade/capacidade nas APIs e `image_input.supported` no Claude. Depois de preparar os pixels, `/v1/messages/count_tokens` estima a entrada real, com margem de 5% e reserva de saída. Esse endpoint não gera conteúdo. Apenas `/v1/messages` é uma requisição de geração e tem barreira atômica persistente. Se visão/limites não forem confirmados, o fluxo para antes da reserva; nunca troca pixels por descrições silenciosamente.
 
-## 10. Executar os testes
+As referências visuais mantêm assetId e hash do original. O checkpoint privado `claudeInput` registra dimensões, bytes, hashes, contagem estimada e eventuais reduções. Publicação usa variantes AVIF/WebP/JPEG/PNG próprias, sem URLs temporárias do Instagram.
+
+## Liberdade de criação e revisão
+
+O briefing distingue fatos/identidade/contatos/assets imutáveis, exigências de qualidade e composição flexível. Produtos, serviços e outras ofertas comprovadas são aceitos. Site, loja, Instagram e WhatsApp conservam destinos e rótulos próprios. A coleta ampliada refaz também a interpretação das fontes textuais.
+
+Claude entrega até 16 arquivos HTML/CSS/JS/SVG com caminhos explícitos e um manifesto privado de interações. JavaScript autoral, galeria/lightbox, decoração SVG, fundos fotográficos, máscaras e reuso funcional são permitidos. O runtime de menu existente pode ser reutilizado, mas não é obrigatório nem exclusivo.
+
+O catálogo local tem oito famílias OFL: DM Sans, Lora, Space Grotesk, Fraunces, Manrope, Playfair Display, Outfit e Bitter. Heading/body são escolhidos livremente dentro do catálogo. Apenas fontes selecionadas e respectivas licenças entram no pacote. Recursos nativos são o padrão; Anime.js 3.2.2/MIT está disponível quando Gemini justificar uma timeline que o beneficie. O modelo não instala dependências.
+
+O validador produz diagnósticos: reparável com renderização, reparo anterior à execução ou falha irrecuperável. Fatos são revistos semanticamente contra evidências pelo Gemini, incluindo texto efetivamente renderizado; pequenas reformulações, legendas fiéis e microcopy não são rejeitadas por diferença literal. Essa avaliação probabilística não é uma prova infalível de verdade.
+
+O navegador testa todas as páginas HTML, nos dois modos de movimento. Registra dobra, página inteira, detalhes, momentos de entrada, medidas de animação/rAF, áreas clicáveis, overflow, imagens, âncoras, axe e cenários de teclado/mouse/toque declarados para as interações. Medições locais não garantem fluidez em qualquer dispositivo. O auditor recebe pixels, código, evidências e resultados reais. Patches usam hash da versão e âncora literal única; HTML/CSS/JS/SVG são revalidados e renderizados. Pequena queda de nota não desfaz correção objetiva. Limite, ciclo, ausência de progresso ou reconstrução ampla bloqueiam a publicação.
+
+## SEO, publicação e retomada
+
+Owner e nome final do repositório são conhecidos antes da criação. Canonical, Open Graph e JSON-LD `Organization` sustentado pelas evidências são finalizados antes da auditoria e do hash. Endereço, contato e logo só entram quando comprovados; nenhuma classificação `LocalBusiness` é presumida. A CSP vem antes de scripts no HTML final.
+
+GitHub recebe apenas arquivos públicos aprovados, inclusive JS/SVG/fontes/biblioteca. Um commit agrupa o pacote; um marcador privado impede sobrescrever um repositório alheio. Pages precisa concluir o build do commit correto e servir os arquivos conferidos por hash no subcaminho. Domínios personalizados não são suportados. Se houver falha de publicação, `/retomar JOB` aproveita o mesmo artefato e não gera outro site.
+
+SQLite usa WAL/FULL e reserva única do Claude por identidade HMAC de bot/chat/mensagem. Duplicatas e concorrência compartilham a reserva. Timeout ambíguo não é liberado. Resposta completa já persistida pode ser recuperada; resposta truncada não é continuada/reconstruída. O fluxo n8n repete consultas GET de status, nunca retorna ao nó de geração. Auditoria terminal também não ganha novas rodadas ao retomar.
+
+## Atualização de v1
+
+Pare novas entradas e faça backup do volume persistente. Não apague/recrie banco, `JOB_HMAC_KEY`, ledger ou tombstones. Para configuração v1 customizada:
 
 ```powershell
-npm ci --ignore-scripts
-npm test
-npm run check
-node scripts/render-smoke.mjs
-node scripts/n8n-smoke.mjs
+node scripts/migrate-config.mjs caminho/para/config.json
 ```
 
-Os dois últimos comandos precisam de Docker e usam somente fixtures/mocks; nenhum deles utiliza as APIs pagas. `n8n-smoke` abre um servidor HTTP temporário para o contêiner alcançar o mock e o encerra ao terminar. `test-output/` é ignorado pelo Git.
+O script faz backup, preserva ajustes e remove as duas opções antigas de imagens IA; a funcionalidade foi retirada, não adiada. Revise os valores, construa imagens `2.0.0` e reimporte o workflow. Não mude configuração/modelo durante um job ativo.
 
-## Referências técnicas consultadas
+Jobs v1 já aprovados podem retomar a publicação dos bytes originais, sem receber uma nova aprovação v2. Jobs v1 já gerados mas não aprovados não são automaticamente convertidos/regenerados: preserve e conclua-os com a versão anterior ou faça uma migração manual revisada dos artefatos, sem tocar na reserva Claude. Essa distinção evita chamar uma aprovação antiga de auditoria v2. Faça a atualização operacional preferencialmente sem jobs v1 em andamento.
 
-- [Apify: schema do Instagram Scraper](https://apify.com/apify/instagram-scraper/input-schema) — `details` retorna metadados; `resultsLimit` não é a quantidade de imagens de um perfil em details.
-- [Gemini: compreensão de imagens](https://ai.google.dev/gemini-api/docs/image-understanding), [saída estruturada](https://ai.google.dev/gemini-api/docs/structured-output), [generateContent](https://ai.google.dev/api/generate-content), [Models API](https://ai.google.dev/api/models).
-- [Claude: modelos e limites](https://platform.claude.com/docs/en/models/overview), [Models API](https://platform.claude.com/docs/en/api/models/retrieve).
-- [GitHub: repositórios](https://docs.github.com/en/rest/repos/repos), [Git database](https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-your-git-database), [Pages](https://docs.github.com/en/rest/pages/pages).
-- [n8n: releases](https://github.com/n8n-io/n8n/releases/).
-- [NVIDIA: referência Ultra 550B](https://build.nvidia.com/nvidia/nemotron-3-ultra-550b-a55b) — referência não comprova quota/acesso na conta; não ativada.
-# instagram-site-premium
+## Operação e testes
+
+Use um volume **local**, fora do OneDrive/NFS, para `jobs.sqlite`; uma instância de worker por volume. O worker confiável usa o socket Docker. O renderer de produção não recebe socket, segredos, mount do host ou rede, e tem usuário sem privilégios, filesystem somente leitura e limites. Timeout remove apenas o contêiner efêmero daquela chamada. O proxy n8n/worker não deve repetir POSTs. Retenção remove dados privados antigos, conservando a reserva/tombstone para impedir repetição.
+
+```powershell
+npm ci
+npm test
+npm run build:workflow
+npm run check
+npm run test:render
+npm run test:n8n
+```
+
+`node scripts/render-comparison.mjs --local-fixture` é uma alternativa exclusiva para a fixture controlada quando Docker não estiver disponível. Não é fallback de produção. Notas/patches de Gemini e a geração são mocks nesse teste; Chromium é real. Nenhuma dessas fixtures é oferecida como foto de uma empresa ou fallback de coleta.
+
+Prompts completos: [PROMPTS.md](PROMPTS.md), gerados de `src/prompts.mjs`. Contratos: `src/contracts.mjs` e `contratos/`. Versões sem patch e finais, diagnósticos e screenshots ficam privados em `data/jobs/<id>/`. Consulte [VALIDACAO.md](VALIDACAO.md) antes de considerar a implantação validada.
+
+Referências de implementação consultadas em 11/10/2026: [visão Claude](https://platform.claude.com/docs/en/build-with-claude/vision), [Models API](https://platform.claude.com/docs/en/api/models/retrieve), [contagem de tokens](https://platform.claude.com/docs/en/build-with-claude/token-counting). Os limites do provedor podem mudar; o preflight verifica a conta/modelo e mantém limites locais conservadores.

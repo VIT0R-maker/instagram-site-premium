@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "properties": {
+    "approved": {
+      "type": "boolean"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "component": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "fix": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "component",
+          "evidence",
+          "description",
+          "fix"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 100
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "approved",
+    "issues",
+    "reason"
+  ],
+  "additionalProperties": false
+}

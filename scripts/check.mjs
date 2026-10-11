@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 const root=fileURLToPath(new URL('../',import.meta.url));
-const f=JSON.parse(readFileSync(path.join(root,'../workflow_instagram_site_premium.json'),'utf8'));
+const f=JSON.parse(readFileSync(path.join(root,'workflow_instagram_site_premium.json'),'utf8'));
 const names=new Set(f.nodes.map(n=>n.name)),ids=new Set(f.nodes.map(n=>n.id));
 assert.equal(names.size,f.nodes.length);assert.equal(ids.size,f.nodes.length);
 const byName=new Map(f.nodes.map(n=>[n.name,n]));
@@ -24,5 +24,5 @@ function files(dir){return readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.is
 for(const file of [...files(path.join(root,'src')),...files(path.join(root,'renderer')),...files(path.join(root,'scripts'))].filter(f=>/\.m?js$/.test(f))) {
   const result=spawnSync(process.execPath,['--check',file],{encoding:'utf8'});assert.equal(result.status,0,result.stderr);
 }
-const provider=readFileSync(path.join(root,'src/providers.mjs'),'utf8');assert.equal((provider.match(/https:\/\/api\.anthropic\.com\/v1\/messages/g)||[]).length,1);
+const provider=readFileSync(path.join(root,'src/providers.mjs'),'utf8');assert.equal((provider.match(/https:\/\/api\.anthropic\.com\/v1\/messages'/g)||[]).length,1);
 console.log(JSON.stringify({nodes:f.nodes.length,connections:Object.keys(f.connections).length,claudeNodes:1,noReturnLoop:true,syntax:'passed',n8nReference:'2.41.6',importedIntoUserInstance:false},null,2));

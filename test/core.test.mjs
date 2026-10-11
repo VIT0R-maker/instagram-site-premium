@@ -78,13 +78,13 @@ test('contraste corrigido e fontes locais com licença e acentos',()=>{
   for(const pair of ['editorial','modern','technical']){const dir=temp(),fonts=installFonts(dir,pair);assert.equal(fonts.files.length,6);assert(fonts.files.some(f=>f.includes('latin-ext')));assert(existsSync(path.join(dir,'site',fonts.files[0])));}
 });
 test('contrato estático válido e hero tipográfico sem fallback para imagem rejeitada',()=>{
-  const {files,brief}=siteFixture();assert(validateSite(files,brief).passed);assert.equal(brief.assets.length,0);
+  const {files,brief,interactions}=siteFixture();assert(validateSite(files,brief,[],interactions).passed);assert.equal(brief.assets.length,0);
 });
-test('bloqueia scripts arbitrários, truncamento, caminho absoluto, CTA falso e copy inventada',()=>{
-  const {files,brief}=siteFixture();for(const [from,to]of [
+test('bloqueia execução inline, truncamento, caminho absoluto e contato inventado',()=>{
+  const {files,brief,interactions}=siteFixture();for(const [from,to]of [
     ['</body>','<script>alert(1)</script></body>'],['</html>',''],['./styles.css','/styles.css'],
-    ['Conversar pelo Instagram</a></section>','Agendar pelo WhatsApp</a></section>'],['Peças em cerâmica feitas à mão.</p>','Garantia de dez anos.</p>']
-  ])assert.throws(()=>validateSite({...files,'index.html':Buffer.from(files['index.html'].toString().replace(from,to))},brief));
+    ['href="https://www.instagram.com/atelier_ceramica/"','href="https://wa.me/5511000000000"']
+  ])assert.throws(()=>validateSite({...files,'index.html':Buffer.from(files['index.html'].toString().replace(from,to))},brief,[],interactions));
 });
 test('patch exige hash/âncora exatos; rejeita reconstrução; aplica ajuste local',()=>{
   const {files}=siteFixture();const p={file:'styles.css',expectedHash:hash(files['styles.css']),find:'padding:70px 0',replace:'padding:72px 0',reason:'ritmo'};
@@ -108,8 +108,8 @@ test('GitHub inválido falha antes da reserva Claude',async()=>{
   await assert.rejects(publicationPreflight(p));assert.equal(s.claude('g'),undefined);s.close();
 });
 test('Claude truncado ou JSON inválido fica persistido e nunca gera novamente',async()=>{
-  const s=new Store(temp());let calls=0;
-  const p=new Providers(cfg,{},s,{id:'c'},null,{request:async()=>{calls++;return {status:200,headers:{'request-id':'fixture'},text:JSON.stringify({stop_reason:'max_tokens',content:[{type:'text',text:'{"partial":'}]})};}});
+  const s=new Store(temp());let calls=0;s.checkpoint('c','models',{[cfg.claudeModel]:{id:cfg.claudeModel,max_tokens:64000,max_input_tokens:200000,capabilities:{image_input:{supported:true}}}});
+  const p=new Providers(cfg,{},s,{id:'c'},null,{api:async()=>({data:{input_tokens:1000}}),request:async()=>{calls++;return {status:200,headers:{'request-id':'fixture'},text:JSON.stringify({stop_reason:'max_tokens',content:[{type:'text',text:'{"partial":'}]})};}});
   await assert.rejects(p.claude({}),e=>e.code==='CLAUDE_INCOMPLETE');await assert.rejects(p.claude({}),e=>e.code==='CLAUDE_INCOMPLETE');assert.equal(calls,1);assert(s.claude('c').response);s.close();
 });
 test('HTTP simulado: 429 respeita Retry-After; autenticação e mutação não repetem cegamente',async()=>{

@@ -2,7 +2,7 @@ import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { atomic, STAGES } from '../src/core.mjs';
-const workflow=JSON.parse(readFileSync(new URL('../../workflow_instagram_site_premium.json',import.meta.url)));
+const workflow=JSON.parse(readFileSync(new URL('../workflow_instagram_site_premium.json',import.meta.url)));
 const posts=[],polls=new Map();
 const server=http.createServer(async(req,res)=>{
   for await(const _ of req){}

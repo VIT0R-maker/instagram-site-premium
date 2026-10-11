@@ -1,0 +1,151 @@
+{
+  "type": "object",
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "observable": {
+            "type": "string"
+          },
+          "quality": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "lighting": {
+            "type": "string"
+          },
+          "sharpness": {
+            "type": "string"
+          },
+          "composition": {
+            "type": "string"
+          },
+          "brandFit": {
+            "type": "string"
+          },
+          "textOrFlyer": {
+            "type": "boolean"
+          },
+          "redundancy": {
+            "type": "string"
+          },
+          "protectedElements": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          },
+          "safeTextArea": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "hero",
+                "about",
+                "service",
+                "gallery",
+                "logo",
+                "reject"
+              ]
+            },
+            "maxItems": 100,
+            "minItems": 1
+          },
+          "reason": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          },
+          "alt": {
+            "type": "string"
+          },
+          "focalDesktop": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "maxItems": 2,
+            "minItems": 2
+          },
+          "focalMobile": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "maxItems": 2,
+            "minItems": 2
+          },
+          "protectedBox": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "maxItems": 4,
+            "minItems": 4
+          },
+          "cropDesktop": {
+            "type": "string"
+          },
+          "cropMobile": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "assetId",
+          "observable",
+          "quality",
+          "lighting",
+          "sharpness",
+          "composition",
+          "brandFit",
+          "textOrFlyer",
+          "redundancy",
+          "protectedElements",
+          "safeTextArea",
+          "roles",
+          "reason",
+          "confidence",
+          "limitations",
+          "alt",
+          "focalDesktop",
+          "focalMobile",
+          "protectedBox",
+          "cropDesktop",
+          "cropMobile"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "images"
+  ],
+  "additionalProperties": false
+}

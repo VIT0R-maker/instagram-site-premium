@@ -1,0 +1,305 @@
+TAP version 13
+# (node:1328) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: URL exata: perfil canônico; rejeita posts, prefixos enganosos e localhost
+ok 1 - URL exata: perfil canônico; rejeita posts, prefixos enganosos e localhost
+  ---
+  duration_ms: 4.0532
+  type: 'test'
+  ...
+# Subtest: jobId estável por mensagem; reentrega update diferente não cria novo job
+ok 2 - jobId estável por mensagem; reentrega update diferente não cria novo job
+  ---
+  duration_ms: 1.6967
+  type: 'test'
+  ...
+# Subtest: barreira concorrente: 40 tentativas, uma chamada real simulada; resposta recuperada
+ok 3 - barreira concorrente: 40 tentativas, uma chamada real simulada; resposta recuperada
+  ---
+  duration_ms: 53.1073
+  type: 'test'
+  ...
+# Subtest: reserva antes do envio e timeout ambíguo jamais liberam nova geração
+ok 4 - reserva antes do envio e timeout ambíguo jamais liberam nova geração
+  ---
+  duration_ms: 28.7941
+  type: 'test'
+  ...
+# Subtest: três nichos preservam evidências/identidade diferentes e mais de dez candidatos
+ok 5 - três nichos preservam evidências/identidade diferentes e mais de dez candidatos
+  ---
+  duration_ms: 17.2764
+  type: 'test'
+  ...
+# Subtest: privado, inexistente, username divergente ou sem evidências falham cedo
+ok 6 - privado, inexistente, username divergente ou sem evidências falham cedo
+  ---
+  duration_ms: 1.1163
+  type: 'test'
+  ...
+# Subtest: não concatena números de evidências nem inventa WhatsApp ou DDI
+ok 7 - não concatena números de evidências nem inventa WhatsApp ou DDI
+  ---
+  duration_ms: 3.145
+  type: 'test'
+  ...
+# Subtest: WhatsApp exige URL exata comprovada; conflito remove ambos
+ok 8 - WhatsApp exige URL exata comprovada; conflito remove ambos
+  ---
+  duration_ms: 1.6827
+  type: 'test'
+  ...
+# Subtest: logo pequena é válida; HTML/corrupção rejeitados; vertical preservada
+ok 9 - logo pequena é válida; HTML/corrupção rejeitados; vertical preservada
+  ---
+  duration_ms: 35.9706
+  type: 'test'
+  ...
+# Subtest: downloads parciais e duplicatas não trocam ID/legenda; hash deduplica
+ok 10 - downloads parciais e duplicatas não trocam ID/legenda; hash deduplica
+  ---
+  duration_ms: 46.4981
+  type: 'test'
+  ...
+# Subtest: SSRF: IPs privados, metadata, IPv4 mapeado e host semelhante bloqueados
+ok 11 - SSRF: IPs privados, metadata, IPv4 mapeado e host semelhante bloqueados
+  ---
+  duration_ms: 2.6191
+  type: 'test'
+  ...
+# Subtest: contraste corrigido e fontes locais com licença e acentos
+ok 12 - contraste corrigido e fontes locais com licença e acentos
+  ---
+  duration_ms: 71.8443
+  type: 'test'
+  ...
+# Subtest: contrato estático válido e hero tipográfico sem fallback para imagem rejeitada
+ok 13 - contrato estático válido e hero tipográfico sem fallback para imagem rejeitada
+  ---
+  duration_ms: 24.7474
+  type: 'test'
+  ...
+# Subtest: bloqueia execução inline, truncamento, caminho absoluto e contato inventado
+ok 14 - bloqueia execução inline, truncamento, caminho absoluto e contato inventado
+  ---
+  duration_ms: 17.5451
+  type: 'test'
+  ...
+# Subtest: patch exige hash/âncora exatos; rejeita reconstrução; aplica ajuste local
+ok 15 - patch exige hash/âncora exatos; rejeita reconstrução; aplica ajuste local
+  ---
+  duration_ms: 1.6715
+  type: 'test'
+  ...
+# Subtest: Gemini inválido/truncado é bloqueado; payload serializado e budget limitados
+ok 16 - Gemini inválido/truncado é bloqueado; payload serializado e budget limitados
+  ---
+  duration_ms: 75.7845
+  type: 'test'
+  ...
+# Subtest: Nemotron desligado não chama endpoint; indisponível/JSON ruim não interrompe
+ok 17 - Nemotron desligado não chama endpoint; indisponível/JSON ruim não interrompe
+  ---
+  duration_ms: 25.3203
+  type: 'test'
+  ...
+# Subtest: GitHub inválido falha antes da reserva Claude
+ok 18 - GitHub inválido falha antes da reserva Claude
+  ---
+  duration_ms: 24.9694
+  type: 'test'
+  ...
+# Subtest: Claude truncado ou JSON inválido fica persistido e nunca gera novamente
+ok 19 - Claude truncado ou JSON inválido fica persistido e nunca gera novamente
+  ---
+  duration_ms: 34.7548
+  type: 'test'
+  ...
+# Subtest: HTTP simulado: 429 respeita Retry-After; autenticação e mutação não repetem cegamente
+ok 20 - HTTP simulado: 429 respeita Retry-After; autenticação e mutação não repetem cegamente
+  ---
+  duration_ms: 0.6844
+  type: 'test'
+  ...
+# (node:17316) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: publicação faz um commit coerente, valida subcaminho e retoma sem duplicar repo
+ok 21 - publicação faz um commit coerente, valida subcaminho e retoma sem duplicar repo
+  ---
+  duration_ms: 63.7947
+  type: 'test'
+  ...
+# Subtest: Pages pendente e 404 temporário são recuperados antes de declarar sucesso
+ok 22 - Pages pendente e 404 temporário são recuperados antes de declarar sucesso
+  ---
+  duration_ms: 48.9315
+  type: 'test'
+  ...
+# Subtest: imagem pública ausente, build falho e qualidade ausente impedem sucesso
+ok 23 - imagem pública ausente, build falho e qualidade ausente impedem sucesso
+  ---
+  duration_ms: 82.084
+  type: 'test'
+  ...
+# Subtest: colisão com repositório de outro trabalho não altera seus arquivos
+ok 24 - colisão com repositório de outro trabalho não altera seus arquivos
+  ---
+  duration_ms: 27.9447
+  type: 'test'
+  ...
+# Subtest: SQLite em oito processos concorrentes: contador físico do provedor permanece um
+not ok 25 - SQLite em oito processos concorrentes: contador físico do provedor permanece um
+  ---
+  duration_ms: 285.3337
+  type: 'test'
+  location: 'C:\\Users\\Vitor\\OneDrive - Etec Centro Paula Souza\\Desktop\\FLUXO\\instagram-site-premium\\test\\publication.test.mjs:63:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    (node:24996) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    file:///C:/Users/Vitor/OneDrive%20-%20Etec%20Centro%20Paula%20Souza/Desktop/FLUXO/instagram-site-premium/src/store.mjs:11
+        this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA busy_timeout=5000;
+                ^
+    
+    Error: database is locked
+        at new Store (file:///C:/Users/Vitor/OneDrive%20-%20Etec%20Centro%20Paula%20Souza/Desktop/FLUXO/instagram-site-premium/src/store.mjs:11:13)
+        at file:///C:/Users/Vitor/OneDrive%20-%20Etec%20Centro%20Paula%20Souza/Desktop/FLUXO/instagram-site-premium/test/claim-process.mjs:4:13
+        at ModuleJob.run (node:internal/modules/esm/module_job:430:25)
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:661:26)
+        at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+      code: 'ERR_SQLITE_ERROR',
+      errcode: 5,
+      errstr: 'database is locked'
+    }
+    
+    Node.js v24.14.1
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    new Store (file:///C:/Users/Vitor/OneDrive%20-%20Etec%20Centro%20Paula%20Souza/Desktop/FLUXO/instagram-site-premium/src/store.mjs:11:13)
+    file:///C:/Users/Vitor/OneDrive%20-%20Etec%20Centro%20Paula%20Souza/Desktop/FLUXO/instagram-site-premium/test/claim-process.mjs:4:13
+    ModuleJob.run (node:internal/modules/esm/module_job:430:25)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:661:26)
+    async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+    ChildProcess.<anonymous> (file:///C:/Users/Vitor/OneDrive%20-%20Etec%20Centro%20Paula%20Souza/Desktop/FLUXO/instagram-site-premium/test/publication.test.mjs:66:305)
+    ChildProcess.emit (node:events:508:28)
+    maybeClose (node:internal/child_process:1100:16)
+    ChildProcess._handle.onexit (node:internal/child_process:305:5)
+  ...
+# (node:13724) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: configuração remove imagens IA; limites de visão e rodadas são validados
+ok 26 - configuração remove imagens IA; limites de visão e rodadas são validados
+  ---
+  duration_ms: 1.6915
+  type: 'test'
+  ...
+# Subtest: produtos e outras ofertas verificadas são válidos; website e loja têm canais distintos
+ok 27 - produtos e outras ofertas verificadas são válidos; website e loja têm canais distintos
+  ---
+  duration_ms: 13.0428
+  type: 'test'
+  ...
+# Subtest: oito famílias preparadas com licença, acentos e pesos; biblioteca é opcional e fixada
+ok 28 - oito famílias preparadas com licença, acentos e pesos; biblioteca é opcional e fixada
+  ---
+  duration_ms: 166.9914
+  type: 'test'
+  ...
+# Subtest: contrato aceita múltiplos HTML/CSS/JS/SVG; rejeita caminhos reservados e travessia
+ok 29 - contrato aceita múltiplos HTML/CSS/JS/SVG; rejeita caminhos reservados e travessia
+  ---
+  duration_ms: 43.0633
+  type: 'test'
+  ...
+# Subtest: SVG, JS autoral, backgrounds e reuso funcional passam; dimensões erradas viram diagnóstico reparável
+ok 30 - SVG, JS autoral, backgrounds e reuso funcional passam; dimensões erradas viram diagnóstico reparável
+  ---
+  duration_ms: 76.767
+  type: 'test'
+  ...
+# Subtest: escapes CSS e imports locais são aceitos; SVG externo/script e JS incompleto exigem reparo antes do browser
+ok 31 - escapes CSS e imports locais são aceitos; SVG externo/script e JS incompleto exigem reparo antes do browser
+  ---
+  duration_ms: 75.4935
+  type: 'test'
+  ...
+# Subtest: segredo ou resposta incompleta é fatal; microcopy equivalente segue para revisão semântica
+ok 32 - segredo ou resposta incompleta é fatal; microcopy equivalente segue para revisão semântica
+  ---
+  duration_ms: 11.8757
+  type: 'test'
+  ...
+# Subtest: SEO finalizado antes do hash é idempotente, usa URL final e Organization factual
+ok 33 - SEO finalizado antes do hash é idempotente, usa URL final e Organization factual
+  ---
+  duration_ms: 38.3103
+  type: 'test'
+  ...
+# Subtest: referências visuais preservam assetId/hash, usam pixels e acompanham a única geração
+ok 34 - referências visuais preservam assetId/hash, usam pixels e acompanham a única geração
+  ---
+  duration_ms: 227.8191
+  type: 'test'
+  ...
+# Subtest: visão ausente, imagens omitidas e contexto insuficiente falham antes da reserva
+ok 35 - visão ausente, imagens omitidas e contexto insuficiente falham antes da reserva
+  ---
+  duration_ms: 52.5595
+  type: 'test'
+  ...
+# Subtest: patch JS/SVG usa versão e âncora exata; não permite alterar assets preparados
+ok 36 - patch JS/SVG usa versão e âncora exata; não permite alterar assets preparados
+  ---
+  duration_ms: 30.1388
+  type: 'test'
+  ...
+# Subtest: queda pequena de nota não reverte correção comprovada
+ok 37 - queda pequena de nota não reverte correção comprovada
+  ---
+  duration_ms: 0.7033
+  type: 'test'
+  ...
+# Subtest: diagnóstico repair-first chega ao Gemini; patch JS revalida e renderiza sem regeneração
+ok 38 - diagnóstico repair-first chega ao Gemini; patch JS revalida e renderiza sem regeneração
+  ---
+  duration_ms: 90.0609
+  type: 'test'
+  ...
+# Subtest: afirmação comercial sem fonte bloqueia publicação mesmo com navegador verde
+ok 39 - afirmação comercial sem fonte bloqueia publicação mesmo com navegador verde
+  ---
+  duration_ms: 44.7109
+  type: 'test'
+  ...
+# Subtest: fracionar reconstrução em patches pequenos não contorna o limite de preservação
+ok 40 - fracionar reconstrução em patches pequenos não contorna o limite de preservação
+  ---
+  duration_ms: 0.4099
+  type: 'test'
+  ...
+# Subtest: coleta expandida reinterpreta fatos com as novas fontes textuais
+ok 41 - coleta expandida reinterpreta fatos com as novas fontes textuais
+  ---
+  duration_ms: 146.0092
+  type: 'test'
+  ...
+# (node:15940) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: HTTP: autorização, duplicação, ordem, progresso, falha e retomada conservam contexto
+ok 42 - HTTP: autorização, duplicação, ordem, progresso, falha e retomada conservam contexto
+  ---
+  duration_ms: 358.6749
+  type: 'test'
+  ...
+1..42
+# tests 42
+# suites 0
+# pass 41
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1729.4344

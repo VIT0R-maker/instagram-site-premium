@@ -8,8 +8,12 @@ import { STAGES, STAGE_TEXT, Fault, must, authEqual, profileUrl, jobIdentity, sa
 
 const packageRoot=fileURLToPath(new URL('../',import.meta.url));
 export function validateConfig(c) {
+  must(c.schemaVersion==='2.0'&&!Object.hasOwn(c,'enableAiDecorativeImages')&&!Object.hasOwn(c,'geminiImageModel'),'CONFIG_MIGRATION','Execute npm run migrate:config -- caminho/config.json para migrar configuração v1 com backup.');
   for(const key of ['maxCandidateImages','expandedCandidateImages','analysisBatchSize','maxFinalists','maxSiteImages','maxJobDuration','maxActiveJobs','downloadConcurrency','geminiMaxCalls','apiAttempts','retentionDays'])must(Number.isInteger(c[key])&&c[key]>0,'CONFIG',`Parâmetro inválido: ${key}`);
-  must(c.analysisBatchSize<=20&&c.maxFinalists<=20&&c.maxCandidateImages<=c.expandedCandidateImages&&c.expandedCandidateImages<=160&&c.maxSiteImages<=20&&c.apiAttempts<=4&&c.maxAuditRounds>=0&&c.maxAuditRounds<=2&&c.maxBriefReviewRounds>=0&&c.maxBriefReviewRounds<=2,'CONFIG_LIMIT','Configuração excede limites testados.');
+  must(c.analysisBatchSize<=20&&c.maxFinalists<=20&&c.maxCandidateImages<=c.expandedCandidateImages&&c.expandedCandidateImages<=160&&c.maxSiteImages<=20&&c.apiAttempts<=4&&Number.isInteger(c.maxAuditRounds)&&c.maxAuditRounds>=0&&c.maxAuditRounds<=8&&c.maxBriefReviewRounds>=0&&c.maxBriefReviewRounds<=4,'CONFIG_LIMIT','Configuração excede limites operacionais.');
+  must(c.claudeMaxImages>=c.maxSiteImages&&c.claudeMaxImages<=20&&c.claudeImageBase64Bytes<=8000000&&c.claudeRequestBytes<=24000000&&c.claudeReferenceMaxEdge<=2000&&c.claudeReferenceMinEdge>=512&&c.claudeReferenceMinEdge<=c.claudeReferenceMaxEdge,'CONFIG_VISION','Limites multimodais inválidos.');
+  must(Number.isInteger(c.maxNoProgressRounds)&&c.maxNoProgressRounds>=1&&c.maxNoProgressRounds<=8&&c.maxPatchFraction>0&&c.maxPatchFraction<=.35&&c.maxCumulativePatchFraction>0&&c.maxCumulativePatchFraction<=.5,'CONFIG_AUDIT','Limites de reparo inválidos.');
+  must(Array.isArray(c.renderViewports)&&[320,390,768,1440].every(w=>c.renderViewports.includes(w))&&c.renderViewports.length<=6&&c.auditImageMaxEdge>=1200&&c.auditImageMaxEdge<=2000&&c.maxDetailShots>=2&&c.maxDetailShots<=16&&c.maxTemporalShots>=2,'CONFIG_RENDER','Viewports/detalhes/movimento obrigatórios ausentes.');
   must(c.geminiPayloadBytes<=16000000&&c.qualityThreshold>=85&&c.qualityThreshold<=100,'CONFIG_QUALITY','Limite de payload/qualidade fora do contrato.');
   must(/^[a-z0-9][a-z0-9-]{0,15}$/.test(c.repoPrefix),'CONFIG_PREFIX','Prefixo do repositório inválido.');
   return c;
@@ -25,7 +29,7 @@ export function createApp({config,env,store,pipeline,root}) {
   const server=http.createServer(async(req,res)=>{
     const send=(code,value)=>{res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
     try {
-      if(req.url==='/healthz'&&req.method==='GET'){send(200,{ok:true,version:'1.0.0'});return;}
+      if(req.url==='/healthz'&&req.method==='GET'){send(200,{ok:true,version:'2.0.0'});return;}
       must(authEqual(req.headers.authorization||'','Bearer '+env.WORKER_TOKEN),'AUTH','Autenticação do worker inválida.');
       const url=new URL(req.url,'http://worker');let body={};
       if(req.method==='POST'){let size=0;const chunks=[];for await(const chunk of req){size+=chunk.length;must(size<=24000,'BODY_SIZE','Corpo HTTP excede o limite.');chunks.push(chunk);}try{body=JSON.parse(Buffer.concat(chunks)||'{}');}catch{throw new Fault('BODY_JSON','Corpo JSON inválido.');}}

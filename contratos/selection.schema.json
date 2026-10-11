@@ -1,0 +1,133 @@
+{
+  "type": "object",
+  "properties": {
+    "heroMode": {
+      "type": "string",
+      "enum": [
+        "photo",
+        "typographic"
+      ]
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "hero",
+              "about",
+              "service",
+              "gallery",
+              "logo"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "componentRatioDesktop": {
+            "type": "string"
+          },
+          "componentRatioMobile": {
+            "type": "string"
+          },
+          "cutRestrictions": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "assetId",
+          "role",
+          "reason",
+          "componentRatioDesktop",
+          "componentRatioMobile",
+          "cutRestrictions"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 20
+    },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "logoAssetId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "logoReason": {
+          "type": "string"
+        },
+        "colors": {
+          "type": "object",
+          "properties": {
+            "background": {
+              "type": "string"
+            },
+            "surface": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            },
+            "muted": {
+              "type": "string"
+            },
+            "accent": {
+              "type": "string"
+            },
+            "onAccent": {
+              "type": "string"
+            },
+            "border": {
+              "type": "string"
+            },
+            "focus": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "background",
+            "surface",
+            "text",
+            "muted",
+            "accent",
+            "onAccent",
+            "border",
+            "focus"
+          ],
+          "additionalProperties": false
+        },
+        "colorEvidence": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "logoAssetId",
+        "logoReason",
+        "colors",
+        "colorEvidence"
+      ],
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "heroMode",
+    "assets",
+    "identity",
+    "limitations"
+  ],
+  "additionalProperties": false
+}

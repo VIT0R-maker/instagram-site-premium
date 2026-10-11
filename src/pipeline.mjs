@@ -16,9 +16,9 @@ import { promisify } from 'node:util';
 const exec=promisify(execFile);
 
 export class Pipeline {
-  constructor(config,env,store,root) {Object.assign(this,{config,env,store,root});}
+  constructor(config,env,store,root,dependencies={}) {Object.assign(this,{config,env,store,root,dependencies});}
   async run(stage,job,signal) {
-    const p=new Providers(this.config,this.env,this.store,job,signal);
+    const p=this.dependencies.createProviders?.(job,signal)||new Providers(this.config,this.env,this.store,job,signal);
     const dir=path.join(this.root,'jobs',job.id),cp=(key,value)=>value===undefined?this.store.checkpoint(job.id,key):this.store.checkpoint(job.id,key,value);
     const save=(key,value)=>{cp(key,value);atomic(path.join(dir,key+'.json'),value);return value;};
     const cfg=this.config;
@@ -34,7 +34,7 @@ export class Pipeline {
     if(stage==='collect') {
       const details=await p.apify('details',1),posts=await p.apify('posts',cfg.postsLimit);
       const pack=normalizeProfile(details,posts,job,cfg.maxCandidateImages);
-      const result=await processCandidates(pack,dir,cfg,signal);
+      const result=await processCandidates(pack,dir,cfg,signal,this.dependencies.fetchImage);
       must(result.assets.some(a=>a.status==='downloaded'),'NO_IMAGES','Nenhuma imagem real pôde ser decodificada.');
       this.store.event(job.id,'collection',{posts:result.posts,candidates:result.candidates.length,downloaded:result.assets.filter(a=>a.status==='downloaded').length,rejected:result.assets.filter(a=>a.status!=='downloaded').length});
       return save('collection',result);
@@ -62,7 +62,7 @@ export class Pipeline {
       // One bounded expansion only when the initial usable collection is poor.
       if(pack.assets.filter(a=>a.visual&&!a.visual.roles.includes('reject')&&a.visual.quality>=65).length<Math.min(5,cfg.maxSiteImages)&&cfg.expandedCandidateImages>cfg.maxCandidateImages) {
         const details=await p.apify('details',1),posts=await p.apify('posts',cfg.expandedPostsLimit);
-        pack=await processCandidates(normalizeProfile(details,posts,job,cfg.expandedCandidateImages),dir,cfg,signal);
+        pack=await processCandidates(normalizeProfile(details,posts,job,cfg.expandedCandidateImages),dir,cfg,signal,this.dependencies.fetchImage);
         facts=verifyFacts(await p.gemini('facts',{profile:pack.profile,sources:pack.sources}),pack);save('facts',facts);
         await analyze();save('collection',pack);
       }
@@ -113,7 +113,7 @@ export class Pipeline {
       const refs=this.store.claude(job.id)?[]:await claudeReferences(brief,cp('visualCollection'),dir,cfg);
       const response=await p.claude(brief,refs);
       const names=response.files.map(f=>f.path);
-      must(new Set(names).size===names.length&&names.includes('index.html')&&names.some(f=>f.endsWith('.css')),'SITE_FILES','Envelope com arquivos ausentes/duplicados.');
+      must(new Set(names.map(n=>n.toLowerCase())).size===names.length&&names.includes('index.html')&&names.some(f=>f.endsWith('.css')),'SITE_FILES','Envelope com arquivos ausentes/duplicados (inclusive em Windows).');
       for(const f of response.files)must(safePublicPath(f.path)&&!/^assets\/|^lib\//.test(f.path),'SITE_PATH','Caminho de arquivo autoral inválido.');
       for(const f of response.files)atomic(path.join(dir,'site',f.path),f.content);
       if(!names.includes('runtime.js')&&response.files.some(f=>f.path.endsWith('.html')&&f.content.includes('./runtime.js'))) {

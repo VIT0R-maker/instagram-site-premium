@@ -1,0 +1,130 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "business": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "niche": {
+          "type": "string"
+        },
+        "subniche": {
+          "type": "string"
+        },
+        "tone": {
+          "type": "string"
+        },
+        "inferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "name",
+        "niche",
+        "subniche",
+        "tone",
+        "inferences",
+        "unknowns"
+      ],
+      "additionalProperties": false
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "service",
+              "product",
+              "offer",
+              "name",
+              "phone",
+              "whatsapp",
+              "email",
+              "website",
+              "shop",
+              "address",
+              "city",
+              "hours",
+              "other"
+            ]
+          },
+          "original": {
+            "type": "string"
+          },
+          "normalized": {
+            "type": "string"
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          },
+          "date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "unknown",
+              "conflict"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "original",
+          "normalized",
+          "sourceId",
+          "quote",
+          "date",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 100
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "business",
+    "claims",
+    "limitations"
+  ],
+  "additionalProperties": false
+}

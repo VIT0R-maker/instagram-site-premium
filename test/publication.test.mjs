@@ -13,6 +13,10 @@ function mock() {
   mkdirSync('test-output',{recursive:true});const root=mkdtempSync(path.resolve('test-output/publication-')),store=new Store(root);
   const job={id:'mock-publication',username:'atelier',repo:'site-atelier-stable'},files=siteFixture().files;
   files['assets/hero.jpg']=Buffer.from('image fixture bytes');
+  files['js/gallery.js']=Buffer.from('document.documentElement.dataset.gallery="ready";');
+  files['icons/expand.svg']=Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"></svg>');
+  files['assets/fonts/fixture.woff2']=Buffer.from('font fixture bytes');
+  files['lib/anime.min.js']=Buffer.from('/* prepared library fixture */');
   const approval={approved:true,filesHash:hash(Object.fromEntries(Object.entries(files).map(([f,b])=>[f,hash(b)])))};
   store.checkpoint(job.id,'preflight',{owner:'owner'});
   const state={repo:null,head:'initial',pages:false,creates:0,refWrites:0,blobs:0,build:'built',buildCalls:0,temporary:false};
@@ -38,7 +42,7 @@ function mock() {
 test('publicação faz um commit coerente, valida subcaminho e retoma sem duplicar repo',async()=>{
   const m=mock();let fetches=0;
   const r=await publishSite(m.p,m.files,m.approval,async u=>{fetches++;assert(new URL(u).pathname.startsWith('/site-atelier-stable/'));return m.fetchPublic(u);},async()=>{});
-  assert.equal(r.status,'published');assert.equal(m.state.creates,1);assert.equal(m.state.refWrites,1);assert(fetches>=4);
+  assert.equal(r.status,'published');assert.equal(m.state.creates,1);assert.equal(m.state.refWrites,1);assert.equal(fetches,Object.keys(m.files).filter(f=>!['.nojekyll','README.md'].includes(f)&&!f.endsWith('.txt')).length);
   await publishSite(m.p,m.files,m.approval,m.fetchPublic,async()=>{});assert.equal(m.state.creates,1);assert.equal(m.state.refWrites,1);m.p.store.close();
 });
 test('Pages pendente e 404 temporário são recuperados antes de declarar sucesso',async()=>{

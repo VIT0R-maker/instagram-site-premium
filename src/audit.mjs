@@ -4,7 +4,7 @@ import { diagnoseSite, applyPatches, fileHashes } from './validate-site.mjs';
 import { finalizeSeo } from './seo.mjs';
 import { renderIsolated } from './render.mjs';
 import { auditReferences } from './vision.mjs';
-import { atomic, must, hash } from './core.mjs';
+import { atomic, must, hash, Fault } from './core.mjs';
 
 const authorFiles=files=>Object.fromEntries(Object.entries(files).filter(([f])=>/\.(html|css|js|svg)$/.test(f)&&!/^lib\//.test(f)).map(([f,b])=>[f,b.toString()]));
 const technicalKeys=(diagnostic,render)=>[...diagnostic.issues.map(i=>`${i.code}:${i.file}:${i.component}`),...(render?.tests||[]).flatMap(t=>(t.errors||[]).map(e=>`${t.width}:${t.motion}:${t.page}:${e}`))];
@@ -15,6 +15,8 @@ export function progressEvidence(previous,current) {
   return {progress:removed.length>0||current.observedImprovements.length>0,removed,regressions,scoreDelta:current.score-previous.score};
 }
 export async function auditProject({files,brief,interactions,config,p,dir,job,signal,cp,save,render=renderIsolated}) {
+  const terminal=cp('auditTerminal');if(terminal)throw new Fault(terminal.code,terminal.message);
+  const gate=(ok,code,message)=>{if(!ok){cp('auditTerminal',{code,message});throw new Fault(code,message);}};
   const snapshot=(round,value)=>{
     const hashes=fileHashes(value);for(const [f,b] of Object.entries(value))atomic(path.join(dir,'audit-versions',String(round),f),b);
     return {round,hashes,files:Object.keys(hashes)};
@@ -24,7 +26,7 @@ export async function auditProject({files,brief,interactions,config,p,dir,job,si
   if(!state) {
     // Baseline contains the sole Claude output plus deterministic metadata, with no Gemini patch.
     files=finalizeSeo(files,brief,brief.publication.url);
-    state={version:snapshot(0,files),round:0,noProgress:0,cumulative:{},seen:[],previous:null};
+    state={version:snapshot(0,files),round:0,noProgress:0,cumulative:{},removed:{},seen:[],previous:null};
     cp('auditBaseline',state.version);cp('auditState',state);
   }else files=restore(state.version);
   const baseline=restore(cp('auditBaseline'));
@@ -34,11 +36,12 @@ export async function auditProject({files,brief,interactions,config,p,dir,job,si
     const deterministic=diagnoseSite(files,brief,Object.values(p.env||{}),interactions);
     // Never pass leaked secrets or truncated output to another model as a repair request.
     save(`diagnostic-${round}`,deterministic);
-    must(!deterministic.fatal,'SITE_FATAL','Site contém falha irrecuperável (segredo, origem ou estrutura incompleta). Veja diagnóstico privado; não haverá outra geração.');
+    gate(!deterministic.fatal,'SITE_FATAL','Site contém falha irrecuperável (segredo, origem ou estrutura incompleta). Veja diagnóstico privado; não haverá outra geração.');
     let rendered={passed:false,tests:[],screenshots:[],engine:null,skipped:'repair-first: corrigir antes de executar'};
     if(deterministic.safeToRender)rendered=await render(files,config,job.repo,signal,{interactions,assets:brief.assets});
     for(const [i,s] of rendered.screenshots.entries())atomic(path.join(dir,'screenshots',`${round}-${i}.jpg`),Buffer.from(s.data,'base64'));
-    const shots=await auditReferences(rendered.screenshots,config);
+    const baselineShots=round>0?(cp('audit-0')?.render.screenshots||[]).map((s,i)=>({...s,i})).filter(s=>s.motion==='no-preference'&&['fold','detail'].includes(s.kind)).slice(0,8).map(s=>({...s,label:'BASELINE SEM PATCH — '+s.label,data:readFileSync(path.join(dir,'screenshots',`0-${s.i}.jpg`)).toString('base64')})):[];
+    const shots=await auditReferences([...rendered.screenshots,...baselineShots],config);
     const audit=await p.gemini('audit',{brief,mode:deterministic.safeToRender?'rendered':'repair-first',diagnostics:deterministic,tests:rendered.tests,interactions,fileHashes:deterministic.fileHashes,files:authorFiles(files),previous:state.previous,baseline:cp('audit-0')||null,patchBudget:{maxFractionPerFile:config.maxPatchFraction,maxCumulativeFraction:config.maxCumulativePatchFraction,cumulative:state.cumulative,remainingRounds:config.maxAuditRounds-round}},shots,'audit',true);
     const score=Object.values(audit.rubric).reduce((a,b)=>a+b,0)/6;
     const current={score,technical:technicalKeys(deterministic,rendered),issues:audit.issues,observedImprovements:audit.observedImprovements};
@@ -53,13 +56,15 @@ export async function auditProject({files,brief,interactions,config,p,dir,job,si
       return save('approval',{approved:true,schemaVersion:'2.0',score,filesHash:hash(hashes),files:Object.keys(hashes),round,renderer:rendered.engine,interactionsHash:hash(interactions),reviewedAt:new Date().toISOString()});
     }
     state.noProgress=state.previous&&!progress.progress?state.noProgress+1:0;
-    must(state.noProgress<config.maxNoProgressRounds,'AUDIT_NO_PROGRESS','Rodadas sem melhoria observável; publicação bloqueada, versões preservadas.');
-    must(round<config.maxAuditRounds&&audit.patches.length,'AUDIT_REJECTED','Site reprovado ou precisa de reconstrução. Não haverá outra geração.');
-    const next=applyPatches(files,audit.patches,config),cumulative={...state.cumulative};
-    for(const patch of audit.patches){cumulative[patch.file]=(cumulative[patch.file]||0)+Math.max(Buffer.byteLength(patch.find),Buffer.byteLength(patch.replace));must(cumulative[patch.file]<=Math.max(600,baseline[patch.file].length*config.maxCumulativePatchFraction),'PATCH_CUMULATIVE','Patches acumulados excedem correção localizada.');}
-    const versionHash=hash(fileHashes(next));must(!state.seen.includes(versionHash),'AUDIT_CYCLE','Auditoria retornou a uma versão já avaliada.');
+    gate(state.noProgress<config.maxNoProgressRounds,'AUDIT_NO_PROGRESS','Rodadas sem melhoria observável; publicação bloqueada, versões preservadas.');
+    gate(round<config.maxAuditRounds&&audit.patches.length,'AUDIT_REJECTED','Site reprovado ou precisa de reconstrução. Não haverá outra geração.');
+    let next;try{next=applyPatches(files,audit.patches,config);}catch(e){gate(false,e.code||'PATCH_INVALID',e.message);}
+    const cumulative={...state.cumulative},removed={...state.removed};
+    for(const patch of audit.patches){cumulative[patch.file]=(cumulative[patch.file]||0)+Math.max(Buffer.byteLength(patch.find),Buffer.byteLength(patch.replace));removed[patch.file]=(removed[patch.file]||0)+Buffer.byteLength(patch.find);gate(cumulative[patch.file]<=Math.max(600,baseline[patch.file].length*config.maxCumulativePatchFraction)&&removed[patch.file]<=baseline[patch.file].length*.45,'PATCH_CUMULATIVE','Patches acumulados excedem correção localizada.');}
+    const versionHash=hash(fileHashes(next));gate(!state.seen.includes(versionHash),'AUDIT_CYCLE','Auditoria retornou a uma versão já avaliada.');
     // No rollback driven by subjective score. New objective failures remain visible to the next review.
-    state={...state,round:round+1,cumulative,previous:current,seen:[...state.seen,hash(fileHashes(files))],version:snapshot(round+1,next)};
+    state={...state,round:round+1,cumulative,removed,previous:current,seen:[...state.seen,hash(fileHashes(files))],version:snapshot(round+1,next)};
     cp('auditState',state);files=next;
   }
+  gate(false,'AUDIT_BUDGET','Orçamento de auditoria esgotado; /retomar não reinicia as rodadas.');
 }

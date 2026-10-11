@@ -19,6 +19,7 @@ const report={engine:'Chromium '+browser.version(),conditions:{deviceScaleFactor
 const pages=Object.keys(files).filter(f=>f.endsWith('.html'));
 const shot=async(page,info,opts={})=>report.screenshots.push({...info,data:(await page.screenshot({type:'jpeg',quality:80,...opts})).toString('base64')});
 async function settle(page){await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(100);}
+async function top(page){await page.evaluate(()=>scrollTo(0,0));await page.waitForFunction(()=>Math.abs(scrollY)<1,{},{timeout:5000});await page.waitForTimeout(100);}
 async function visibleState(locator,name){return locator.evaluate((n,key)=>key?getComputedStyle(n)[key]||n.getAttribute(key):n.innerHTML,name);}
 async function assertStep(page,step,before){
   const e=step.expect,l=page.locator(e.selector).first();
@@ -40,7 +41,7 @@ try {
   for(const file of pages)for(const width of payload.viewports||[320,390,768,1440])for(const motion of ['no-preference','reduce']) {
     const height=width<768?844:900,url=new URL(file,base).href;
     const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,hasTouch:true,locale:'pt-BR',timezoneId:'America/Sao_Paulo',reducedMotion:motion,serviceWorkers:'block'});
-    const page=await context.newPage();page.setDefaultTimeout(4000);const errors=[],interactionResults=[];
+    const page=await context.newPage();page.setDefaultTimeout(4000);const errors=[],interactionResults=[],focusEvidence=[];
     await context.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
     page.on('pageerror',e=>errors.push('JS: '+e.message.slice(0,180)));
     page.on('console',m=>{if(m.type()==='error')errors.push('Console: '+m.text().slice(0,180));});
@@ -58,7 +59,9 @@ try {
       });
       const activeReduced=await page.evaluate(()=>document.getAnimations().filter(a=>a.playState==='running'&&Number(a.effect?.getTiming().duration)>100).length);
       if(motion==='reduce'&&activeReduced)errors.push('Movimento reduzido mantém animação longa ativa');
-      await page.evaluate(async()=>{const h=Math.min(document.documentElement.scrollHeight,18000);for(let y=0;y<h;y+=600){scrollTo(0,y);await new Promise(r=>setTimeout(r,80));}scrollTo(0,0);});
+      const scrollHeight=await page.evaluate(()=>document.documentElement.scrollHeight);
+      for(let y=0;y<Math.min(scrollHeight,payload.maxHeight);y+=600){await page.mouse.wheel(0,600);await page.waitForTimeout(100);}
+      await top(page);
       await page.waitForTimeout(600);
       const metrics=await page.evaluate(()=>{
         const visible=n=>{const r=n.getBoundingClientRect(),s=getComputedStyle(n);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none';};
@@ -75,11 +78,11 @@ try {
         const hit=await c.evaluate(n=>{const r=n.getBoundingClientRect(),at=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return {blocked:!at||!n.contains(at),small:r.width<44||r.height<44};});
         if(hit.blocked)errors.push('CTA obstruído');if(hit.small)errors.push('CTA menor que 44px');
       }
-      await page.evaluate(()=>scrollTo(0,0));await page.waitForTimeout(250);
+      await top(page);
       await shot(page,{page:file,width,height,motion,kind:'fold',label:`${file} ${width}x${height} ${motion} primeira dobra`});
       if(metrics.height<=payload.maxHeight)await shot(page,{page:file,width,height:metrics.height,motion,kind:'full',label:`${file} ${width} ${motion} página inteira; altura ${metrics.height}`},{fullPage:true});
       if(motion==='no-preference'&&[320,1440].includes(width)) {
-        const sections=(await page.locator('main > section, main > article, [data-audit-detail]').all()).slice(0,payload.maxDetailShots||4);
+        const sections=(await page.locator('main section, main article, [data-audit-detail]').all()).slice(0,payload.maxDetailShots||4);
         for(const [i,s] of sections.entries())if(await s.isVisible()) {
           await s.scrollIntoViewIfNeeded();await page.waitForTimeout(350);const box=await s.boundingBox();
           if(box?.height&&box.height<=3000)report.screenshots.push({page:file,width,height:Math.ceil(box.height),motion,kind:'detail',label:`${file} ${width} normal detalhe ${await s.getAttribute('id')||i}`,data:(await s.screenshot({type:'jpeg',quality:85})).toString('base64')});
@@ -90,7 +93,7 @@ try {
         if(interaction.page&&interaction.page!==file)continue;
         try {
           await page.goto(url,{waitUntil:'domcontentloaded'});await settle(page);
-          for(const step of scenario.steps) {
+          for(const [stepIndex,step] of scenario.steps.entries()) {
             const l=page.locator(step.selector).first(),before=step.expect.condition==='changed'?await visibleState(page.locator(step.expect.selector).first(),step.expect.name):null;
             if(['click','tap','press'].includes(step.action)) {
               const href=await l.getAttribute('href');if(href&&/^(https?:|mailto:|tel:)/.test(href))throw Error('Cenário não deve seguir contato externo');
@@ -102,6 +105,10 @@ try {
             else if(step.action==='tap')await l.tap();
             else if(step.action==='click')await l.click();
             await assertStep(page,step,before);
+            if(scenario.input==='keyboard') {
+              focusEvidence.push({interaction:interaction.id,step:stepIndex,...await page.evaluate(()=>{const n=document.activeElement,s=getComputedStyle(n);return {tag:n.tagName,id:n.id,label:(n.getAttribute('aria-label')||n.textContent||'').slice(0,100),outline:s.outline,boxShadow:s.boxShadow,color:s.color,background:s.backgroundColor};})});
+              if(stepIndex===0&&motion==='no-preference'&&[320,1440].includes(width))await shot(page,{page:file,width,height,motion,kind:'interaction',label:`${file} ${width} normal ${interaction.kind}/${interaction.id} teclado após abrir`});
+            }
           }
           interactionResults.push({id:interaction.id,input:scenario.input,passed:true,steps:scenario.steps.length});
         }catch(e){const msg=`Interação ${interaction.id}/${scenario.input}: ${e.message.slice(0,220)}`;errors.push(msg);interactionResults.push({id:interaction.id,input:scenario.input,passed:false,error:msg});}
@@ -111,11 +118,14 @@ try {
         if(!await a.isVisible())continue;const href=await a.getAttribute('href');if(href==='#')continue;
         try{await a.focus();await a.press('Enter');if(new URL(page.url()).hash!==href)errors.push('Âncora não navegou: '+href);}catch{errors.push('Âncora inacessível: '+href);}
       }
+      // Let finite entry transitions finish before stable-state contrast checks;
+      // normal-motion timing and early screenshots above remain recorded, not disabled.
+      await page.waitForTimeout(800);
       await page.evaluate(axe.source);
       const accessibility=await page.evaluate(async()=>await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}}));
       const axeIssues=accessibility.violations.map(v=>({id:v.id,impact:v.impact,targets:v.nodes.map(n=>n.target)}));
       if(axeIssues.some(v=>['serious','critical'].includes(v.impact)))errors.push('axe: violação séria/crítica');
-      report.tests.push({page:file,width,height,motion,passed:errors.length===0,errors:[...new Set(errors)],metrics,animation:{start:animationStart,activeReduced,timing},interactions:interactionResults,axe:axeIssues});
+      report.tests.push({page:file,width,height,motion,passed:errors.length===0,errors:[...new Set(errors)],metrics,animation:{start:animationStart,activeReduced,timing},interactions:interactionResults,focusEvidence,axe:axeIssues});
     }catch(e){report.tests.push({page:file,width,height,motion,passed:false,errors:[...errors,'Render: '+e.message.slice(0,300)],interactions:interactionResults});}
     await context.close();
   }

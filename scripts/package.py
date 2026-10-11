@@ -10,7 +10,7 @@ with ZipFile(target, 'w', ZIP_DEFLATED) as archive:
     archive.write(workspace / 'workflow_instagram_site_premium.json', 'workflow_instagram_site_premium.json')
     for item in sorted(package.rglob('*')):
         relative = item.relative_to(package)
-        if not item.is_file() or any(part in excluded for part in relative.parts) or item.name == '.env':
+        if not item.is_file() or any(part in excluded for part in relative.parts) or (item.name.startswith('.env') and item.name != '.env.example') or '.backup-' in item.name:
             continue
         archive.write(item, Path('instagram-site-premium') / relative)
 print(target.name)

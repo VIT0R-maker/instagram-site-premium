@@ -32,7 +32,9 @@ export function finalizeSeo(files,brief,url) {
     const canonical=file==='index.html'?url:new URL(file,url).href;
     const ld=JSON.stringify(structuredData(brief,url)).replaceAll('<','\\u003c');
     const additions=`<meta http-equiv="Content-Security-Policy" content="${esc(SITE_CSP)}"><title>${esc(brief.seo.title)}</title><meta name="description" content="${esc(brief.seo.description)}"><link rel="canonical" href="${esc(canonical)}"><meta property="og:type" content="website"><meta property="og:locale" content="pt_BR"><meta property="og:site_name" content="${esc(brief.business.name)}"><meta property="og:title" content="${esc(brief.seo.title)}"><meta property="og:description" content="${esc(brief.seo.description)}"><meta property="og:url" content="${esc(canonical)}">${image?`<meta property="og:image" content="${esc(new URL(image.path,url).href)}"><meta property="og:image:width" content="${image.width}"><meta property="og:image:height" content="${image.height}"><meta property="og:image:alt" content="${esc(photo.alt)}">`:''}<script type="application/ld+json">${ld}</script>`;
-    for(const n of parseFragment(additions).childNodes){n.parentNode=head;head.childNodes.push(n);}
+    const injected=parseFragment(additions).childNodes;for(const n of injected)n.parentNode=head;
+    const charset=head.childNodes.filter(n=>n.tagName==='meta'&&attr(n,'charset'));
+    head.childNodes=[...charset,...injected,...head.childNodes.filter(n=>!charset.includes(n))];
     out[file]=Buffer.from(serialize(doc));
   }
   return out;

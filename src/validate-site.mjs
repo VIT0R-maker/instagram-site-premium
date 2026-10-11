@@ -72,7 +72,7 @@ export function diagnoseSite(files,brief,secretValues=[],interactions=[]) {
     if(!/\.(html|svg)$/.test(file))continue;
     const isHtml=file.endsWith('.html'),parseErrors=[];
     if(isHtml)check(/^<!doctype html>/i.test(content.trim())&&/<\/html>\s*$/i.test(content)&&/<\/head>/i.test(content)&&/<\/body>/i.test(content),'HTML_INCOMPLETE','Estrutura incompleta; não reconstruir resposta truncada.',file,'fatal');
-    if(!isHtml)check(/^\s*(?:<\?xml[^>]*>\s*)?<svg[\s>]/i.test(content)&&/<\/svg>\s*$/.test(content),'SVG_INCOMPLETE','SVG incompleto.',file,'repair-first');
+    if(!isHtml){check(/^\s*(?:<\?xml[^>]*>\s*)?<svg[\s>]/i.test(content)&&/<\/svg>\s*$/.test(content),'SVG_INCOMPLETE','SVG incompleto.',file,'repair-first');check(!/<!DOCTYPE|<!ENTITY/i.test(content),'SVG_ENTITY','SVG não deve carregar entidades externas.',file,'repair-first');}
     const doc=isHtml?parse(content,{onParseError:e=>parseErrors.push(e.code)}):parseFragment(content.replace(/^\s*<\?xml[^>]*>/,''));
     for(const error of parseErrors)add('HTML_PARSE',error,file);
     const nodes=[];walk(doc,n=>{if(n.tagName)nodes.push(n);});const ids=new Map();
@@ -135,19 +135,24 @@ export function diagnoseSite(files,brief,secretValues=[],interactions=[]) {
   const htmls=Object.entries(files).filter(([f])=>f.endsWith('.html')).map(([,b])=>b.toString());
   for(const b of backgrounds)check(htmls.some(s=>s.includes(`data-asset-id="${b.assetId}"`)||s.includes(`data-asset-id='${b.assetId}'`)),'BACKGROUND_SEMANTICS','Identifique a fotografia CSS com data-asset-id e alternativa semântica.',b.file,'renderable',b.assetId);
   for(const a of brief.assets||[])check(used.has(a.assetId),'IMAGE_MISSING','Asset selecionado não utilizado.','index.html','renderable',a.assetId);
-  for(const t of interactions){check(t.minWidth<=t.maxWidth,'INTERACTION_RANGE','Intervalo de interação inválido.','interactions');check(new Set(t.paths.map(p=>p.input)).size===3,'INTERACTION_INPUTS','Declare teclado, mouse e toque para a interação implementada.','interactions','renderable',t.id);}
+  for(const t of interactions){
+    check(t.minWidth<=t.maxWidth&&existing.has(t.page),'INTERACTION_RANGE','Página/intervalo de interação inválido.','interactions');
+    check(new Set(t.paths.map(p=>p.input)).size===3,'INTERACTION_INPUTS','Declare teclado, mouse e toque para a interação implementada.','interactions','renderable',t.id);
+    for(const p of t.paths){const actions=p.input==='keyboard'?['press']:p.input==='touch'?['tap']:['click','hover'];check(p.steps.some(s=>actions.includes(s.action))&&p.steps.some(s=>!['body','html',':root'].includes(s.expect.selector.trim())),'INTERACTION_PROOF','Cenário precisa executar a modalidade declarada e comprovar o componente.','interactions','renderable',t.id);}
+  }
   return {passed:issues.length===0,safeToRender:!issues.some(i=>i.category!=='renderable'),fatal:issues.some(i=>i.category==='fatal'),issues,fileHashes:fileHashes(files),images:used.size,copy,backgrounds,semanticReviewRequired:true};
 }
 export function validateSite(files,brief,secrets=[],interactions=[]) {
   const r=diagnoseSite(files,brief,secrets,interactions);if(!r.passed)throw new Fault(r.issues[0].code,r.issues[0].message,{issues:r.issues});return r;
 }
 export function applyPatches(files,patches,config={}) {
-  const original={...files},out={...files},changed={};
+  const original={...files},out={...files},changed={},removed={};
   for(const p of patches) {
     must(safePublicPath(p.file)&&/\.(html|css|js|svg)$/.test(p.file)&&!/^assets\/|^lib\//.test(p.file)&&original[p.file]&&hash(original[p.file])===p.expectedHash,'PATCH_HASH','Patch não corresponde à versão/arquivo autoral auditado.');
     const current=out[p.file].toString();must(p.find&&p.find!==p.replace&&current.split(p.find).length===2,'PATCH_ANCHOR','Âncora deve ser única, exata e alterar conteúdo.');
     changed[p.file]=(changed[p.file]||0)+Math.max(Buffer.byteLength(p.find),Buffer.byteLength(p.replace));
-    must(changed[p.file]<=Math.max(500,original[p.file].length*(config.maxPatchFraction||.25))&&p.find.length<current.length*.5,'PATCH_SCOPE','Correção exige reconstrução ampla; publicação bloqueada.');
+    removed[p.file]=(removed[p.file]||0)+Buffer.byteLength(p.find);
+    must(changed[p.file]<=Math.max(500,original[p.file].length*(config.maxPatchFraction||.25))&&removed[p.file]<=original[p.file].length*.45&&p.find.length<current.length*.5,'PATCH_SCOPE','Correção exige reconstrução ampla; publicação bloqueada.');
     out[p.file]=Buffer.from(current.replace(p.find,()=>p.replace));
   }
   return out;

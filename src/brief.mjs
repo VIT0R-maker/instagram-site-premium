@@ -1,7 +1,7 @@
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { must, atomic, hash } from './core.mjs';
+import { must, hash } from './core.mjs';
 
 export function verifyFacts(facts,pack) {
   const sources=new Map(pack.sources.map(s=>[s.id,s]));const ids=new Set();
@@ -86,23 +86,4 @@ export function validateBrief(brief,dir,config) {
   must(brief.assets.length<=config.maxSiteImages,'ASSET_LIMIT','Quantidade final excede o limite.');
   must(Buffer.byteLength(JSON.stringify(brief))<config.claudeInputBytes-6000,'BRIEF_SIZE','Briefing grande demais para a geração reservada.');
   return hash(brief);
-}export { installFonts } from './resources.mjs';
-export function validateBrief(brief,dir,config) {
-  must(brief.schemaVersion==='2.0'&&brief.approved===true,'BRIEF_APPROVAL','Briefing sem aprovação.');
-  must(brief.sections.length>0 && brief.sections[0].id==='hero','BRIEF_HERO','Primeira seção não é hero.');
-  const sectionIds=new Set(),usedAssets=new Set(),claims=new Set(brief.evidence.claims.filter(c=>c.status==='verified').map(c=>c.id)),assets=new Set(brief.assets.map(a=>a.assetId)),links=new Set(brief.links.map(l=>l.id));
-  for(const s of brief.sections) {
-    must(/^[a-z][a-z0-9-]{0,40}$/.test(s.id)&&!sectionIds.has(s.id),'SECTION_ID','Seção com ID inválido/duplicado.');sectionIds.add(s.id);
-    must(s.claimIds.every(id=>claims.has(id))&&s.assetIds.every(id=>assets.has(id))&&(!s.ctaLinkId||links.has(s.ctaLinkId)),'BRIEF_REFERENCE','Referência inexistente no briefing.');
-    for(const id of s.assetIds)usedAssets.add(id);
-  }
-  must(brief.navigation.every(n=>sectionIds.has(n.sectionId)),'NAVIGATION','Âncora de navegação inexistente.');
-  must(brief.sections.some(s=>s.ctaLinkId),'CTA_MISSING','Briefing sem CTA funcional.');
-  must(brief.assets.every(a=>a.role==='logo'||usedAssets.has(a.assetId)),'ASSET_UNUSED','Asset selecionado sem destino de seção.');
-  for(const a of brief.assets)for(const v of a.variants)must(existsSync(path.join(dir,'site',v.path)),'ASSET_MISSING','Arquivo selecionado ainda não existe.');
-  const colors=brief.brand.colors;
-  must(contrast(colors.text,colors.background)>=4.5 && contrast(colors.text,colors.surface)>=4.5 && contrast(colors.onAccent,colors.accent)>=4.5,'CONTRAST','Tokens sem contraste mínimo.');
-  must(brief.assets.length<=config.maxSiteImages,'ASSET_LIMIT','Quantidade final excede o limite.');
-  must(Buffer.byteLength(JSON.stringify(brief))<config.claudeInputBytes-6000,'BRIEF_SIZE','Briefing grande demais para a geração reservada.');
-  return hash(brief);
-}
+}
