@@ -1,0 +1,24 @@
+{
+  "n8n": "2.41.6",
+  "exitCode": 0,
+  "stagesPosted": [
+    "preflight",
+    "collect",
+    "curate",
+    "brief",
+    "generate",
+    "audit",
+    "publish"
+  ],
+  "polls": {
+    "preflight": 2,
+    "collect": 2,
+    "curate": 2,
+    "brief": 2,
+    "generate": 2,
+    "audit": 2,
+    "publish": 2
+  },
+  "realProviders": false,
+  "passed": true
+}

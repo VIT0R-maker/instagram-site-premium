@@ -1,0 +1,119 @@
+{
+  "engine": "Chromium 156.0.8078.4",
+  "conditions": {
+    "deviceScaleFactor": 1,
+    "locale": "pt-BR",
+    "timezoneId": "America/Sao_Paulo",
+    "network": "none; local fixture only"
+  },
+  "tests": [
+    {
+      "width": 360,
+      "height": 844,
+      "passed": true,
+      "errors": [],
+      "metrics": {
+        "overflow": false,
+        "height": 844,
+        "brokenImages": [],
+        "hiddenImages": []
+      },
+      "axe": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "passed": true,
+      "errors": [],
+      "metrics": {
+        "overflow": false,
+        "height": 844,
+        "brokenImages": [],
+        "hiddenImages": []
+      },
+      "axe": []
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "passed": true,
+      "errors": [],
+      "metrics": {
+        "overflow": false,
+        "height": 900,
+        "brokenImages": [],
+        "hiddenImages": []
+      },
+      "axe": []
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "passed": true,
+      "errors": [],
+      "metrics": {
+        "overflow": false,
+        "height": 900,
+        "brokenImages": [],
+        "hiddenImages": []
+      },
+      "axe": []
+    },
+    {
+      "mode": "no-js",
+      "passed": true,
+      "errors": []
+    }
+  ],
+  "passed": true,
+  "screenshots": [
+    {
+      "label": "360x844 primeira dobra",
+      "width": 360,
+      "height": 844,
+      "kind": "fold"
+    },
+    {
+      "label": "360x844 página inteira; altura 844",
+      "width": 360,
+      "height": 844,
+      "kind": "full"
+    },
+    {
+      "label": "390x844 primeira dobra",
+      "width": 390,
+      "height": 844,
+      "kind": "fold"
+    },
+    {
+      "label": "390x844 página inteira; altura 844",
+      "width": 390,
+      "height": 844,
+      "kind": "full"
+    },
+    {
+      "label": "768x900 primeira dobra",
+      "width": 768,
+      "height": 900,
+      "kind": "fold"
+    },
+    {
+      "label": "768x900 página inteira; altura 900",
+      "width": 768,
+      "height": 900,
+      "kind": "full"
+    },
+    {
+      "label": "1440x900 primeira dobra",
+      "width": 1440,
+      "height": 900,
+      "kind": "fold"
+    },
+    {
+      "label": "1440x900 página inteira; altura 900",
+      "width": 1440,
+      "height": 900,
+      "kind": "full"
+    }
+  ]
+}

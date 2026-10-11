@@ -1,0 +1,172 @@
+TAP version 13
+# (node:20396) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: URL exata: perfil canônico; rejeita posts, prefixos enganosos e localhost
+ok 1 - URL exata: perfil canônico; rejeita posts, prefixos enganosos e localhost
+  ---
+  duration_ms: 1.1328
+  type: 'test'
+  ...
+# Subtest: jobId estável por mensagem; reentrega update diferente não cria novo job
+ok 2 - jobId estável por mensagem; reentrega update diferente não cria novo job
+  ---
+  duration_ms: 0.6779
+  type: 'test'
+  ...
+# Subtest: barreira concorrente: 40 tentativas, uma chamada real simulada; resposta recuperada
+ok 3 - barreira concorrente: 40 tentativas, uma chamada real simulada; resposta recuperada
+  ---
+  duration_ms: 45.9221
+  type: 'test'
+  ...
+# Subtest: reserva antes do envio e timeout ambíguo jamais liberam nova geração
+ok 4 - reserva antes do envio e timeout ambíguo jamais liberam nova geração
+  ---
+  duration_ms: 27.6392
+  type: 'test'
+  ...
+# Subtest: três nichos preservam evidências/identidade diferentes e mais de dez candidatos
+ok 5 - três nichos preservam evidências/identidade diferentes e mais de dez candidatos
+  ---
+  duration_ms: 19.7324
+  type: 'test'
+  ...
+# Subtest: privado, inexistente, username divergente ou sem evidências falham cedo
+ok 6 - privado, inexistente, username divergente ou sem evidências falham cedo
+  ---
+  duration_ms: 0.4594
+  type: 'test'
+  ...
+# Subtest: não concatena números de evidências nem inventa WhatsApp ou DDI
+ok 7 - não concatena números de evidências nem inventa WhatsApp ou DDI
+  ---
+  duration_ms: 2.3359
+  type: 'test'
+  ...
+# Subtest: WhatsApp exige URL exata comprovada; conflito remove ambos
+ok 8 - WhatsApp exige URL exata comprovada; conflito remove ambos
+  ---
+  duration_ms: 1.519
+  type: 'test'
+  ...
+# Subtest: logo pequena é válida; HTML/corrupção rejeitados; vertical preservada
+ok 9 - logo pequena é válida; HTML/corrupção rejeitados; vertical preservada
+  ---
+  duration_ms: 42.5037
+  type: 'test'
+  ...
+# Subtest: downloads parciais e duplicatas não trocam ID/legenda; hash deduplica
+ok 10 - downloads parciais e duplicatas não trocam ID/legenda; hash deduplica
+  ---
+  duration_ms: 36.6782
+  type: 'test'
+  ...
+# Subtest: SSRF: IPs privados, metadata, IPv4 mapeado e host semelhante bloqueados
+ok 11 - SSRF: IPs privados, metadata, IPv4 mapeado e host semelhante bloqueados
+  ---
+  duration_ms: 1.7538
+  type: 'test'
+  ...
+# Subtest: contraste corrigido e fontes locais com licença e acentos
+ok 12 - contraste corrigido e fontes locais com licença e acentos
+  ---
+  duration_ms: 53.176
+  type: 'test'
+  ...
+# Subtest: contrato estático válido e hero tipográfico sem fallback para imagem rejeitada
+ok 13 - contrato estático válido e hero tipográfico sem fallback para imagem rejeitada
+  ---
+  duration_ms: 13.7067
+  type: 'test'
+  ...
+# Subtest: bloqueia scripts arbitrários, truncamento, caminho absoluto, CTA falso e copy inventada
+ok 14 - bloqueia scripts arbitrários, truncamento, caminho absoluto, CTA falso e copy inventada
+  ---
+  duration_ms: 6.1091
+  type: 'test'
+  ...
+# Subtest: patch exige hash/âncora exatos; rejeita reconstrução; aplica ajuste local
+ok 15 - patch exige hash/âncora exatos; rejeita reconstrução; aplica ajuste local
+  ---
+  duration_ms: 0.5872
+  type: 'test'
+  ...
+# Subtest: Gemini inválido/truncado é bloqueado; payload serializado e budget limitados
+ok 16 - Gemini inválido/truncado é bloqueado; payload serializado e budget limitados
+  ---
+  duration_ms: 60.7494
+  type: 'test'
+  ...
+# Subtest: Nemotron desligado não chama endpoint; indisponível/JSON ruim não interrompe
+ok 17 - Nemotron desligado não chama endpoint; indisponível/JSON ruim não interrompe
+  ---
+  duration_ms: 19.4635
+  type: 'test'
+  ...
+# Subtest: GitHub inválido falha antes da reserva Claude
+ok 18 - GitHub inválido falha antes da reserva Claude
+  ---
+  duration_ms: 20.6285
+  type: 'test'
+  ...
+# Subtest: Claude truncado ou JSON inválido fica persistido e nunca gera novamente
+ok 19 - Claude truncado ou JSON inválido fica persistido e nunca gera novamente
+  ---
+  duration_ms: 24.43
+  type: 'test'
+  ...
+# Subtest: HTTP simulado: 429 respeita Retry-After; autenticação e mutação não repetem cegamente
+ok 20 - HTTP simulado: 429 respeita Retry-After; autenticação e mutação não repetem cegamente
+  ---
+  duration_ms: 0.7052
+  type: 'test'
+  ...
+# (node:27276) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: publicação faz um commit coerente, valida subcaminho e retoma sem duplicar repo
+ok 21 - publicação faz um commit coerente, valida subcaminho e retoma sem duplicar repo
+  ---
+  duration_ms: 47.8906
+  type: 'test'
+  ...
+# Subtest: Pages pendente e 404 temporário são recuperados antes de declarar sucesso
+ok 22 - Pages pendente e 404 temporário são recuperados antes de declarar sucesso
+  ---
+  duration_ms: 34.1114
+  type: 'test'
+  ...
+# Subtest: imagem pública ausente, build falho e qualidade ausente impedem sucesso
+ok 23 - imagem pública ausente, build falho e qualidade ausente impedem sucesso
+  ---
+  duration_ms: 66.0218
+  type: 'test'
+  ...
+# Subtest: colisão com repositório de outro trabalho não altera seus arquivos
+ok 24 - colisão com repositório de outro trabalho não altera seus arquivos
+  ---
+  duration_ms: 19.0917
+  type: 'test'
+  ...
+# Subtest: SQLite em oito processos concorrentes: contador físico do provedor permanece um
+ok 25 - SQLite em oito processos concorrentes: contador físico do provedor permanece um
+  ---
+  duration_ms: 166.2518
+  type: 'test'
+  ...
+# (node:26716) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: HTTP: autorização, duplicação, ordem, progresso, falha e retomada conservam contexto
+ok 26 - HTTP: autorização, duplicação, ordem, progresso, falha e retomada conservam contexto
+  ---
+  duration_ms: 375.0258
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3425.7805

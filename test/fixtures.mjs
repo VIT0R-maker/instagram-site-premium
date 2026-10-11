@@ -1,0 +1,25 @@
+import { readFileSync } from 'node:fs';
+export const niches=[
+  {username:'atelier_ceramica',name:'Ateliê Terra',service:'Peças em cerâmica feitas à mão',niche:'cerâmica artesanal',direction:'editorial'},
+  {username:'barbearia_centro',name:'Barbearia Centro',service:'Corte de cabelo e barba',niche:'barbearia',direction:'modern'},
+  {username:'oficina_precisa',name:'Oficina Precisa',service:'Alinhamento e balanceamento',niche:'oficina automotiva',direction:'technical'}
+];
+export function sourceFixture(n=0,count=18) {
+  const v=niches[n];
+  const details=[{username:v.username,fullName:v.name,biography:v.service,isPrivate:false,profilePicUrlHD:'https://scontent.cdninstagram.com/logo.png'}];
+  const posts=Array.from({length:count},(_,i)=>({id:'p'+i,ownerUsername:v.username,caption:v.service+' — registro '+i,timestamp:new Date(Date.UTC(2026,8,30-i)).toISOString(),url:`https://www.instagram.com/p/post${i}/`,type:'Sidecar',childPosts:Array.from({length:5},(_,j)=>({displayUrl:`https://scontent.cdninstagram.com/${i}-${j}.jpg`}))}));
+  const job={id:'abc123456789012345678901',chat:'123',username:v.username,profile:`https://www.instagram.com/${v.username}/`,repo:'site-'+v.username+'-sample'};
+  return {v,details,posts,job};
+}
+export function factsFixture(n=0) {
+  const v=niches[n];return {schemaVersion:'1.0',business:{name:v.name,niche:v.niche,subniche:v.niche,tone:'direto',inferences:['Público interessado em '+v.niche],unknowns:['WhatsApp','endereço']},claims:[{id:'service-1',kind:'service',original:v.service,normalized:v.service,sourceId:'profile:bio',quote:v.service,date:null,status:'verified'}],limitations:['WhatsApp não comprovado; CTA para Instagram.']};
+}
+export function siteFixture() {
+  const link={id:'instagram',url:'https://www.instagram.com/atelier_ceramica/',label:'Conversar pelo Instagram'};
+  const brief={schemaVersion:'1.0',approved:true,job:{id:'test'},business:{name:'Ateliê Terra'},evidence:{claims:[{id:'s',status:'verified'}]},brand:{colors:{background:'#fbf8f1',surface:'#ffffff',text:'#222222',muted:'#444444',accent:'#61381f',onAccent:'#ffffff',focus:'#222222'}},assets:[],sections:[{id:'hero',heading:'Cerâmica feita à mão',paragraphs:['Peças em cerâmica feitas à mão.'],claimIds:['s'],assetIds:[],ctaLinkId:'instagram'},{id:'contato',heading:'Vamos conversar',paragraphs:[],claimIds:[],assetIds:[],ctaLinkId:'instagram'}],navigation:[{label:'Início',sectionId:'hero'},{label:'Contato',sectionId:'contato'}],links:[link],seo:{title:'Ateliê Terra',description:'Peças em cerâmica feitas à mão.'}};
+  const html=`<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ateliê Terra</title><meta name="description" content="Peças em cerâmica feitas à mão."><link rel="stylesheet" href="./styles.css"><script src="./runtime.js" defer></script></head>
+<body><a class="skip" href="#main">Pular para o conteúdo</a><header><a href="#hero">Ateliê Terra</a><button type="button" data-menu-toggle aria-controls="nav" aria-expanded="false" aria-label="Abrir menu">Menu</button><nav id="nav" data-menu aria-label="Principal"><a href="#hero">Início</a><a href="#contato">Contato</a></nav></header><main id="main"><section id="hero"><h1>Cerâmica feita à mão</h1><p>Peças em cerâmica feitas à mão.</p><a class="cta" data-primary-cta data-link-id="instagram" href="${link.url}">${link.label}</a></section><section id="contato"><h2>Vamos conversar</h2><a class="cta" data-link-id="instagram" href="${link.url}">${link.label}</a></section></main><footer>Ateliê Terra</footer></body></html>`;
+  const css=`*{box-sizing:border-box}html{scroll-behavior:auto}body{margin:0;background:#fbf8f1;color:#222;font:18px/1.6 Georgia,serif}a{color:inherit}header{padding:24px 6%;display:flex;align-items:center;gap:24px;flex-wrap:wrap;border-bottom:1px solid #555}nav{display:flex;gap:24px;margin-left:auto}button{display:none;min-height:44px;min-width:60px;background:white;color:#222;border:1px solid #222}main{max-width:1100px;margin:auto;padding:0 6%}section{padding:70px 0}h1{font-size:clamp(2.6rem,7vw,5.2rem);line-height:1.08;max-width:14ch;margin:0 0 28px}h2{font-size:2rem}p{max-width:44ch}.cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 20px;background:#61381f;color:white;text-decoration:none;border-radius:4px;max-width:100%;text-align:center}footer{padding:24px 6%;border-top:1px solid #555}.skip{position:absolute;left:8px;top:-100px;padding:12px;background:white;z-index:10}.skip:focus{top:8px}:focus-visible{outline:3px solid #152bbd;outline-offset:4px}@media(max-width:700px){button{display:block;margin-left:auto}nav{width:100%;margin:0}html.js nav{display:none}html.js nav.is-open{display:flex}section{padding:48px 0}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}`;
+  return {brief,files:{'index.html':Buffer.from(html),'styles.css':Buffer.from(css),'runtime.js':readFileSync(new URL('../src/runtime.js',import.meta.url)),'.nojekyll':Buffer.alloc(0),'README.md':Buffer.from('# Site de teste\n')}};
+}

@@ -1,0 +1,9 @@
+{
+  "nodes": 58,
+  "connections": 47,
+  "claudeNodes": 1,
+  "noReturnLoop": true,
+  "syntax": "passed",
+  "n8nReference": "2.41.6",
+  "importedIntoUserInstance": false
+}

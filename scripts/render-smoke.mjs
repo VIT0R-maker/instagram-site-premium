@@ -1,0 +1,14 @@
+import { siteFixture } from '../test/fixtures.mjs';
+import { renderIsolated } from '../src/render.mjs';
+import { atomic, readJson } from '../src/core.mjs';
+import { fileURLToPath } from 'node:url';
+import { validateSite } from '../src/validate-site.mjs';
+const {files,brief}=siteFixture();
+validateSite(files,brief);
+const config=readJson(new URL('../config.json',import.meta.url));
+const result=await renderIsolated(files,config,'site-fixture-subpath');
+for(const [i,s]of result.screenshots.entries())atomic(fileURLToPath(new URL(`../test-output/render/${i}.jpg`,import.meta.url)),Buffer.from(s.data,'base64'));
+const {screenshots,...report}=result;
+atomic('test-output/render/report.json',{...report,screenshots:screenshots.map(({data,...s})=>s)});
+console.log(JSON.stringify({passed:result.passed,engine:result.engine,tests:result.tests,screenshots:screenshots.length},null,2));
+if(!result.passed)process.exitCode=1;
