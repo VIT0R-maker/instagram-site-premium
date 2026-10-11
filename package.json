@@ -1,25 +1,37 @@
 {
   "name": "instagram-site-premium-worker",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24.14.0 <25" },
+  "engines": {
+    "node": ">=24.14.0 <25"
+  },
   "scripts": {
     "start": "node --env-file=.env src/server.mjs",
     "test": "node --test test/*.test.mjs",
     "build:workflow": "node scripts/build-workflow.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "test:render": "node scripts/render-comparison.mjs",
+    "test:n8n": "node scripts/n8n-smoke.mjs",
+    "migrate:config": "node scripts/migrate-config.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/bitter": "5.3.0",
+    "@fontsource-variable/dm-sans": "5.3.0",
+    "@fontsource-variable/fraunces": "5.3.0",
+    "@fontsource-variable/lora": "5.3.0",
+    "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource-variable/outfit": "5.3.0",
+    "@fontsource-variable/playfair-display": "5.3.0",
+    "@fontsource-variable/space-grotesk": "5.3.0",
+    "acorn": "8.19.0",
     "ajv": "8.20.0",
-    "ipaddr.js": "2.2.0",
+    "animejs": "3.2.2",
     "axe-core": "4.14.0",
     "css-tree": "3.2.1",
+    "ipaddr.js": "2.2.0",
     "parse5": "8.0.1",
     "playwright": "1.64.0",
-    "sharp": "0.35.5",
-    "@fontsource-variable/dm-sans": "5.3.0",
-    "@fontsource-variable/lora": "5.3.0",
-    "@fontsource-variable/space-grotesk": "5.3.0"
+    "sharp": "0.35.5"
   }
 }

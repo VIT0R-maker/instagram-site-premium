@@ -22,7 +22,8 @@ export class Providers {
     const {data}=await this.transport.api(`https://api.anthropic.com/v1/models/${model}`,{hosts:['api.anthropic.com'],headers:{'x-api-key':this.env.ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01'},signal:this.signal});
     // Fail closed when the account/model does not expose documented limits.
     must(Number(data.max_tokens) >= this.config.claudeMaxOutputTokens,'MODEL_OUTPUT','A Models API do Claude não confirmou o limite de saída configurado.');
-    must(Number(data.max_input_tokens)>=this.config.claudeInputBytes,'MODEL_INPUT','A Models API não confirmou contexto suficiente para o teto conservador de entrada.');
+    must(Number(data.max_input_tokens)>0,'MODEL_INPUT','A Models API não confirmou o contexto.');
+    must(data.capabilities?.image_input?.supported===true,'MODEL_VISION','A Models API não confirmou visão. Configure um Claude com suporte multimodal; imagens nunca serão omitidas silenciosamente.');
     metadata[model]=data;
     this.store.checkpoint(this.job.id,'models',metadata); return metadata;
   }
@@ -80,10 +81,38 @@ export class Providers {
       this.store.event(this.job.id,'nemotron',{model:this.config.nemotronModel,usage:data.usage || null}); return value;
     } catch { this.store.event(this.job.id,'nemotron_skipped'); return null; }
   }
-  async claude(brief) {
-    const body={model:this.config.claudeModel,max_tokens:this.config.claudeMaxOutputTokens,system:CLAUDE_SYSTEM,messages:[{role:'user',content:JSON.stringify(brief)}]};
-    must(Buffer.byteLength(JSON.stringify(body))<=this.config.claudeInputBytes,'CLAUDE_INPUT','Briefing excedeu o limite de entrada reservado.');
+  async claude(brief,images=[]) {
+    let body;
+    if(!this.store.claude(this.job.id)) {
+      const model=this.store.checkpoint(this.job.id,'models')?.[this.config.claudeModel];
+      must(model?.capabilities?.image_input?.supported===true,'MODEL_VISION','Preflight multimodal obrigatório antes da reserva Claude.');
+      must(model.max_tokens>=this.config.claudeMaxOutputTokens,'MODEL_OUTPUT','Limite de saída não confirmado.');
+      const ids=images.map(i=>i.assetId),assets=brief.assets||[];
+      must(ids.length===assets.length&&new Set(ids).size===ids.length&&assets.every(a=>ids.includes(a.assetId)),'CLAUDE_IMAGE_IDS','Todos os assets aprovados devem acompanhar a única criação, com seus pixels.');
+      must(images.length<=this.config.claudeMaxImages&&images.length<=100,'CLAUDE_IMAGES','Limite de imagens por requisição excedido.');
+      must(Buffer.byteLength(JSON.stringify(brief))<=this.config.claudeInputBytes,'CLAUDE_INPUT','Briefing excedeu o teto de texto.');
+      const content=[];
+      for(const im of images) {
+        must(['image/jpeg','image/png','image/webp'].includes(im.mime)&&im.width<=2000&&im.height<=2000,'CLAUDE_IMAGE_FORMAT','Referência visual incompatível com o endpoint.');
+        must(im.sourceHash===assets.find(a=>a.assetId===im.assetId).hash,'CLAUDE_IMAGE_ID','Pixels e manifesto devem ter a mesma origem.');
+        const data=im.bytes.toString('base64');must(data.length<=this.config.claudeImageBase64Bytes,'CLAUDE_IMAGE_SIZE','Referência individual excedeu o limite.');
+        content.push({type:'text',text:`Asset real ${im.assetId}; referência ${im.width}x${im.height}; original SHA-256 ${im.sourceHash}. Use os caminhos do manifesto para publicar.`},{type:'image',source:{type:'base64',media_type:im.mime,data}});
+      }
+      content.push({type:'text',text:JSON.stringify({brief,outputContract:schemas.files})});
+      body={model:model.id||this.config.claudeModel,max_tokens:this.config.claudeMaxOutputTokens,system:CLAUDE_SYSTEM,messages:[{role:'user',content}]};
+      const requestBytes=Buffer.byteLength(JSON.stringify(body));
+      must(requestBytes<=this.config.claudeRequestBytes&&requestBytes<32000000,'CLAUDE_PAYLOAD','Payload multimodal serializado excedeu o teto.');
+      const tokenKey='claudeTokenCount:'+hash(body);let inputTokens=this.store.checkpoint(this.job.id,tokenKey);
+      if(!inputTokens) {
+        // This endpoint only estimates tokens; it never generates, analyzes or continues a site.
+        const {data}=await this.transport.api('https://api.anthropic.com/v1/messages/count_tokens',{hosts:['api.anthropic.com'],method:'POST',attempts:this.config.apiAttempts,timeout:60000,signal:this.signal,headers:{'x-api-key':this.env.ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01'},body:{model:body.model,system:body.system,messages:body.messages}});
+        inputTokens=data.input_tokens;must(Number.isInteger(inputTokens)&&inputTokens>0,'CLAUDE_TOKEN_COUNT','Contagem multimodal não confirmada.');this.store.checkpoint(this.job.id,tokenKey,inputTokens);
+      }
+      must(inputTokens*1.05+body.max_tokens<=model.max_input_tokens,'CLAUDE_CONTEXT','Contexto insuficiente com margem de 5% e saída reservada. Redimensione/revise antes de gerar.');
+      this.store.checkpoint(this.job.id,'claudeInput',{model:body.model,inputTokens,requestBytes,maxOutput:body.max_tokens,requestHash:hash(body),images:images.map(({bytes,...meta})=>({...meta,bytes:bytes.length}))});
+    }
     const saved=await invokeClaudeOnce(this.store,this.job.id,async()=>{
+      must(body,'CLAUDE_STATE','Uma reserva existente não pode originar outra geração.');
       const r=await this.transport.request('https://api.anthropic.com/v1/messages',{hosts:['api.anthropic.com'],method:'POST',body,headers:{'x-api-key':this.env.ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01'},timeout:this.config.claudeTimeoutMs,signal:this.signal});
       return {text:r.text,status:r.status,requestId:r.headers['request-id']};
     });

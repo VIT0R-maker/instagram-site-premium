@@ -1,14 +1,14 @@
 import { spawn } from 'node:child_process';
 import { must, Fault } from './core.mjs';
 
-export async function renderIsolated(files,config,repo,signal) {
+export async function renderIsolated(files,config,repo,signal,details={}) {
   const args=['run','--rm','-i','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--memory','1536m','--cpus','1.5','--pids-limit','128','--shm-size','256m','--tmpfs','/tmp:rw,nosuid,nodev,size=256m','--user','1000:1000',config.rendererImage];
-  const input=JSON.stringify({files:Object.fromEntries(Object.entries(files).map(([p,b])=>[p,b.toString('base64')])),basePath:`/${repo}/`,maxHeight:config.maxScreenshotHeight});
+  const input=JSON.stringify({files:Object.fromEntries(Object.entries(files).map(([p,b])=>[p,b.toString('base64')])),basePath:`/${repo}/`,maxHeight:config.maxScreenshotHeight,viewports:config.renderViewports,maxDetailShots:config.maxDetailShots,maxTemporalShots:config.maxTemporalShots,...details});
   return new Promise((resolve,reject)=>{
     const child=spawn('docker',args,{stdio:['pipe','pipe','pipe'],windowsHide:true,signal});
     const chunks=[];let size=0;const errs=[];
     const timer=setTimeout(()=>child.kill(),config.rendererTimeoutMs);
-    child.stdout.on('data',d=>{size+=d.length;if(size>32000000)child.kill();else chunks.push(d);});
+    child.stdout.on('data',d=>{size+=d.length;if(size>96000000)child.kill();else chunks.push(d);});
     child.stderr.on('data',d=>{if(errs.length<4)errs.push(d.toString().slice(0,1000));});
     child.on('error',()=>{clearTimeout(timer);reject(new Fault('RENDER_RUNTIME','Não foi possível iniciar o renderer Docker isolado.'));});
     child.on('close',code=>{
