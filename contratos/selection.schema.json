@@ -26,6 +26,14 @@
               "logo"
             ]
           },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "essential",
+              "recommended",
+              "optional"
+            ]
+          },
           "reason": {
             "type": "string"
           },
@@ -42,6 +50,7 @@
         "required": [
           "assetId",
           "role",
+          "priority",
           "reason",
           "componentRatioDesktop",
           "componentRatioMobile",
@@ -49,7 +58,7 @@
         ],
         "additionalProperties": false
       },
-      "maxItems": 20
+      "maxItems": 100
     },
     "identity": {
       "type": "object",

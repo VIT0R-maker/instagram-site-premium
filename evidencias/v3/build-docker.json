@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-12T14:42:09.016Z",
+  "results": [
+    {
+      "name": "worker",
+      "exitCode": 1,
+      "error": null,
+      "output": "ERROR: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+    },
+    {
+      "name": "renderer",
+      "exitCode": 1,
+      "error": null,
+      "output": "ERROR: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n"
+    }
+  ],
+  "passed": false
+}

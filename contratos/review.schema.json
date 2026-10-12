@@ -4,6 +4,23 @@
     "approved": {
       "type": "boolean"
     },
+    "repairTargets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "facts",
+          "selection",
+          "crops",
+          "fonts",
+          "direction",
+          "structure",
+          "copy",
+          "links"
+        ]
+      },
+      "maxItems": 8
+    },
     "issues": {
       "type": "array",
       "items": {
@@ -48,6 +65,7 @@
   },
   "required": [
     "approved",
+    "repairTargets",
     "issues",
     "reason"
   ],

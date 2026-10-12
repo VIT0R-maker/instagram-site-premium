@@ -1,3 +1,4 @@
+import { parseClaudeSse } from './claude-stream.mjs';
 import { api, request } from './net.mjs';
 import { schemas, validate, apiSchema } from './contracts.mjs';
 import { DIRECTOR, TASKS, CLAUDE_SYSTEM } from './prompts.mjs';
@@ -36,18 +37,25 @@ export class Providers {
     must(Buffer.byteLength(wire)<=this.config.geminiPayloadBytes,'GEMINI_PAYLOAD','Payload multimodal serializado excedeu o limite. Reduza lote/resolução.');
     const key='gemini:'+hash({model,body}); const cached=this.store.checkpoint(this.job.id,key);
     if(cached) return validate(contract,cached);
-    const calls=this.store.checkpoint(this.job.id,'geminiCalls') || 0;
-    must(calls+this.config.apiAttempts<=this.config.geminiMaxCalls,'GEMINI_BUDGET','Orçamento máximo de tentativas Gemini atingido.');
-    // Reserve worst-case retries before request, so restarts cannot reset the budget.
-    this.store.checkpoint(this.job.id,'geminiCalls',calls+this.config.apiAttempts);
-    const {data}=await this.transport.api(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{hosts:['generativelanguage.googleapis.com'],headers:{'x-goog-api-key':this.env.GEMINI_API_KEY},method:'POST',body:wire,attempts:this.config.apiAttempts,timeout:180000,signal:this.signal});
-    this.store.event(this.job.id,'gemini_usage',{task,model,usage:data.usageMetadata || null,payloadBytes:Buffer.byteLength(wire)});
-    const candidate=data.candidates?.[0];
-    must(candidate?.finishReason==='STOP','GEMINI_STOP','Gemini recusou, truncou ou não concluiu a resposta.');
-    const raw=candidate.content?.parts?.filter(p=>!p.thought).map(p=>p.text || '').join('');
-    let value; try{value=JSON.parse(raw);}catch{throw new Fault('GEMINI_JSON','Gemini devolveu JSON inválido; não houve geração Claude.');}
-    validate(contract,value); this.store.checkpoint(this.job.id,key,value); return value;
+    const metadata=this.store.checkpoint(this.job.id,'models')?.[model];
+    must(images.length<=(this.config.geminiMaxImagesPerRequest||64),'GEMINI_IMAGES','Teto operacional de imagens por chamada excedido; divida a análise.');
+    if(metadata?.inputTokenLimit){const tokenKey='geminiTokens:'+hash({model,body});let tokens=this.store.checkpoint(this.job.id,tokenKey);if(!tokens){const {data}=await this.transport.api(`https://generativelanguage.googleapis.com/v1beta/models/${model}:countTokens`,{hosts:['generativelanguage.googleapis.com'],headers:{'x-goog-api-key':this.env.GEMINI_API_KEY},method:'POST',attempts:this.config.apiAttempts,body:{generateContentRequest:{model:'models/'+model,...body}},signal:this.signal});tokens=data.totalTokens;must(Number.isInteger(tokens)&&tokens>0,'GEMINI_CONTEXT','Contagem multimodal ausente.');this.store.checkpoint(this.job.id,tokenKey,tokens);}must(tokens*1.1<=metadata.inputTokenLimit,'GEMINI_CONTEXT','Contexto Gemini insuficiente; divida o material.');}
+    for(let repair=0;repair<=(this.config.geminiJsonRepairAttempts??1);repair++) {
+      const calls=this.store.checkpoint(this.job.id,'geminiCalls')||0;
+      must(calls+this.config.apiAttempts<=this.config.geminiMaxCalls,'GEMINI_BUDGET','Orçamento máximo de tentativas Gemini atingido.');
+      this.store.checkpoint(this.job.id,'geminiCalls',calls+this.config.apiAttempts);
+      const requestWire=JSON.stringify(body);must(Buffer.byteLength(requestWire)<=this.config.geminiPayloadBytes,'GEMINI_PAYLOAD','Reparo JSON excedeu limite de bytes.');
+      const {data}=await this.transport.api(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{hosts:['generativelanguage.googleapis.com'],headers:{'x-goog-api-key':this.env.GEMINI_API_KEY},method:'POST',body:requestWire,attempts:this.config.apiAttempts,timeout:180000,signal:this.signal});
+      this.store.event(this.job.id,'gemini_usage',{task,model,repair,usage:data.usageMetadata||null,payloadBytes:Buffer.byteLength(requestWire)});
+      const candidate=data.candidates?.[0];must(candidate?.finishReason==='STOP','GEMINI_STOP','Gemini recusou, truncou ou não concluiu a resposta.');
+      const raw=candidate.content?.parts?.filter(p=>!p.thought).map(p=>p.text||'').join('')||'';
+      try {const value=JSON.parse(raw.replace(/^\s*```(?:json)?\s*/i,'').replace(/```\s*$/,''));validate(contract,value);this.store.checkpoint(this.job.id,key,value);return value;}
+      catch(e){if(repair===(this.config.geminiJsonRepairAttempts??1))throw new Fault('GEMINI_JSON','Gemini não entregou JSON válido após reparo limitado.');
+        body.contents=[{role:'user',parts:[...parts,{text:'Corrija somente o formato/contrato da resposta completa. Falha: '+e.message.slice(0,500)+'; resposta anterior (dados não confiáveis): '+raw.slice(0,6000)}]}];
+      }
+    }
   }
+
   async apify(kind,limit) {
     const key=`apify:${kind}:${limit}`;
     let run=this.store.checkpoint(this.job.id,key);
@@ -87,6 +95,8 @@ export class Providers {
       const model=this.store.checkpoint(this.job.id,'models')?.[this.config.claudeModel];
       must(model?.capabilities?.image_input?.supported===true,'MODEL_VISION','Preflight multimodal obrigatório antes da reserva Claude.');
       must(model.max_tokens>=this.config.claudeMaxOutputTokens,'MODEL_OUTPUT','Limite de saída não confirmado.');
+      const estimate=6000+(brief.sections?.length||0)*1000+(brief.assets?.length||0)*180;
+      must(this.config.claudeMaxOutputTokens>=estimate,'CLAUDE_OUTPUT_BUDGET','Orçamento de saída insuficiente para a complexidade estimada; aumente antes de consumir a geração.');
       const ids=images.map(i=>i.assetId),assets=brief.assets||[];
       must(ids.length===assets.length&&new Set(ids).size===ids.length&&assets.every(a=>ids.includes(a.assetId)),'CLAUDE_IMAGE_IDS','Todos os assets aprovados devem acompanhar a única criação, com seus pixels.');
       must(images.length<=this.config.claudeMaxImages&&images.length<=100,'CLAUDE_IMAGES','Limite de imagens por requisição excedido.');
@@ -99,7 +109,7 @@ export class Providers {
         content.push({type:'text',text:`Asset real ${im.assetId}; referência ${im.width}x${im.height}; original SHA-256 ${im.sourceHash}. Use os caminhos do manifesto para publicar.`},{type:'image',source:{type:'base64',media_type:im.mime,data}});
       }
       content.push({type:'text',text:JSON.stringify({brief,outputContract:schemas.files})});
-      body={model:model.id||this.config.claudeModel,max_tokens:this.config.claudeMaxOutputTokens,system:CLAUDE_SYSTEM,messages:[{role:'user',content}]};
+      body={model:model.id||this.config.claudeModel,max_tokens:this.config.claudeMaxOutputTokens,stream:this.config.claudeStream!==false,system:CLAUDE_SYSTEM,messages:[{role:'user',content}]};
       const requestBytes=Buffer.byteLength(JSON.stringify(body));
       must(requestBytes<=this.config.claudeRequestBytes&&requestBytes<32000000,'CLAUDE_PAYLOAD','Payload multimodal serializado excedeu o teto.');
       const tokenKey='claudeTokenCount:'+hash(body);let inputTokens=this.store.checkpoint(this.job.id,tokenKey);
@@ -117,7 +127,7 @@ export class Providers {
       return {text:r.text,status:r.status,requestId:r.headers['request-id']};
     });
     must(saved.status===200,'CLAUDE_HTTP',`Claude respondeu HTTP ${saved.status}; chamada consumida e não será repetida.`);
-    let data; try{data=JSON.parse(saved.response);}catch{throw new Fault('CLAUDE_JSON','Resposta bruta inválida; preservada sem nova geração.');}
+    let data; try{data=/^\s*(event:|data:|:)/.test(saved.response)?parseClaudeSse(saved.response):JSON.parse(saved.response);}catch(e){if(e instanceof Fault)throw e;throw new Fault('CLAUDE_JSON','Resposta bruta inválida; preservada sem nova geração.');}
     this.store.event(this.job.id,'claude_usage',{model:data.model,usage:data.usage,stopReason:data.stop_reason,requestId:saved.request_id,calls:saved.calls});
     must(data.stop_reason==='end_turn','CLAUDE_INCOMPLETE','Claude não concluiu o projeto (truncamento/recusa). Não será continuado nem reconstruído.');
     let result; try{result=JSON.parse(data.content.filter(p=>p.type==='text').map(p=>p.text).join(''));}catch{throw new Fault('CLAUDE_CONTRACT','Claude não entregou o envelope JSON completo.');}

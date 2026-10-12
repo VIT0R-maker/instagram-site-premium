@@ -1,0 +1,3023 @@
+{
+  "audit": {
+    "score": 80,
+    "rubric": {
+      "identity": 80,
+      "composition": 80,
+      "spacing": 80,
+      "typography": 80,
+      "images": 80,
+      "responsiveness": 80
+    },
+    "semanticReview": {
+      "approved": true,
+      "unsupportedClaims": [],
+      "equivalentCopy": []
+    },
+    "observedImprovements": [],
+    "issues": [
+      {
+        "severity": "high",
+        "viewport": "320/390",
+        "component": "hero/CTA",
+        "evidence": "Fixture inclui título excessivo e CTA de 32px.",
+        "description": "Defeitos locais inseridos no cenário.",
+        "fix": "Aplicar os três patches definidos."
+      }
+    ],
+    "patches": [
+      {
+        "file": "js/gallery.js",
+        "find": "dialog.addEventListener('close',()=>opener.focus());",
+        "replace": "dialog.addEventListener('close',()=>opener.focus());dialog.addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();closer.focus();}});",
+        "reason": "Manter foco dentro do modal durante a tabulação",
+        "expectedHash": "a20cb8141baef851738c7cf11d638e8b2137759a86b53c15a1f47e77bf871377"
+      },
+      {
+        "file": "styles.css",
+        "find": "h1{font-size:76px;max-width:none}",
+        "replace": "h1{font-size:clamp(2.55rem,11vw,4rem);max-width:12ch}",
+        "reason": "Título mobile caber na largura e recuperar hierarquia",
+        "expectedHash": "6a2d99018953280413611e9db995a91a73b8c8ebb85c2d808676a8f63c1c6dd9"
+      },
+      {
+        "file": "styles.css",
+        "find": ".cta{min-height:32px;padding:4px 14px}",
+        "replace": ".cta{min-height:48px;padding:12px 18px}",
+        "reason": "Restaurar área de toque confortável",
+        "expectedHash": "6a2d99018953280413611e9db995a91a73b8c8ebb85c2d808676a8f63c1c6dd9"
+      },
+      {
+        "file": "styles.css",
+        "find": ".hero-photo{height:300px;background-size:cover}",
+        "replace": ".hero-photo{height:auto;aspect-ratio:1928/1221;background-size:contain;border-radius:2px}",
+        "reason": "Preservar recipiente e tampa completos no mobile",
+        "expectedHash": "6a2d99018953280413611e9db995a91a73b8c8ebb85c2d808676a8f63c1c6dd9"
+      },
+      {
+        "file": "styles.css",
+        "find": ".hero-photo{height:540px;",
+        "replace": ".hero-photo{height:auto;aspect-ratio:1928/1221;",
+        "reason": "Preservar composição da fotografia também no desktop",
+        "expectedHash": "6a2d99018953280413611e9db995a91a73b8c8ebb85c2d808676a8f63c1c6dd9"
+      },
+      {
+        "file": "styles.css",
+        "find": "border-radius:48% 48% 2px 2px",
+        "replace": "border-radius:12px 12px 2px 2px",
+        "reason": "Recorte decorativo não deve esconder as extremidades da peça",
+        "expectedHash": "6a2d99018953280413611e9db995a91a73b8c8ebb85c2d808676a8f63c1c6dd9"
+      }
+    ],
+    "coverage": {
+      "totalCaptures": 37,
+      "parts": 4,
+      "allReviewed": true
+    },
+    "visualParts": [
+      {
+        "coverageIds": [
+          "capture-0",
+          "capture-1",
+          "capture-2",
+          "capture-3",
+          "capture-4",
+          "capture-5",
+          "capture-6",
+          "capture-7",
+          "capture-8",
+          "capture-9",
+          "capture-10",
+          "capture-11"
+        ],
+        "score": 91,
+        "rubric": {
+          "identity": 91,
+          "composition": 91,
+          "spacing": 91,
+          "typography": 91,
+          "images": 91,
+          "responsiveness": 91
+        },
+        "issues": [],
+        "observations": [
+          "Inspeção simulada: conferir capturas reais separadamente."
+        ]
+      },
+      {
+        "coverageIds": [
+          "capture-12",
+          "capture-13",
+          "capture-14",
+          "capture-15",
+          "capture-16",
+          "capture-17",
+          "capture-18",
+          "capture-19",
+          "capture-20",
+          "capture-21",
+          "capture-22",
+          "capture-23"
+        ],
+        "score": 91,
+        "rubric": {
+          "identity": 91,
+          "composition": 91,
+          "spacing": 91,
+          "typography": 91,
+          "images": 91,
+          "responsiveness": 91
+        },
+        "issues": [],
+        "observations": [
+          "Inspeção simulada: conferir capturas reais separadamente."
+        ]
+      },
+      {
+        "coverageIds": [
+          "capture-24",
+          "capture-25",
+          "capture-26",
+          "capture-27",
+          "capture-28",
+          "capture-29",
+          "capture-30",
+          "capture-31",
+          "capture-32",
+          "capture-33",
+          "capture-34",
+          "capture-35"
+        ],
+        "score": 91,
+        "rubric": {
+          "identity": 91,
+          "composition": 91,
+          "spacing": 91,
+          "typography": 91,
+          "images": 91,
+          "responsiveness": 91
+        },
+        "issues": [],
+        "observations": [
+          "Inspeção simulada: conferir capturas reais separadamente."
+        ]
+      },
+      {
+        "coverageIds": [
+          "capture-36"
+        ],
+        "score": 91,
+        "rubric": {
+          "identity": 91,
+          "composition": 91,
+          "spacing": 91,
+          "typography": 91,
+          "images": 91,
+          "responsiveness": 91
+        },
+        "issues": [],
+        "observations": [
+          "Inspeção simulada: conferir capturas reais separadamente."
+        ]
+      }
+    ]
+  },
+  "score": 80,
+  "passed": false,
+  "progress": {
+    "progress": true,
+    "regressions": []
+  },
+  "deterministic": {
+    "passed": true,
+    "safeToRender": true,
+    "fatal": false,
+    "issues": [],
+    "fileHashes": {
+      ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assets/fixture-jomon.jpg": "6495c9b8e8125befadd1f8935bf00d314dd6c7a0248a6b1adb527a74266e11ed",
+      "assets/fonts/fraunces-latin-ext-wght-italic.woff2": "877bcc2fd1be299c950d0971578336818ca5818e1e956f12e0d8c6736436ca45",
+      "assets/fonts/fraunces-latin-ext-wght-normal.woff2": "a21ecfbf41fbc393e24ef9b7e38532a27e8da5e0a074aa7d66802d1b5ccec2f0",
+      "assets/fonts/fraunces-latin-wght-italic.woff2": "bceec2ef4d549efbc8df0194a8d5280b6a64c3e399244dffccd9ea1bd9ad6db7",
+      "assets/fonts/fraunces-latin-wght-normal.woff2": "7f9d191d999336d3b9790afa72e1358e50a13b06d4f289341e92a311967a80f9",
+      "assets/fonts/LICENSE-fraunces.txt": "cd3384cafac6f2bddc3955273958a2e029f97027c8037ac539ef5744a77b579e",
+      "assets/fonts/LICENSE-manrope.txt": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30",
+      "assets/fonts/manrope-latin-ext-wght-normal.woff2": "3911b66d9f2e005a4b989223405d0e5032619c668597ba467cc76a23c8fffcfb",
+      "assets/fonts/manrope-latin-wght-normal.woff2": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+      "icons/expand.svg": "d33bc4082f76251d76252cd628614a13468620f670cdadd3b8babf8d2c92591e",
+      "index.html": "fa717a5da5c7755316d4828268c9241e399e1799961d6a991103c17a47fb1633",
+      "js/gallery.js": "a20cb8141baef851738c7cf11d638e8b2137759a86b53c15a1f47e77bf871377",
+      "runtime.js": "cf4f12f5f110ac7fb3b7c20e2c3a6ae3e0624af321072d771afacae6c2bc220b",
+      "styles.css": "6a2d99018953280413611e9db995a91a73b8c8ebb85c2d808676a8f63c1c6dd9"
+    },
+    "images": 1,
+    "copy": [
+      {
+        "file": "index.html",
+        "kind": "link",
+        "text": "Ver perfil no Instagram ",
+        "channel": "instagram",
+        "destination": "https://www.instagram.com/fixture_acervo/"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Estudo de acervo — fixture visual"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Pular para o conteúdo"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "ESTUDO DE ACERVO"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "ENSAIO VISUAL · FIXTURE LOCAL"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Menu"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Início"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Acervo"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "FORMA / MEMÓRIA / MATÉRIA"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Matéria que atravessa o tempo."
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Demonstração local com fotografia CC0. Um estudo de composição para observar textura, proporção e luz."
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Ver perfil no Instagram"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "01 / RECIPIENTE E TAMPA"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Fotografia: BabelStone · CC0"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "UM OLHAR MAIS PRÓXIMO"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Observe de perto."
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Esta imagem histórica é usada apenas como material de teste. Não representa produtos de uma empresa analisada."
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Ampliar fotografia"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "ESTUDO DE ACERVO"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Teste local. Sem geração por IA e sem publicação."
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Fechar"
+      },
+      {
+        "file": "index.html",
+        "kind": "text",
+        "text": "Fotografia real de teste — BabelStone, CC0."
+      }
+    ],
+    "backgrounds": [
+      {
+        "file": "styles.css",
+        "path": "assets/fixture-jomon.jpg",
+        "assetId": "fixture_jomon"
+      }
+    ],
+    "semanticReviewRequired": true
+  },
+  "render": {
+    "engine": "Chromium 156.0.8078.4",
+    "conditions": {
+      "deviceScaleFactor": 1,
+      "locale": "pt-BR",
+      "timezoneId": "America/Sao_Paulo",
+      "network": "none; assets locais",
+      "motion": [
+        "no-preference",
+        "reduce"
+      ],
+      "limitations": [
+        "rAF em ambiente virtualizado é diagnóstico, não benchmark de fluidez em dispositivos reais.",
+        "axe não mede com exatidão todo contraste sobre fotografias; inspeção visual também é obrigatória."
+      ]
+    },
+    "tests": [
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 844,
+        "motion": "no-preference",
+        "inputContext": {
+          "hasTouch": true,
+          "isMobile": true,
+          "hover": "none",
+          "touchPathsAtDesktop": "contexto auxiliar com toque"
+        },
+        "coverage": {
+          "height": 1737,
+          "coveredTo": 1737,
+          "complete": true,
+          "tiles": [
+            "index.html:320:no-preference:0",
+            "index.html:320:no-preference:1200"
+          ]
+        },
+        "passed": false,
+        "errors": [
+          "Viewport mobile ampliado por conteúdo que não cabe",
+          "CTA menor que 44px",
+          "Recorte remove região protegida: fixture_jomon",
+          "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/pointer: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+        ],
+        "metrics": {
+          "overflow": false,
+          "height": 1737,
+          "overflowText": [],
+          "images": [
+            {
+              "src": "./assets/fixture-jomon.jpg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg",
+              "naturalWidth": 1928,
+              "naturalHeight": 1221,
+              "alt": "Ampliar fotografia do recipiente Jōmon e tampa",
+              "bounds": {
+                "x": 19.1875,
+                "y": 1359.1875,
+                "width": 281.625,
+                "height": 178.34375
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            },
+            {
+              "src": "./icons/expand.svg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/icons/expand.svg",
+              "naturalWidth": 150,
+              "naturalHeight": 150,
+              "alt": "",
+              "bounds": {
+                "x": 256.8125,
+                "y": 1553.53125,
+                "width": 24,
+                "height": 24
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            }
+          ],
+          "backgrounds": [
+            {
+              "assetId": "fixture_jomon",
+              "bounds": {
+                "x": 19.1875,
+                "y": 689.1875,
+                "width": 308.203125,
+                "height": 300
+              },
+              "backgroundImage": "url(\"http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg\")",
+              "backgroundSize": "cover",
+              "backgroundPosition": "50% 50%",
+              "maskImage": "none",
+              "alternative": "Recipiente cerâmico Jōmon e sua tampa, fotografados no British Museum"
+            }
+          ],
+          "headings": [
+            {
+              "text": "Matéria que atravessa o tempo.",
+              "bounds": {
+                "x": 19.1875,
+                "y": 167.5,
+                "width": 308.203125,
+                "height": 316.125
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "76px"
+            },
+            {
+              "text": "Observe de perto.",
+              "bounds": {
+                "x": 19.1875,
+                "y": 1143.875,
+                "width": 281.625,
+                "height": 76.03125
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "35.2px"
+            }
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "loaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "loaded"
+            }
+          ],
+          "hiddenMainContent": [],
+          "renderedText": "Pular para o conteúdo\nESTUDO DE ACERVO\nENSAIO VISUAL · FIXTURE LOCAL\nMenu\n\nFORMA / MEMÓRIA / MATÉRIA\n\nMatéria que atravessa o tempo.\n\nDemonstração local com fotografia CC0. Um estudo de composição para observar textura, proporção e luz.\n\nVer perfil no Instagram\n01 / RECIPIENTE E TAMPA\nFotografia: BabelStone · CC0\n\nUM OLHAR MAIS PRÓXIMO\n\nObserve de perto.\n\nEsta imagem histórica é usada apenas como material de teste. Não representa produtos de uma empresa analisada.\n\nAmpliar fotografia\nESTUDO DE ACERVO\nTeste local. Sem geração por IA e sem publicação.",
+          "cropChecks": [
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": false,
+              "adjusted": false,
+              "objectPosition": "50.000% 50.000%",
+              "anchor": [
+                0.5,
+                0.5
+              ],
+              "visibleBox": [
+                0.1746922409880705,
+                0,
+                0.650615518023859,
+                1
+              ],
+              "protectedFraction": 0.9620119369414302,
+              "risk": "A região protegida não cabe: altere proporção, use contain ou outra composição."
+            },
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "mode": "fill"
+            }
+          ]
+        },
+        "animation": {
+          "start": [
+            {
+              "target": "DIV",
+              "duration": 650,
+              "state": "running"
+            }
+          ],
+          "activeReduced": 0,
+          "timing": {
+            "sampleMs": 706.4000000000465,
+            "frames": 43,
+            "p95FrameMs": 16.700000000000045,
+            "maxFrameMs": 16.799999999999955
+          }
+        },
+        "interactions": [
+          {
+            "id": "menu",
+            "input": "keyboard",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "menu",
+            "input": "pointer",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "menu",
+            "input": "touch",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "lightbox",
+            "input": "keyboard",
+            "passed": false,
+            "error": "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "pointer",
+            "passed": false,
+            "error": "Interação lightbox/pointer: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "touch",
+            "passed": false,
+            "error": "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+          }
+        ],
+        "focusEvidence": [
+          {
+            "interaction": "menu",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Fechar menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "menu",
+            "step": 1,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Abrir menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "menu",
+            "step": 2,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Abrir menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "lightbox",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "close-photo",
+            "label": "Fechar fotografia",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(87, 59, 41)"
+          }
+        ],
+        "axe": []
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 844,
+        "motion": "reduce",
+        "inputContext": {
+          "hasTouch": true,
+          "isMobile": true,
+          "hover": "none",
+          "touchPathsAtDesktop": "contexto auxiliar com toque"
+        },
+        "coverage": {
+          "height": 1737,
+          "coveredTo": 1737,
+          "complete": true,
+          "tiles": [
+            "index.html:320:reduce:0",
+            "index.html:320:reduce:1200"
+          ]
+        },
+        "passed": false,
+        "errors": [
+          "Viewport mobile ampliado por conteúdo que não cabe",
+          "CTA menor que 44px",
+          "Recorte remove região protegida: fixture_jomon",
+          "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/pointer: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+        ],
+        "metrics": {
+          "overflow": false,
+          "height": 1737,
+          "overflowText": [],
+          "images": [
+            {
+              "src": "./assets/fixture-jomon.jpg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg",
+              "naturalWidth": 1928,
+              "naturalHeight": 1221,
+              "alt": "Ampliar fotografia do recipiente Jōmon e tampa",
+              "bounds": {
+                "x": 19.1875,
+                "y": 1359.1875,
+                "width": 281.625,
+                "height": 178.34375
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            },
+            {
+              "src": "./icons/expand.svg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/icons/expand.svg",
+              "naturalWidth": 150,
+              "naturalHeight": 150,
+              "alt": "",
+              "bounds": {
+                "x": 256.8125,
+                "y": 1553.53125,
+                "width": 24,
+                "height": 24
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            }
+          ],
+          "backgrounds": [
+            {
+              "assetId": "fixture_jomon",
+              "bounds": {
+                "x": 19.1875,
+                "y": 689.1875,
+                "width": 308.203125,
+                "height": 300
+              },
+              "backgroundImage": "url(\"http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg\")",
+              "backgroundSize": "cover",
+              "backgroundPosition": "50% 50%",
+              "maskImage": "none",
+              "alternative": "Recipiente cerâmico Jōmon e sua tampa, fotografados no British Museum"
+            }
+          ],
+          "headings": [
+            {
+              "text": "Matéria que atravessa o tempo.",
+              "bounds": {
+                "x": 19.1875,
+                "y": 167.5,
+                "width": 308.203125,
+                "height": 316.125
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "76px"
+            },
+            {
+              "text": "Observe de perto.",
+              "bounds": {
+                "x": 19.1875,
+                "y": 1143.875,
+                "width": 281.625,
+                "height": 76.03125
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "35.2px"
+            }
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "loaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "loaded"
+            }
+          ],
+          "hiddenMainContent": [],
+          "renderedText": "Pular para o conteúdo\nESTUDO DE ACERVO\nENSAIO VISUAL · FIXTURE LOCAL\nMenu\n\nFORMA / MEMÓRIA / MATÉRIA\n\nMatéria que atravessa o tempo.\n\nDemonstração local com fotografia CC0. Um estudo de composição para observar textura, proporção e luz.\n\nVer perfil no Instagram\n01 / RECIPIENTE E TAMPA\nFotografia: BabelStone · CC0\n\nUM OLHAR MAIS PRÓXIMO\n\nObserve de perto.\n\nEsta imagem histórica é usada apenas como material de teste. Não representa produtos de uma empresa analisada.\n\nAmpliar fotografia\nESTUDO DE ACERVO\nTeste local. Sem geração por IA e sem publicação.",
+          "cropChecks": [
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": false,
+              "adjusted": false,
+              "objectPosition": "50.000% 50.000%",
+              "anchor": [
+                0.5,
+                0.5
+              ],
+              "visibleBox": [
+                0.1746922409880705,
+                0,
+                0.650615518023859,
+                1
+              ],
+              "protectedFraction": 0.9620119369414302,
+              "risk": "A região protegida não cabe: altere proporção, use contain ou outra composição."
+            },
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "mode": "fill"
+            }
+          ]
+        },
+        "animation": {
+          "start": [],
+          "activeReduced": 0,
+          "timing": {
+            "sampleMs": 707.9000000000699,
+            "frames": 44,
+            "p95FrameMs": 16.700000000000045,
+            "maxFrameMs": 16.800000000000068
+          }
+        },
+        "interactions": [
+          {
+            "id": "menu",
+            "input": "keyboard",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "menu",
+            "input": "pointer",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "menu",
+            "input": "touch",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "lightbox",
+            "input": "keyboard",
+            "passed": false,
+            "error": "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "pointer",
+            "passed": false,
+            "error": "Interação lightbox/pointer: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "touch",
+            "passed": false,
+            "error": "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+          }
+        ],
+        "focusEvidence": [
+          {
+            "interaction": "menu",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Fechar menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "menu",
+            "step": 1,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Abrir menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "menu",
+            "step": 2,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Abrir menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "lightbox",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "close-photo",
+            "label": "Fechar fotografia",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(87, 59, 41)"
+          }
+        ],
+        "axe": []
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 844,
+        "motion": "no-preference",
+        "inputContext": {
+          "hasTouch": true,
+          "isMobile": true,
+          "hover": "none",
+          "touchPathsAtDesktop": "contexto auxiliar com toque"
+        },
+        "coverage": {
+          "height": 1738,
+          "coveredTo": 1738,
+          "complete": true,
+          "tiles": [
+            "index.html:390:no-preference:0",
+            "index.html:390:no-preference:1200"
+          ]
+        },
+        "passed": false,
+        "errors": [
+          "CTA menor que 44px",
+          "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/pointer: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+        ],
+        "metrics": {
+          "overflow": false,
+          "height": 1738,
+          "overflowText": [],
+          "images": [
+            {
+              "src": "./assets/fixture-jomon.jpg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg",
+              "naturalWidth": 1928,
+              "naturalHeight": 1221,
+              "alt": "Ampliar fotografia do recipiente Jōmon e tampa",
+              "bounds": {
+                "x": 23.390625,
+                "y": 1321.171875,
+                "width": 343.21875,
+                "height": 217.359375
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            },
+            {
+              "src": "./icons/expand.svg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/icons/expand.svg",
+              "naturalWidth": 150,
+              "naturalHeight": 150,
+              "alt": "",
+              "bounds": {
+                "x": 322.609375,
+                "y": 1554.53125,
+                "width": 24,
+                "height": 24
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            }
+          ],
+          "backgrounds": [
+            {
+              "assetId": "fixture_jomon",
+              "bounds": {
+                "x": 23.390625,
+                "y": 689.1875,
+                "width": 343.21875,
+                "height": 300
+              },
+              "backgroundImage": "url(\"http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg\")",
+              "backgroundSize": "cover",
+              "backgroundPosition": "50% 50%",
+              "maskImage": "none",
+              "alternative": "Recipiente cerâmico Jōmon e sua tampa, fotografados no British Museum"
+            }
+          ],
+          "headings": [
+            {
+              "text": "Matéria que atravessa o tempo.",
+              "bounds": {
+                "x": 23.390625,
+                "y": 167.5,
+                "width": 343.21875,
+                "height": 316.125
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "76px"
+            },
+            {
+              "text": "Observe de perto.",
+              "bounds": {
+                "x": 23.390625,
+                "y": 1143.875,
+                "width": 343.21875,
+                "height": 38.015625
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "35.2px"
+            }
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "loaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "loaded"
+            }
+          ],
+          "hiddenMainContent": [],
+          "renderedText": "Pular para o conteúdo\nESTUDO DE ACERVO\nENSAIO VISUAL · FIXTURE LOCAL\nMenu\n\nFORMA / MEMÓRIA / MATÉRIA\n\nMatéria que atravessa o tempo.\n\nDemonstração local com fotografia CC0. Um estudo de composição para observar textura, proporção e luz.\n\nVer perfil no Instagram\n01 / RECIPIENTE E TAMPA\nFotografia: BabelStone · CC0\n\nUM OLHAR MAIS PRÓXIMO\n\nObserve de perto.\n\nEsta imagem histórica é usada apenas como material de teste. Não representa produtos de uma empresa analisada.\n\nAmpliar fotografia\nESTUDO DE ACERVO\nTeste local. Sem geração por IA e sem publicação.",
+          "cropChecks": [
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "adjusted": false,
+              "objectPosition": "50.000% 50.000%",
+              "anchor": [
+                0.5,
+                0.5
+              ],
+              "visibleBox": [
+                0.13773332144709544,
+                0,
+                0.7245333571058091,
+                1
+              ],
+              "protectedFraction": 1,
+              "risk": null
+            },
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "mode": "fill"
+            }
+          ]
+        },
+        "animation": {
+          "start": [
+            {
+              "target": "DIV",
+              "duration": 650,
+              "state": "running"
+            }
+          ],
+          "activeReduced": 0,
+          "timing": {
+            "sampleMs": 707.3000000000466,
+            "frames": 43,
+            "p95FrameMs": 16.799999999999983,
+            "maxFrameMs": 16.800000000000068
+          }
+        },
+        "interactions": [
+          {
+            "id": "menu",
+            "input": "keyboard",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "menu",
+            "input": "pointer",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "menu",
+            "input": "touch",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "lightbox",
+            "input": "keyboard",
+            "passed": false,
+            "error": "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "pointer",
+            "passed": false,
+            "error": "Interação lightbox/pointer: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "touch",
+            "passed": false,
+            "error": "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+          }
+        ],
+        "focusEvidence": [
+          {
+            "interaction": "menu",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Fechar menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "menu",
+            "step": 1,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Abrir menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "menu",
+            "step": 2,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Abrir menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "lightbox",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "close-photo",
+            "label": "Fechar fotografia",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(87, 59, 41)"
+          }
+        ],
+        "axe": []
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 844,
+        "motion": "reduce",
+        "inputContext": {
+          "hasTouch": true,
+          "isMobile": true,
+          "hover": "none",
+          "touchPathsAtDesktop": "contexto auxiliar com toque"
+        },
+        "coverage": {
+          "height": 1738,
+          "coveredTo": 1738,
+          "complete": true,
+          "tiles": [
+            "index.html:390:reduce:0",
+            "index.html:390:reduce:1200"
+          ]
+        },
+        "passed": false,
+        "errors": [
+          "CTA menor que 44px",
+          "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/pointer: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+        ],
+        "metrics": {
+          "overflow": false,
+          "height": 1738,
+          "overflowText": [],
+          "images": [
+            {
+              "src": "./assets/fixture-jomon.jpg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg",
+              "naturalWidth": 1928,
+              "naturalHeight": 1221,
+              "alt": "Ampliar fotografia do recipiente Jōmon e tampa",
+              "bounds": {
+                "x": 23.390625,
+                "y": 1321.171875,
+                "width": 343.21875,
+                "height": 217.359375
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            },
+            {
+              "src": "./icons/expand.svg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/icons/expand.svg",
+              "naturalWidth": 150,
+              "naturalHeight": 150,
+              "alt": "",
+              "bounds": {
+                "x": 322.609375,
+                "y": 1554.53125,
+                "width": 24,
+                "height": 24
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            }
+          ],
+          "backgrounds": [
+            {
+              "assetId": "fixture_jomon",
+              "bounds": {
+                "x": 23.390625,
+                "y": 689.1875,
+                "width": 343.21875,
+                "height": 300
+              },
+              "backgroundImage": "url(\"http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg\")",
+              "backgroundSize": "cover",
+              "backgroundPosition": "50% 50%",
+              "maskImage": "none",
+              "alternative": "Recipiente cerâmico Jōmon e sua tampa, fotografados no British Museum"
+            }
+          ],
+          "headings": [
+            {
+              "text": "Matéria que atravessa o tempo.",
+              "bounds": {
+                "x": 23.390625,
+                "y": 167.5,
+                "width": 343.21875,
+                "height": 316.125
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "76px"
+            },
+            {
+              "text": "Observe de perto.",
+              "bounds": {
+                "x": 23.390625,
+                "y": 1143.875,
+                "width": 343.21875,
+                "height": 38.015625
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "35.2px"
+            }
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "loaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "loaded"
+            }
+          ],
+          "hiddenMainContent": [],
+          "renderedText": "Pular para o conteúdo\nESTUDO DE ACERVO\nENSAIO VISUAL · FIXTURE LOCAL\nMenu\n\nFORMA / MEMÓRIA / MATÉRIA\n\nMatéria que atravessa o tempo.\n\nDemonstração local com fotografia CC0. Um estudo de composição para observar textura, proporção e luz.\n\nVer perfil no Instagram\n01 / RECIPIENTE E TAMPA\nFotografia: BabelStone · CC0\n\nUM OLHAR MAIS PRÓXIMO\n\nObserve de perto.\n\nEsta imagem histórica é usada apenas como material de teste. Não representa produtos de uma empresa analisada.\n\nAmpliar fotografia\nESTUDO DE ACERVO\nTeste local. Sem geração por IA e sem publicação.",
+          "cropChecks": [
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "adjusted": false,
+              "objectPosition": "50.000% 50.000%",
+              "anchor": [
+                0.5,
+                0.5
+              ],
+              "visibleBox": [
+                0.13773332144709544,
+                0,
+                0.7245333571058091,
+                1
+              ],
+              "protectedFraction": 1,
+              "risk": null
+            },
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "mode": "fill"
+            }
+          ]
+        },
+        "animation": {
+          "start": [],
+          "activeReduced": 0,
+          "timing": {
+            "sampleMs": 715.6999999999767,
+            "frames": 44,
+            "p95FrameMs": 16.799999999999955,
+            "maxFrameMs": 16.80000000000001
+          }
+        },
+        "interactions": [
+          {
+            "id": "menu",
+            "input": "keyboard",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "menu",
+            "input": "pointer",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "menu",
+            "input": "touch",
+            "passed": true,
+            "steps": 3
+          },
+          {
+            "id": "lightbox",
+            "input": "keyboard",
+            "passed": false,
+            "error": "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "pointer",
+            "passed": false,
+            "error": "Interação lightbox/pointer: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "touch",
+            "passed": false,
+            "error": "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+          }
+        ],
+        "focusEvidence": [
+          {
+            "interaction": "menu",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Fechar menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "menu",
+            "step": 1,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Abrir menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "menu",
+            "step": 2,
+            "tag": "BUTTON",
+            "id": "",
+            "label": "Abrir menu",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(0, 0, 0)",
+            "background": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "interaction": "lightbox",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "close-photo",
+            "label": "Fechar fotografia",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(87, 59, 41)"
+          }
+        ],
+        "axe": []
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 900,
+        "motion": "no-preference",
+        "inputContext": {
+          "hasTouch": false,
+          "isMobile": false,
+          "hover": "hover",
+          "touchPathsAtDesktop": "contexto auxiliar com toque"
+        },
+        "coverage": {
+          "height": 1311,
+          "coveredTo": 1311,
+          "complete": true,
+          "tiles": [
+            "index.html:768:no-preference:0",
+            "index.html:768:no-preference:1200"
+          ]
+        },
+        "passed": false,
+        "errors": [
+          "Recorte remove região protegida: fixture_jomon",
+          "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/pointer: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+        ],
+        "metrics": {
+          "overflow": false,
+          "height": 1311,
+          "overflowText": [],
+          "images": [
+            {
+              "src": "./assets/fixture-jomon.jpg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg",
+              "naturalWidth": 1928,
+              "naturalHeight": 1221,
+              "alt": "Ampliar fotografia do recipiente Jōmon e tampa",
+              "bounds": {
+                "x": 425,
+                "y": 909.78125,
+                "width": 300.765625,
+                "height": 190.46875
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            },
+            {
+              "src": "./icons/expand.svg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/icons/expand.svg",
+              "naturalWidth": 150,
+              "naturalHeight": 150,
+              "alt": "",
+              "bounds": {
+                "x": 681.765625,
+                "y": 1116.25,
+                "width": 24,
+                "height": 24
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            }
+          ],
+          "backgrounds": [
+            {
+              "assetId": "fixture_jomon",
+              "bounds": {
+                "x": 404.5,
+                "y": 177.9375,
+                "width": 321.265625,
+                "height": 540
+              },
+              "backgroundImage": "url(\"http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg\")",
+              "backgroundSize": "cover",
+              "backgroundPosition": "50% 50%",
+              "maskImage": "none",
+              "alternative": "Recipiente cerâmico Jōmon e sua tampa, fotografados no British Museum"
+            }
+          ],
+          "headings": [
+            {
+              "text": "Matéria que atravessa o tempo.",
+              "bounds": {
+                "x": 42.234375,
+                "y": 318.953125,
+                "width": 321.265625,
+                "height": 139.734375
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "44.8px"
+            },
+            {
+              "text": "Observe de perto.",
+              "bounds": {
+                "x": 42.234375,
+                "y": 980.609375,
+                "width": 300.75,
+                "height": 38.015625
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "35.2px"
+            }
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "loaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "loaded"
+            }
+          ],
+          "hiddenMainContent": [],
+          "renderedText": "Pular para o conteúdo\nESTUDO DE ACERVO\nENSAIO VISUAL · FIXTURE LOCAL\nInício\nAcervo\n\nFORMA / MEMÓRIA / MATÉRIA\n\nMatéria que atravessa o tempo.\n\nDemonstração local com fotografia CC0. Um estudo de composição para observar textura, proporção e luz.\n\nVer perfil no Instagram\n01 / RECIPIENTE E TAMPA\nFotografia: BabelStone · CC0\n\nUM OLHAR MAIS PRÓXIMO\n\nObserve de perto.\n\nEsta imagem histórica é usada apenas como material de teste. Não representa produtos de uma empresa analisada.\n\nAmpliar fotografia\nESTUDO DE ACERVO\nTeste local. Sem geração por IA e sem publicação.",
+          "cropChecks": [
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": false,
+              "adjusted": false,
+              "objectPosition": "50.000% 50.000%",
+              "anchor": [
+                0.5,
+                0.5
+              ],
+              "visibleBox": [
+                0.311613777410385,
+                0,
+                0.37677244517923003,
+                1
+              ],
+              "protectedFraction": 0.5796499156603538,
+              "risk": "A região protegida não cabe: altere proporção, use contain ou outra composição."
+            },
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "mode": "fill"
+            }
+          ]
+        },
+        "animation": {
+          "start": [
+            {
+              "target": "DIV",
+              "duration": 650,
+              "state": "running"
+            }
+          ],
+          "activeReduced": 0,
+          "timing": {
+            "sampleMs": 713.9999999999534,
+            "frames": 43,
+            "p95FrameMs": 16.700000000000045,
+            "maxFrameMs": 16.80000000000001
+          }
+        },
+        "interactions": [
+          {
+            "id": "lightbox",
+            "input": "keyboard",
+            "passed": false,
+            "error": "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "pointer",
+            "passed": false,
+            "error": "Interação lightbox/pointer: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "touch",
+            "passed": false,
+            "error": "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+          }
+        ],
+        "focusEvidence": [
+          {
+            "interaction": "lightbox",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "close-photo",
+            "label": "Fechar fotografia",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(87, 59, 41)"
+          }
+        ],
+        "axe": []
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 900,
+        "motion": "reduce",
+        "inputContext": {
+          "hasTouch": false,
+          "isMobile": false,
+          "hover": "hover",
+          "touchPathsAtDesktop": "contexto auxiliar com toque"
+        },
+        "coverage": {
+          "height": 1311,
+          "coveredTo": 1311,
+          "complete": true,
+          "tiles": [
+            "index.html:768:reduce:0",
+            "index.html:768:reduce:1200"
+          ]
+        },
+        "passed": false,
+        "errors": [
+          "Recorte remove região protegida: fixture_jomon",
+          "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/pointer: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+        ],
+        "metrics": {
+          "overflow": false,
+          "height": 1311,
+          "overflowText": [],
+          "images": [
+            {
+              "src": "./assets/fixture-jomon.jpg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg",
+              "naturalWidth": 1928,
+              "naturalHeight": 1221,
+              "alt": "Ampliar fotografia do recipiente Jōmon e tampa",
+              "bounds": {
+                "x": 425,
+                "y": 909.78125,
+                "width": 300.765625,
+                "height": 190.46875
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            },
+            {
+              "src": "./icons/expand.svg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/icons/expand.svg",
+              "naturalWidth": 150,
+              "naturalHeight": 150,
+              "alt": "",
+              "bounds": {
+                "x": 681.765625,
+                "y": 1116.25,
+                "width": 24,
+                "height": 24
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            }
+          ],
+          "backgrounds": [
+            {
+              "assetId": "fixture_jomon",
+              "bounds": {
+                "x": 404.5,
+                "y": 177.9375,
+                "width": 321.265625,
+                "height": 540
+              },
+              "backgroundImage": "url(\"http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg\")",
+              "backgroundSize": "cover",
+              "backgroundPosition": "50% 50%",
+              "maskImage": "none",
+              "alternative": "Recipiente cerâmico Jōmon e sua tampa, fotografados no British Museum"
+            }
+          ],
+          "headings": [
+            {
+              "text": "Matéria que atravessa o tempo.",
+              "bounds": {
+                "x": 42.234375,
+                "y": 318.953125,
+                "width": 321.265625,
+                "height": 139.734375
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "44.8px"
+            },
+            {
+              "text": "Observe de perto.",
+              "bounds": {
+                "x": 42.234375,
+                "y": 980.609375,
+                "width": 300.75,
+                "height": 38.015625
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "35.2px"
+            }
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "loaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "loaded"
+            }
+          ],
+          "hiddenMainContent": [],
+          "renderedText": "Pular para o conteúdo\nESTUDO DE ACERVO\nENSAIO VISUAL · FIXTURE LOCAL\nInício\nAcervo\n\nFORMA / MEMÓRIA / MATÉRIA\n\nMatéria que atravessa o tempo.\n\nDemonstração local com fotografia CC0. Um estudo de composição para observar textura, proporção e luz.\n\nVer perfil no Instagram\n01 / RECIPIENTE E TAMPA\nFotografia: BabelStone · CC0\n\nUM OLHAR MAIS PRÓXIMO\n\nObserve de perto.\n\nEsta imagem histórica é usada apenas como material de teste. Não representa produtos de uma empresa analisada.\n\nAmpliar fotografia\nESTUDO DE ACERVO\nTeste local. Sem geração por IA e sem publicação.",
+          "cropChecks": [
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": false,
+              "adjusted": false,
+              "objectPosition": "50.000% 50.000%",
+              "anchor": [
+                0.5,
+                0.5
+              ],
+              "visibleBox": [
+                0.311613777410385,
+                0,
+                0.37677244517923003,
+                1
+              ],
+              "protectedFraction": 0.5796499156603538,
+              "risk": "A região protegida não cabe: altere proporção, use contain ou outra composição."
+            },
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "mode": "fill"
+            }
+          ]
+        },
+        "animation": {
+          "start": [],
+          "activeReduced": 0,
+          "timing": {
+            "sampleMs": 700.2000000000465,
+            "frames": 43,
+            "p95FrameMs": 16.700000000000045,
+            "maxFrameMs": 16.800000000000068
+          }
+        },
+        "interactions": [
+          {
+            "id": "lightbox",
+            "input": "keyboard",
+            "passed": false,
+            "error": "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "pointer",
+            "passed": false,
+            "error": "Interação lightbox/pointer: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "touch",
+            "passed": false,
+            "error": "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+          }
+        ],
+        "focusEvidence": [
+          {
+            "interaction": "lightbox",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "close-photo",
+            "label": "Fechar fotografia",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(87, 59, 41)"
+          }
+        ],
+        "axe": []
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 900,
+        "motion": "no-preference",
+        "inputContext": {
+          "hasTouch": false,
+          "isMobile": false,
+          "hover": "hover",
+          "touchPathsAtDesktop": "contexto auxiliar com toque"
+        },
+        "coverage": {
+          "height": 1478,
+          "coveredTo": 1478,
+          "complete": true,
+          "tiles": [
+            "index.html:1440:no-preference:0",
+            "index.html:1440:no-preference:1200"
+          ]
+        },
+        "passed": false,
+        "errors": [
+          "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/pointer: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+        ],
+        "metrics": {
+          "overflow": false,
+          "height": 1478,
+          "overflowText": [],
+          "images": [
+            {
+              "src": "./assets/fixture-jomon.jpg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg",
+              "naturalWidth": 1928,
+              "naturalHeight": 1221,
+              "alt": "Ampliar fotografia do recipiente Jōmon e tampa",
+              "bounds": {
+                "x": 796.890625,
+                "y": 909.78125,
+                "width": 563.921875,
+                "height": 357.125
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            },
+            {
+              "src": "./icons/expand.svg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/icons/expand.svg",
+              "naturalWidth": 150,
+              "naturalHeight": 150,
+              "alt": "",
+              "bounds": {
+                "x": 1316.8125,
+                "y": 1282.90625,
+                "width": 24,
+                "height": 24
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            }
+          ],
+          "backgrounds": [
+            {
+              "assetId": "fixture_jomon",
+              "bounds": {
+                "x": 758.4375,
+                "y": 177.9375,
+                "width": 602.375,
+                "height": 540
+              },
+              "backgroundImage": "url(\"http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg\")",
+              "backgroundSize": "cover",
+              "backgroundPosition": "50% 50%",
+              "maskImage": "none",
+              "alternative": "Recipiente cerâmico Jōmon e sua tampa, fotografados no British Museum"
+            }
+          ],
+          "headings": [
+            {
+              "text": "Matéria que atravessa o tempo.",
+              "bounds": {
+                "x": 79.1875,
+                "y": 276.515625,
+                "width": 560.296875,
+                "height": 224.625
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "72px"
+            },
+            {
+              "text": "Observe de perto.",
+              "bounds": {
+                "x": 79.1875,
+                "y": 1051.859375,
+                "width": 563.921875,
+                "height": 62.1875
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "57.6px"
+            }
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "loaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "loaded"
+            }
+          ],
+          "hiddenMainContent": [],
+          "renderedText": "Pular para o conteúdo\nESTUDO DE ACERVO\nENSAIO VISUAL · FIXTURE LOCAL\nInício\nAcervo\n\nFORMA / MEMÓRIA / MATÉRIA\n\nMatéria que atravessa o tempo.\n\nDemonstração local com fotografia CC0. Um estudo de composição para observar textura, proporção e luz.\n\nVer perfil no Instagram\n01 / RECIPIENTE E TAMPA\nFotografia: BabelStone · CC0\n\nUM OLHAR MAIS PRÓXIMO\n\nObserve de perto.\n\nEsta imagem histórica é usada apenas como material de teste. Não representa produtos de uma empresa analisada.\n\nAmpliar fotografia\nESTUDO DE ACERVO\nTeste local. Sem geração por IA e sem publicação.",
+          "cropChecks": [
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "adjusted": false,
+              "objectPosition": "50.000% 50.000%",
+              "anchor": [
+                0.5,
+                0.5
+              ],
+              "visibleBox": [
+                0.14677468735592436,
+                0,
+                0.7064506252881513,
+                1
+              ],
+              "protectedFraction": 1,
+              "risk": null
+            },
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "mode": "fill"
+            }
+          ]
+        },
+        "animation": {
+          "start": [
+            {
+              "target": "DIV",
+              "duration": 650,
+              "state": "running"
+            }
+          ],
+          "activeReduced": 0,
+          "timing": {
+            "sampleMs": 713.6,
+            "frames": 43,
+            "p95FrameMs": 16.700000000000045,
+            "maxFrameMs": 16.80000000000001
+          }
+        },
+        "interactions": [
+          {
+            "id": "lightbox",
+            "input": "keyboard",
+            "passed": false,
+            "error": "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "pointer",
+            "passed": false,
+            "error": "Interação lightbox/pointer: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "touch",
+            "passed": false,
+            "error": "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+          }
+        ],
+        "focusEvidence": [
+          {
+            "interaction": "lightbox",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "close-photo",
+            "label": "Fechar fotografia",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(87, 59, 41)"
+          }
+        ],
+        "axe": []
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 900,
+        "motion": "reduce",
+        "inputContext": {
+          "hasTouch": false,
+          "isMobile": false,
+          "hover": "hover",
+          "touchPathsAtDesktop": "contexto auxiliar com toque"
+        },
+        "coverage": {
+          "height": 1478,
+          "coveredTo": 1478,
+          "complete": true,
+          "tiles": [
+            "index.html:1440:reduce:0",
+            "index.html:1440:reduce:1200"
+          ]
+        },
+        "passed": false,
+        "errors": [
+          "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/pointer: Expectativa focused falhou: #close-photo =",
+          "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+        ],
+        "metrics": {
+          "overflow": false,
+          "height": 1478,
+          "overflowText": [],
+          "images": [
+            {
+              "src": "./assets/fixture-jomon.jpg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg",
+              "naturalWidth": 1928,
+              "naturalHeight": 1221,
+              "alt": "Ampliar fotografia do recipiente Jōmon e tampa",
+              "bounds": {
+                "x": 796.890625,
+                "y": 909.78125,
+                "width": 563.921875,
+                "height": 357.125
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            },
+            {
+              "src": "./icons/expand.svg",
+              "currentSrc": "http://127.0.0.1:61576/site-fixture-subpath/icons/expand.svg",
+              "naturalWidth": 150,
+              "naturalHeight": 150,
+              "alt": "",
+              "bounds": {
+                "x": 1316.8125,
+                "y": 1282.90625,
+                "width": 24,
+                "height": 24
+              },
+              "objectFit": "fill",
+              "objectPosition": "50% 50%"
+            }
+          ],
+          "backgrounds": [
+            {
+              "assetId": "fixture_jomon",
+              "bounds": {
+                "x": 758.4375,
+                "y": 177.9375,
+                "width": 602.375,
+                "height": 540
+              },
+              "backgroundImage": "url(\"http://127.0.0.1:61576/site-fixture-subpath/assets/fixture-jomon.jpg\")",
+              "backgroundSize": "cover",
+              "backgroundPosition": "50% 50%",
+              "maskImage": "none",
+              "alternative": "Recipiente cerâmico Jōmon e sua tampa, fotografados no British Museum"
+            }
+          ],
+          "headings": [
+            {
+              "text": "Matéria que atravessa o tempo.",
+              "bounds": {
+                "x": 79.1875,
+                "y": 276.515625,
+                "width": 560.296875,
+                "height": 224.625
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "72px"
+            },
+            {
+              "text": "Observe de perto.",
+              "bounds": {
+                "x": 79.1875,
+                "y": 1051.859375,
+                "width": 563.921875,
+                "height": 62.1875
+              },
+              "font": "Fraunces, Georgia, serif",
+              "fontSize": "57.6px"
+            }
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "italic",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Fraunces",
+              "weight": "100 900",
+              "style": "normal",
+              "status": "loaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "unloaded"
+            },
+            {
+              "family": "Manrope",
+              "weight": "200 800",
+              "style": "normal",
+              "status": "loaded"
+            }
+          ],
+          "hiddenMainContent": [],
+          "renderedText": "Pular para o conteúdo\nESTUDO DE ACERVO\nENSAIO VISUAL · FIXTURE LOCAL\nInício\nAcervo\n\nFORMA / MEMÓRIA / MATÉRIA\n\nMatéria que atravessa o tempo.\n\nDemonstração local com fotografia CC0. Um estudo de composição para observar textura, proporção e luz.\n\nVer perfil no Instagram\n01 / RECIPIENTE E TAMPA\nFotografia: BabelStone · CC0\n\nUM OLHAR MAIS PRÓXIMO\n\nObserve de perto.\n\nEsta imagem histórica é usada apenas como material de teste. Não representa produtos de uma empresa analisada.\n\nAmpliar fotografia\nESTUDO DE ACERVO\nTeste local. Sem geração por IA e sem publicação.",
+          "cropChecks": [
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "adjusted": false,
+              "objectPosition": "50.000% 50.000%",
+              "anchor": [
+                0.5,
+                0.5
+              ],
+              "visibleBox": [
+                0.14677468735592436,
+                0,
+                0.7064506252881513,
+                1
+              ],
+              "protectedFraction": 1,
+              "risk": null
+            },
+            {
+              "assetId": "fixture_jomon",
+              "assessed": true,
+              "fits": true,
+              "mode": "fill"
+            }
+          ]
+        },
+        "animation": {
+          "start": [],
+          "activeReduced": 0,
+          "timing": {
+            "sampleMs": 714.1000000000465,
+            "frames": 44,
+            "p95FrameMs": 16.799999999999955,
+            "maxFrameMs": 16.80000000000001
+          }
+        },
+        "interactions": [
+          {
+            "id": "lightbox",
+            "input": "keyboard",
+            "passed": false,
+            "error": "Interação lightbox/keyboard: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "pointer",
+            "passed": false,
+            "error": "Interação lightbox/pointer: Expectativa focused falhou: #close-photo ="
+          },
+          {
+            "id": "lightbox",
+            "input": "touch",
+            "passed": false,
+            "error": "Interação lightbox/touch: Expectativa focused falhou: #close-photo ="
+          }
+        ],
+        "focusEvidence": [
+          {
+            "interaction": "lightbox",
+            "step": 0,
+            "tag": "BUTTON",
+            "id": "close-photo",
+            "label": "Fechar fotografia",
+            "outline": "rgb(20, 62, 99) solid 3px",
+            "boxShadow": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgb(87, 59, 41)"
+          }
+        ],
+        "axe": []
+      },
+      {
+        "page": "index.html",
+        "mode": "no-js",
+        "passed": true,
+        "errors": []
+      }
+    ],
+    "screenshots": [
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 844,
+        "motion": "no-preference",
+        "kind": "temporal",
+        "timeMs": 100,
+        "label": "index.html 320 normal início (~100ms após DOM/fontes)",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 844,
+        "motion": "no-preference",
+        "kind": "fold",
+        "label": "index.html 320x844 no-preference primeira dobra",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 1737,
+        "motion": "no-preference",
+        "kind": "full",
+        "label": "index.html 320 no-preference página inteira; altura 1737",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 25
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 1200,
+        "motion": "no-preference",
+        "kind": "detail",
+        "coverageId": "index.html:320:no-preference:0",
+        "y": 0,
+        "label": "index.html 320 no-preference faixa 0–1200",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 537,
+        "motion": "no-preference",
+        "kind": "detail",
+        "coverageId": "index.html:320:no-preference:1200",
+        "y": 1200,
+        "label": "index.html 320 no-preference faixa 1200–1737",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 1
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 844,
+        "motion": "no-preference",
+        "kind": "interaction",
+        "label": "index.html 320 normal menu/menu teclado após abrir",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 844,
+        "motion": "no-preference",
+        "kind": "interaction",
+        "label": "index.html 320 normal lightbox/lightbox teclado após abrir",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 2
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 844,
+        "motion": "reduce",
+        "kind": "fold",
+        "label": "index.html 320x844 reduce primeira dobra",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 1737,
+        "motion": "reduce",
+        "kind": "full",
+        "label": "index.html 320 reduce página inteira; altura 1737",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 25
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 1200,
+        "motion": "reduce",
+        "kind": "detail",
+        "coverageId": "index.html:320:reduce:0",
+        "y": 0,
+        "label": "index.html 320 reduce faixa 0–1200",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 320,
+        "height": 537,
+        "motion": "reduce",
+        "kind": "detail",
+        "coverageId": "index.html:320:reduce:1200",
+        "y": 1200,
+        "label": "index.html 320 reduce faixa 1200–1737",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 327,
+          "viewportHeight": 863
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 1
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 844,
+        "motion": "no-preference",
+        "kind": "fold",
+        "label": "index.html 390x844 no-preference primeira dobra",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 390,
+          "viewportHeight": 844
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 1738,
+        "motion": "no-preference",
+        "kind": "full",
+        "label": "index.html 390 no-preference página inteira; altura 1738",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 390,
+          "viewportHeight": 844
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 1200,
+        "motion": "no-preference",
+        "kind": "detail",
+        "coverageId": "index.html:390:no-preference:0",
+        "y": 0,
+        "label": "index.html 390 no-preference faixa 0–1200",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 390,
+          "viewportHeight": 844
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 538,
+        "motion": "no-preference",
+        "kind": "detail",
+        "coverageId": "index.html:390:no-preference:1200",
+        "y": 1200,
+        "label": "index.html 390 no-preference faixa 1200–1738",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 390,
+          "viewportHeight": 844
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 844,
+        "motion": "reduce",
+        "kind": "fold",
+        "label": "index.html 390x844 reduce primeira dobra",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 390,
+          "viewportHeight": 844
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 1738,
+        "motion": "reduce",
+        "kind": "full",
+        "label": "index.html 390 reduce página inteira; altura 1738",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 390,
+          "viewportHeight": 844
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 1200,
+        "motion": "reduce",
+        "kind": "detail",
+        "coverageId": "index.html:390:reduce:0",
+        "y": 0,
+        "label": "index.html 390 reduce faixa 0–1200",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 390,
+          "viewportHeight": 844
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 390,
+        "height": 538,
+        "motion": "reduce",
+        "kind": "detail",
+        "coverageId": "index.html:390:reduce:1200",
+        "y": 1200,
+        "label": "index.html 390 reduce faixa 1200–1738",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 390,
+          "viewportHeight": 844
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 900,
+        "motion": "no-preference",
+        "kind": "fold",
+        "label": "index.html 768x900 no-preference primeira dobra",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 768,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 1311,
+        "motion": "no-preference",
+        "kind": "full",
+        "label": "index.html 768 no-preference página inteira; altura 1311",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 768,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 1200,
+        "motion": "no-preference",
+        "kind": "detail",
+        "coverageId": "index.html:768:no-preference:0",
+        "y": 0,
+        "label": "index.html 768 no-preference faixa 0–1200",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 768,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 111,
+        "motion": "no-preference",
+        "kind": "detail",
+        "coverageId": "index.html:768:no-preference:1200",
+        "y": 1200,
+        "label": "index.html 768 no-preference faixa 1200–1311",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 768,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 900,
+        "motion": "reduce",
+        "kind": "fold",
+        "label": "index.html 768x900 reduce primeira dobra",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 768,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 1311,
+        "motion": "reduce",
+        "kind": "full",
+        "label": "index.html 768 reduce página inteira; altura 1311",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 768,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 1200,
+        "motion": "reduce",
+        "kind": "detail",
+        "coverageId": "index.html:768:reduce:0",
+        "y": 0,
+        "label": "index.html 768 reduce faixa 0–1200",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 768,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "height": 111,
+        "motion": "reduce",
+        "kind": "detail",
+        "coverageId": "index.html:768:reduce:1200",
+        "y": 1200,
+        "label": "index.html 768 reduce faixa 1200–1311",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 768,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 900,
+        "motion": "no-preference",
+        "kind": "temporal",
+        "timeMs": 100,
+        "label": "index.html 1440 normal início (~100ms após DOM/fontes)",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 900,
+        "motion": "no-preference",
+        "kind": "fold",
+        "label": "index.html 1440x900 no-preference primeira dobra",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 1478,
+        "motion": "no-preference",
+        "kind": "full",
+        "label": "index.html 1440 no-preference página inteira; altura 1478",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 1200,
+        "motion": "no-preference",
+        "kind": "detail",
+        "coverageId": "index.html:1440:no-preference:0",
+        "y": 0,
+        "label": "index.html 1440 no-preference faixa 0–1200",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 278,
+        "motion": "no-preference",
+        "kind": "detail",
+        "coverageId": "index.html:1440:no-preference:1200",
+        "y": 1200,
+        "label": "index.html 1440 no-preference faixa 1200–1478",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 900,
+        "motion": "no-preference",
+        "kind": "interaction",
+        "label": "index.html 1440 normal lightbox/lightbox teclado após abrir",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 11
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 900,
+        "motion": "reduce",
+        "kind": "fold",
+        "label": "index.html 1440x900 reduce primeira dobra",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 1478,
+        "motion": "reduce",
+        "kind": "full",
+        "label": "index.html 1440 reduce página inteira; altura 1478",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 1200,
+        "motion": "reduce",
+        "kind": "detail",
+        "coverageId": "index.html:1440:reduce:0",
+        "y": 0,
+        "label": "index.html 1440 reduce faixa 0–1200",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      },
+      {
+        "page": "index.html",
+        "width": 1440,
+        "height": 278,
+        "motion": "reduce",
+        "kind": "detail",
+        "coverageId": "index.html:1440:reduce:1200",
+        "y": 1200,
+        "label": "index.html 1440 reduce faixa 1200–1478",
+        "capture": {
+          "scrollX": 0,
+          "scrollY": 0,
+          "viewportWidth": 1440,
+          "viewportHeight": 900
+        },
+        "after": {
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      }
+    ],
+    "passed": false
+  }
+}

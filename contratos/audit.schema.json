@@ -176,6 +176,123 @@
         "additionalProperties": false
       },
       "maxItems": 12
+    },
+    "manifestRepairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "expectedHash": {
+            "type": "string"
+          },
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "enum": [
+                    "keyboard",
+                    "pointer",
+                    "touch"
+                  ]
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "click",
+                          "tap",
+                          "press",
+                          "hover",
+                          "focus",
+                          "scroll",
+                          "check"
+                        ]
+                      },
+                      "selector": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "expect": {
+                        "type": "object",
+                        "properties": {
+                          "selector": {
+                            "type": "string"
+                          },
+                          "condition": {
+                            "type": "string",
+                            "enum": [
+                              "visible",
+                              "hidden",
+                              "attribute",
+                              "text",
+                              "focused",
+                              "changed"
+                            ]
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "selector",
+                          "condition",
+                          "name",
+                          "value"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "selector",
+                      "value",
+                      "expect"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 16,
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "input",
+                "steps"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "id",
+          "reason",
+          "expectedHash",
+          "paths"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 8
+    },
+    "scopeJustification": {
+      "type": "string"
     }
   },
   "required": [

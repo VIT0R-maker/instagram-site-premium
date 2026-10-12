@@ -5,7 +5,7 @@ import { must, Fault } from './core.mjs';
 export async function renderIsolated(files,config,repo,signal,details={}) {
   const container='ig-render-'+randomUUID();
   const args=['run','--rm','--name',container,'-i','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--memory','1536m','--cpus','1.5','--pids-limit','128','--shm-size','256m','--tmpfs','/tmp:rw,nosuid,nodev,size=256m','--user','1000:1000',config.rendererImage];
-  const input=JSON.stringify({files:Object.fromEntries(Object.entries(files).map(([p,b])=>[p,b.toString('base64')])),basePath:`/${repo}/`,maxHeight:config.maxScreenshotHeight,viewports:config.renderViewports,maxDetailShots:config.maxDetailShots,maxTemporalShots:config.maxTemporalShots,...details});
+  const input=JSON.stringify({files:Object.fromEntries(Object.entries(files).map(([p,b])=>[p,b.toString('base64')])),basePath:`/${repo}/`,maxHeight:config.maxScreenshotHeight,viewports:config.renderViewports,auditTileHeight:config.auditTileHeight,fontReadyTimeoutMs:config.fontReadyTimeoutMs,maxTemporalShots:config.maxTemporalShots,...details});
   return new Promise((resolve,reject)=>{
     const child=spawn('docker',args,{stdio:['pipe','pipe','pipe'],windowsHide:true,signal});
     const chunks=[];let size=0;const errs=[];

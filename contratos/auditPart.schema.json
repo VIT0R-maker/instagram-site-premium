@@ -1,0 +1,118 @@
+{
+  "type": "object",
+  "properties": {
+    "coverageIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "rubric": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "composition": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "spacing": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "typography": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "images": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "responsiveness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "identity",
+        "composition",
+        "spacing",
+        "typography",
+        "images",
+        "responsiveness"
+      ],
+      "additionalProperties": false
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "viewport": {
+            "type": "string"
+          },
+          "component": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "fix": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "viewport",
+          "component",
+          "evidence",
+          "description",
+          "fix"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 100
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "coverageIds",
+    "score",
+    "rubric",
+    "issues",
+    "observations"
+  ],
+  "additionalProperties": false
+}

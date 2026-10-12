@@ -1,0 +1,362 @@
+TAP version 13
+# (node:25272) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: URL exata: perfil canônico; rejeita posts, prefixos enganosos e localhost
+ok 1 - URL exata: perfil canônico; rejeita posts, prefixos enganosos e localhost
+  ---
+  duration_ms: 1.7077
+  type: 'test'
+  ...
+# Subtest: jobId estável por mensagem; reentrega update diferente não cria novo job
+ok 2 - jobId estável por mensagem; reentrega update diferente não cria novo job
+  ---
+  duration_ms: 0.8612
+  type: 'test'
+  ...
+# Subtest: barreira concorrente: 40 tentativas, uma chamada real simulada; resposta recuperada
+ok 3 - barreira concorrente: 40 tentativas, uma chamada real simulada; resposta recuperada
+  ---
+  duration_ms: 52.3646
+  type: 'test'
+  ...
+# Subtest: reserva antes do envio e timeout ambíguo jamais liberam nova geração
+ok 4 - reserva antes do envio e timeout ambíguo jamais liberam nova geração
+  ---
+  duration_ms: 28.2969
+  type: 'test'
+  ...
+# Subtest: três nichos preservam evidências/identidade diferentes e mais de dez candidatos
+ok 5 - três nichos preservam evidências/identidade diferentes e mais de dez candidatos
+  ---
+  duration_ms: 12.3168
+  type: 'test'
+  ...
+# Subtest: privado, inexistente, username divergente ou sem evidências falham cedo
+ok 6 - privado, inexistente, username divergente ou sem evidências falham cedo
+  ---
+  duration_ms: 0.3334
+  type: 'test'
+  ...
+# Subtest: não concatena números de evidências nem inventa WhatsApp ou DDI
+ok 7 - não concatena números de evidências nem inventa WhatsApp ou DDI
+  ---
+  duration_ms: 1.4636
+  type: 'test'
+  ...
+# Subtest: WhatsApp exige URL exata comprovada; conflito remove ambos
+ok 8 - WhatsApp exige URL exata comprovada; conflito remove ambos
+  ---
+  duration_ms: 0.8998
+  type: 'test'
+  ...
+# Subtest: logo pequena é válida; HTML/corrupção rejeitados; vertical preservada
+ok 9 - logo pequena é válida; HTML/corrupção rejeitados; vertical preservada
+  ---
+  duration_ms: 23.9619
+  type: 'test'
+  ...
+# Subtest: downloads parciais e duplicatas não trocam ID/legenda; hash deduplica
+ok 10 - downloads parciais e duplicatas não trocam ID/legenda; hash deduplica
+  ---
+  duration_ms: 39.7715
+  type: 'test'
+  ...
+# Subtest: SSRF: IPs privados, metadata, IPv4 mapeado e host semelhante bloqueados
+ok 11 - SSRF: IPs privados, metadata, IPv4 mapeado e host semelhante bloqueados
+  ---
+  duration_ms: 2.2317
+  type: 'test'
+  ...
+# Subtest: contraste corrigido e fontes locais com licença e acentos
+ok 12 - contraste corrigido e fontes locais com licença e acentos
+  ---
+  duration_ms: 114.6648
+  type: 'test'
+  ...
+# Subtest: contrato estático válido e hero tipográfico sem fallback para imagem rejeitada
+ok 13 - contrato estático válido e hero tipográfico sem fallback para imagem rejeitada
+  ---
+  duration_ms: 20.0814
+  type: 'test'
+  ...
+# Subtest: bloqueia execução inline, truncamento, caminho absoluto e contato inventado
+ok 14 - bloqueia execução inline, truncamento, caminho absoluto e contato inventado
+  ---
+  duration_ms: 15.8931
+  type: 'test'
+  ...
+# Subtest: patch exige hash/âncora exatos; rejeita reconstrução; aplica ajuste local
+ok 15 - patch exige hash/âncora exatos; rejeita reconstrução; aplica ajuste local
+  ---
+  duration_ms: 1.5059
+  type: 'test'
+  ...
+# Subtest: Gemini inválido/truncado é bloqueado; payload serializado e budget limitados
+ok 16 - Gemini inválido/truncado é bloqueado; payload serializado e budget limitados
+  ---
+  duration_ms: 91.8854
+  type: 'test'
+  ...
+# Subtest: Nemotron desligado não chama endpoint; indisponível/JSON ruim não interrompe
+ok 17 - Nemotron desligado não chama endpoint; indisponível/JSON ruim não interrompe
+  ---
+  duration_ms: 36.258
+  type: 'test'
+  ...
+# Subtest: GitHub inválido falha antes da reserva Claude
+ok 18 - GitHub inválido falha antes da reserva Claude
+  ---
+  duration_ms: 26.7646
+  type: 'test'
+  ...
+# Subtest: Claude truncado ou JSON inválido fica persistido e nunca gera novamente
+ok 19 - Claude truncado ou JSON inválido fica persistido e nunca gera novamente
+  ---
+  duration_ms: 25.6543
+  type: 'test'
+  ...
+# Subtest: HTTP simulado: 429 respeita Retry-After; autenticação e mutação não repetem cegamente
+ok 20 - HTTP simulado: 429 respeita Retry-After; autenticação e mutação não repetem cegamente
+  ---
+  duration_ms: 0.4989
+  type: 'test'
+  ...
+# (node:17972) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: reduz onze recursos para dez sem esvaziar galeria; preserva logo e essenciais
+ok 21 - reduz onze recursos para dez sem esvaziar galeria; preserva logo e essenciais
+  ---
+  duration_ms: 2.2208
+  type: 'test'
+  ...
+# Subtest: logo institucional não perde para nota fotográfica; rejeitada não retorna
+ok 22 - logo institucional não perde para nota fotográfica; rejeitada não retorna
+  ---
+  duration_ms: 0.7219
+  type: 'test'
+  ...
+# Subtest: crop ajusta ponto focal sem cortar assunto e distingue mobile/desktop
+ok 23 - crop ajusta ponto focal sem cortar assunto e distingue mobile/desktop
+  ---
+  duration_ms: 1.7542
+  type: 'test'
+  ...
+# Subtest: recursos opcionais não são obrigatórios no DOM; logo essencial continua exigida
+ok 24 - recursos opcionais não são obrigatórios no DOM; logo essencial continua exigida
+  ---
+  duration_ms: 118.0605
+  type: 'test'
+  ...
+# Subtest: escolha inválida é reavaliada com pixels; não usa primeira direção
+ok 25 - escolha inválida é reavaliada com pixels; não usa primeira direção
+  ---
+  duration_ms: 0.8023
+  type: 'test'
+  ...
+# Subtest: revisão de fontes refaz direção/copy, preservando coleta e fatos; seções variáveis
+ok 26 - revisão de fontes refaz direção/copy, preservando coleta e fatos; seções variáveis
+  ---
+  duration_ms: 88.7379
+  type: 'test'
+  ...
+# Subtest: auditoria dividida cobre todas as faixas; defeito no último lote impede aprovação alta
+ok 27 - auditoria dividida cobre todas as faixas; defeito no último lote impede aprovação alta
+  ---
+  duration_ms: 0.8616
+  type: 'test'
+  ...
+# Subtest: manifesto aceita corrigir seletor, sem apagar fechamento, tecla ou expectativa
+ok 28 - manifesto aceita corrigir seletor, sem apagar fechamento, tecla ou expectativa
+  ---
+  duration_ms: 1.2425
+  type: 'test'
+  ...
+# Subtest: stream completo é inequívoco; erro explícito e encerramento parcial nunca passam
+ok 29 - stream completo é inequívoco; erro explícito e encerramento parcial nunca passam
+  ---
+  duration_ms: 0.741
+  type: 'test'
+  ...
+# Subtest: erro de stream persistido nunca autoriza segunda geração
+ok 30 - erro de stream persistido nunca autoriza segunda geração
+  ---
+  duration_ms: 34.0437
+  type: 'test'
+  ...
+# Subtest: Gemini recupera JSON uma vez; preserva schema e não chama Claude
+ok 31 - Gemini recupera JSON uma vez; preserva schema e não chama Claude
+  ---
+  duration_ms: 33.6938
+  type: 'test'
+  ...
+# Subtest: retomada restaura somente primeira etapa pendente, mantém geração e renova polling
+ok 32 - retomada restaura somente primeira etapa pendente, mantém geração e renova polling
+  ---
+  duration_ms: 65.8061
+  type: 'test'
+  ...
+# Subtest: retomada de geração recupera resposta recebida; ambiguidade permanece bloqueada
+ok 33 - retomada de geração recupera resposta recebida; ambiguidade permanece bloqueada
+  ---
+  duration_ms: 53.5841
+  type: 'test'
+  ...
+# Subtest: nota baixa permite patch e reavaliação; problema visual high bloqueia média alta
+ok 34 - nota baixa permite patch e reavaliação; problema visual high bloqueia média alta
+  ---
+  duration_ms: 164.1413
+  type: 'test'
+  ...
+# Subtest: queda do processo recupera estágio, sem liberar reserva enviada
+ok 35 - queda do processo recupera estágio, sem liberar reserva enviada
+  ---
+  duration_ms: 36.1995
+  type: 'test'
+  ...
+# (node:10404) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: publicação faz um commit coerente, valida subcaminho e retoma sem duplicar repo
+ok 36 - publicação faz um commit coerente, valida subcaminho e retoma sem duplicar repo
+  ---
+  duration_ms: 60.7379
+  type: 'test'
+  ...
+# Subtest: Pages pendente e 404 temporário são recuperados antes de declarar sucesso
+ok 37 - Pages pendente e 404 temporário são recuperados antes de declarar sucesso
+  ---
+  duration_ms: 45.5815
+  type: 'test'
+  ...
+# Subtest: imagem pública ausente, build falho e qualidade ausente impedem sucesso
+ok 38 - imagem pública ausente, build falho e qualidade ausente impedem sucesso
+  ---
+  duration_ms: 85.3736
+  type: 'test'
+  ...
+# Subtest: colisão com repositório de outro trabalho não altera seus arquivos
+ok 39 - colisão com repositório de outro trabalho não altera seus arquivos
+  ---
+  duration_ms: 28.5004
+  type: 'test'
+  ...
+# Subtest: SQLite em oito processos concorrentes: contador físico do provedor permanece um
+ok 40 - SQLite em oito processos concorrentes: contador físico do provedor permanece um
+  ---
+  duration_ms: 243.0963
+  type: 'test'
+  ...
+# (node:25288) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: configuração remove imagens IA; limites de visão e rodadas são validados
+ok 41 - configuração remove imagens IA; limites de visão e rodadas são validados
+  ---
+  duration_ms: 1.2153
+  type: 'test'
+  ...
+# Subtest: produtos e outras ofertas verificadas são válidos; website e loja têm canais distintos
+ok 42 - produtos e outras ofertas verificadas são válidos; website e loja têm canais distintos
+  ---
+  duration_ms: 10.9844
+  type: 'test'
+  ...
+# Subtest: vinte famílias preparadas com licença, acentos e pesos; biblioteca é opcional e fixada
+ok 43 - vinte famílias preparadas com licença, acentos e pesos; biblioteca é opcional e fixada
+  ---
+  duration_ms: 529.1868
+  type: 'test'
+  ...
+# Subtest: contrato aceita múltiplos HTML/CSS/JS/SVG; rejeita caminhos reservados e travessia
+ok 44 - contrato aceita múltiplos HTML/CSS/JS/SVG; rejeita caminhos reservados e travessia
+  ---
+  duration_ms: 42.6742
+  type: 'test'
+  ...
+# Subtest: SVG, JS autoral, backgrounds e reuso funcional passam; dimensões erradas viram diagnóstico reparável
+ok 45 - SVG, JS autoral, backgrounds e reuso funcional passam; dimensões erradas viram diagnóstico reparável
+  ---
+  duration_ms: 68.0368
+  type: 'test'
+  ...
+# Subtest: escapes CSS e imports locais são aceitos; SVG externo/script e JS incompleto exigem reparo antes do browser
+ok 46 - escapes CSS e imports locais são aceitos; SVG externo/script e JS incompleto exigem reparo antes do browser
+  ---
+  duration_ms: 65.2367
+  type: 'test'
+  ...
+# Subtest: segredo ou resposta incompleta é fatal; microcopy equivalente segue para revisão semântica
+ok 47 - segredo ou resposta incompleta é fatal; microcopy equivalente segue para revisão semântica
+  ---
+  duration_ms: 5.5255
+  type: 'test'
+  ...
+# Subtest: SEO finalizado antes do hash é idempotente, usa URL final e Organization factual
+ok 48 - SEO finalizado antes do hash é idempotente, usa URL final e Organization factual
+  ---
+  duration_ms: 31.6707
+  type: 'test'
+  ...
+# Subtest: referências visuais preservam assetId/hash, usam pixels e acompanham a única geração
+ok 49 - referências visuais preservam assetId/hash, usam pixels e acompanham a única geração
+  ---
+  duration_ms: 196.5193
+  type: 'test'
+  ...
+# Subtest: visão ausente, imagens omitidas e contexto insuficiente falham antes da reserva
+ok 50 - visão ausente, imagens omitidas e contexto insuficiente falham antes da reserva
+  ---
+  duration_ms: 50.7651
+  type: 'test'
+  ...
+# Subtest: patch JS/SVG usa versão e âncora exata; não permite alterar assets preparados
+ok 51 - patch JS/SVG usa versão e âncora exata; não permite alterar assets preparados
+  ---
+  duration_ms: 33.8907
+  type: 'test'
+  ...
+# Subtest: queda pequena de nota não reverte correção comprovada
+ok 52 - queda pequena de nota não reverte correção comprovada
+  ---
+  duration_ms: 0.7732
+  type: 'test'
+  ...
+# Subtest: diagnóstico repair-first chega ao Gemini; patch JS revalida e renderiza sem regeneração
+ok 53 - diagnóstico repair-first chega ao Gemini; patch JS revalida e renderiza sem regeneração
+  ---
+  duration_ms: 74.6641
+  type: 'test'
+  ...
+# Subtest: afirmação comercial sem fonte bloqueia publicação mesmo com navegador verde
+ok 54 - afirmação comercial sem fonte bloqueia publicação mesmo com navegador verde
+  ---
+  duration_ms: 37.7071
+  type: 'test'
+  ...
+# Subtest: fracionar reconstrução em patches pequenos não contorna o limite de preservação
+ok 55 - fracionar reconstrução em patches pequenos não contorna o limite de preservação
+  ---
+  duration_ms: 0.3147
+  type: 'test'
+  ...
+# Subtest: coleta expandida reinterpreta fatos com as novas fontes textuais
+ok 56 - coleta expandida reinterpreta fatos com as novas fontes textuais
+  ---
+  duration_ms: 114.6898
+  type: 'test'
+  ...
+# (node:27184) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: HTTP: autorização, duplicação, ordem, progresso, falha e retomada conservam contexto
+ok 57 - HTTP: autorização, duplicação, ordem, progresso, falha e retomada conservam contexto
+  ---
+  duration_ms: 368.9715
+  type: 'test'
+  ...
+1..57
+# tests 57
+# suites 0
+# pass 57
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1977.2769

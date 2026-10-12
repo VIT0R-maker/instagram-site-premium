@@ -34,9 +34,9 @@ test('produtos e outras ofertas verificadas são válidos; website e loja têm c
   for(const [kind,url] of [['website','https://example.org/sobre'],['shop','https://shop.example.org/colecao']]){pack.sources.push({id:kind,text:url});facts.claims.push({id:kind,kind,sourceId:kind,original:url,normalized:url,quote:url,date:null,status:'verified'});}
   const links=confirmedLinks(verifyFacts(facts,pack),pack);assert.equal(links.find(l=>l.channel==='website').label,'Visitar o site');assert.equal(links.find(l=>l.channel==='shop').label,'Acessar a loja');assert.equal(links[0].label,'Ver perfil no Instagram');
 });
-test('oito famílias preparadas com licença, acentos e pesos; biblioteca é opcional e fixada',()=>{
-  verifyResources();assert.equal(Object.keys(FONT_CATALOG).length,8);
-  for(const name of Object.keys(FONT_CATALOG)){const fonts=installFonts(temp(),{heading:name,body:name});assert.equal(fonts.files.length,3);assert(fonts.css.includes('unicode-range'));assert(fonts.css.includes(FONT_CATALOG[name].weights));}
+test('vinte famílias preparadas com licença, acentos e pesos; biblioteca é opcional e fixada',()=>{
+  verifyResources();assert.equal(Object.keys(FONT_CATALOG).length,20);
+  for(const name of Object.keys(FONT_CATALOG)){const fonts=installFonts(temp(),{heading:name,body:name});assert.equal(fonts.files.length,FONT_CATALOG[name].styles.length*2+1);assert(fonts.css.includes('unicode-range'));assert(fonts.css.includes(FONT_CATALOG[name].weights));}
   assert.equal(installLibrary(temp(),'native').files.length,0);assert.throws(()=>installLibrary(temp(),'unknown','anything'));assert.throws(()=>installLibrary(temp(),'animejs','curto'));
   const lib=installLibrary(temp(),'animejs','Timeline de múltiplos elementos sincronizados.');assert.equal(lib.version,'3.2.2');assert(lib.hashes['lib/anime.min.js']);
 });

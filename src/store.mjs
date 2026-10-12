@@ -8,12 +8,19 @@ export class Store {
   constructor(root) {
     mkdirSync(root, { recursive: true, mode: 0o700 });
     this.db = new DatabaseSync(path.join(root, 'jobs.sqlite'));
-    this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA busy_timeout=5000;
+    // Install the busy handler BEFORE WAL/DDL, which can contend on first startup.
+    this.db.exec('PRAGMA busy_timeout=5000');
+    const initialize=()=>this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;
       CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY, chat TEXT NOT NULL, username TEXT NOT NULL, profile TEXT NOT NULL, created INTEGER NOT NULL, data TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS stages(job TEXT, stage TEXT, state TEXT, result TEXT, started INTEGER, ended INTEGER, PRIMARY KEY(job,stage));
       CREATE TABLE IF NOT EXISTS claude(job TEXT PRIMARY KEY, state TEXT NOT NULL, response TEXT, status INTEGER, request_id TEXT, calls INTEGER NOT NULL CHECK(calls=1), reserved INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS checkpoints(job TEXT, key TEXT, value TEXT, PRIMARY KEY(job,key));
       CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, job TEXT, at INTEGER, kind TEXT, data TEXT);`);
+    const deadline=Date.now()+10000;
+    for(;;)try{initialize();break;}catch(e){
+      if(e.errcode!==5||Date.now()>=deadline){this.db.close();throw e;}
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,25);
+    }
   }
   create(job) {
     this.db.prepare('INSERT OR IGNORE INTO jobs VALUES(?,?,?,?,?,?)').run(job.id, job.chat, job.username, job.profile, Date.now(), JSON.stringify(job));

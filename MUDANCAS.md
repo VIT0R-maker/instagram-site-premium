@@ -1,17 +1,19 @@
-# Mudanças da revisão 2
+# Entrega v3 — 12/10/2026
 
-- Removida geração de imagens IA da configuração e das orientações. Migração v1 explícita com backup.
-- Claude recebe pixels, briefing e manifesto na única criação. Verificação de visão, tamanho de imagem/corpo, contexto e saída antes da reserva.
-- Produtos e outras ofertas comprovadas aceitos; websites/lojas preservados como canais distintos.
-- Coleta expandida atualiza as evidências textuais e a interpretação do negócio.
-- Briefing separa fatos imutáveis, qualidade obrigatória e composição flexível.
-- Contrato de vários arquivos HTML/CSS/JS/SVG, interações declaradas, backgrounds/máscaras e reuso funcional. Runtime de menu tornou-se opcional.
-- Oito famílias tipográficas locais com licença; biblioteca de animação opcional fixada e preparada.
-- SEO e CSP finalizados antes da auditoria/hash; dados estruturados não inventam classificação/endereço.
-- Diagnósticos recuperáveis permitem reparo; cópia é revisada por sentido/evidência, não fragmentos literais.
-- Auditoria com versões persistidas, hashes/âncoras, patches de JS/SVG além de HTML/CSS, orçamento acumulado e parada sem progresso. Nota isolada não provoca rollback.
-- Chromium testa 320/390/768/1440 px, normal/reduced, foco/teclado/toque/mouse, movimento e detalhes de seções. Capturas aguardam conclusão da rolagem suave para comparar a mesma dobra.
-- Workflow continua com 58 nós nativos, atualizado para o worker v2. Export incluído também dentro do repositório.
-- Testes, comparação local e documentos reescritos para separar mocks, comportamento real do browser e validações de produção ainda pendentes.
+A revisão consolida o repositório principal depois de consultar `criador-premium`. A geração única persistente e a publicação por bytes aprovados foram preservadas.
 
-A reserva Claude, recuperação conservadora, publicação por commit e verificação Pages foram preservadas. Não houve migração desnecessária de infraestrutura, reset do banco nem publicação em conta externa.
+- Corrigida inicialização SQLite: busy handler antes de WAL/DDL e retry limitado somente em contenção da inicialização. O teste agora inicia oito processos sobre banco novo.
+- Recortes: geometria adaptada da referência, regiões protegidas, alternativas por proporção, sugestões diferentes mobile/desktop e verificação do enquadramento real.
+- Tipografia: catálogo passou de oito para vinte famílias locais, com pesos/estilos verificados, acentos e licenças. Não foram copiadas URLs externas com pesos presumidos.
+- Curadoria: reserva de candidatos de logo, prioridades de recursos, redução correta sem esvaziar galeria, reaproveitamento de análises na expansão e rejeitadas fora da seleção.
+- Briefing: revisão pode reparar causas além da copy. Direção inválida tem recuperação limitada. Estrutura não exige primeira seção chamada hero; recursos opcionais não são obrigatórios no DOM.
+- Claude: streaming com término inequívoco, erro explícito propagado, resposta bruta persistida e nenhuma segunda geração. Saída padrão de 48 mil tokens validada contra modelo/complexidade. Todas as referências selecionadas continuam presentes.
+- Gemini: recuperação limitada de JSON, contagem de contexto, orçamento persistente e auditoria visual em lotes sem omitir o final da página.
+- Renderer: enquadramento da dobra verificado, fontes com timeout, desktop com mouse/hover, mobile com toque, capturas contíguas legíveis nos dois modos e teste de página adicional.
+- Correção: snapshots, hashes/âncoras, nova renderização obrigatória, manifesto corrigível sem apagar ações e orçamento maior somente quando justificado. High/critical bloqueiam independentemente da nota.
+- Retomada: verifica propriedade e estado, reabre somente primeira etapa recuperável, renova polling apropriado e preserva geração/artefatos/publicação.
+- Export: JSON determinístico e teste de igualdade com gerador. Prompts/contratos/documentação sincronizados; relatórios antigos identificados como históricos.
+
+Não foram importados o template fixo, o descarte perceptual automático, o limite de cinco referências, a exclusão da logo, o parser de stream que engole erros nem o gate baseado apenas em média do projeto de referência. Os 58 nós continuam: simplificar o planejador era opcional e não foi necessário para estas melhorias.
+
+Resultados medidos e limitações: [VALIDACAO.md](VALIDACAO.md). Instalação e parâmetros atuais: [README.md](README.md).

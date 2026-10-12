@@ -134,7 +134,7 @@ export function diagnoseSite(files,brief,secretValues=[],interactions=[]) {
   }
   const htmls=Object.entries(files).filter(([f])=>f.endsWith('.html')).map(([,b])=>b.toString());
   for(const b of backgrounds)check(htmls.some(s=>s.includes(`data-asset-id="${b.assetId}"`)||s.includes(`data-asset-id='${b.assetId}'`)),'BACKGROUND_SEMANTICS','Identifique a fotografia CSS com data-asset-id e alternativa semântica.',b.file,'renderable',b.assetId);
-  for(const a of brief.assets||[])check(used.has(a.assetId),'IMAGE_MISSING','Asset selecionado não utilizado.','index.html','renderable',a.assetId);
+  for(const a of brief.assets||[])if(a.priority==='essential'||a.role==='logo')check(used.has(a.assetId),'IMAGE_MISSING','Recurso essencial não utilizado.','index.html','renderable',a.assetId);
   for(const t of interactions){
     check(t.minWidth<=t.maxWidth&&existing.has(t.page),'INTERACTION_RANGE','Página/intervalo de interação inválido.','interactions');
     check(new Set(t.paths.map(p=>p.input)).size===3,'INTERACTION_INPUTS','Declare teclado, mouse e toque para a interação implementada.','interactions','renderable',t.id);
@@ -152,7 +152,7 @@ export function applyPatches(files,patches,config={}) {
     const current=out[p.file].toString();must(p.find&&p.find!==p.replace&&current.split(p.find).length===2,'PATCH_ANCHOR','Âncora deve ser única, exata e alterar conteúdo.');
     changed[p.file]=(changed[p.file]||0)+Math.max(Buffer.byteLength(p.find),Buffer.byteLength(p.replace));
     removed[p.file]=(removed[p.file]||0)+Buffer.byteLength(p.find);
-    must(changed[p.file]<=Math.max(500,original[p.file].length*(config.maxPatchFraction||.25))&&removed[p.file]<=original[p.file].length*.45&&p.find.length<current.length*.5,'PATCH_SCOPE','Correção exige reconstrução ampla; publicação bloqueada.');
+    must(changed[p.file]<=Math.max(500,original[p.file].length*(config.maxPatchFraction||.25))&&removed[p.file]<=original[p.file].length*(config.maxRemovedFraction||.45)&&p.find.length<current.length*(config.maxRemovedFraction||.5),'PATCH_SCOPE','Correção exige reconstrução ampla; publicação bloqueada.');
     out[p.file]=Buffer.from(current.replace(p.find,()=>p.replace));
   }
   return out;

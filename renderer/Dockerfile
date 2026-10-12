@@ -3,5 +3,6 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts --omit=dev
 COPY renderer/run.mjs ./renderer/run.mjs
+COPY src/crops.mjs ./src/crops.mjs
 USER pwuser
 ENTRYPOINT ["node", "renderer/run.mjs"]

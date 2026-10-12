@@ -1,4 +1,4 @@
-# Decisão técnica — revisão 2
+# Decisão técnica — revisão 3
 
 A implementação existente foi preservada. n8n continua orquestrando etapas e Telegram; o worker reúne processamento, contratos e persistência; o renderer executa o artefato sem credenciais. Esses componentes fornecem capacidades verificáveis. A quantidade de componentes não prova design superior.
 
@@ -13,6 +13,6 @@ Inspeção local em 11/10/2026: Node 24.14.1, projeto Node/ESM instalado, Playwr
 | Correções após inspeção | Reparar o artefato real sem reconstruí-lo | Gemini propõe; worker aplica hashes/âncoras; renderer revalida | A combinação permite mostrar defeito e confirmar resultado. O teste local demonstrou detecção e reparo de overflow, CTA e foco. O Gemini real não foi exercitado. |
 | Persistência de trabalhos | Recuperar coleta/artefato/publicação sem repetir criação | SQLite local no worker | Reserva atômica é requisito operacional, não melhoria estética. Uma tabela de reservas compartilhada impede retries/concorrência de gerar duas vezes. |
 
-O Docker continua obrigatório para código gerado em produção. A execução nativa de uma fixture controlada é apenas uma ferramenta de teste, sem fallback automático. O erro do daemon impede afirmar que a imagem Docker v2 foi construída/executada nesta revisão. A instalação anterior v1 tem evidências históricas próprias e não substitui essa confirmação.
+O Docker continua obrigatório para código gerado em produção. A execução nativa de uma fixture controlada é apenas uma ferramenta de teste, sem fallback automático. O erro do daemon impede afirmar que a imagem Docker v3 foi construída/executada nesta revisão. A instalação anterior v1 tem evidências históricas próprias e não substitui essa confirmação.
 
 Poderia ser hospedado com menos processos se o ambiente n8n fornecesse as mesmas bibliotecas, disco persistente e isolamento do navegador com desempenho equivalente. Isso não foi confirmado aqui; uma migração agora acrescentaria risco sem benefício visual observado.

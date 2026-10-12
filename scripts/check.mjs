@@ -24,5 +24,6 @@ function files(dir){return readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.is
 for(const file of [...files(path.join(root,'src')),...files(path.join(root,'renderer')),...files(path.join(root,'scripts'))].filter(f=>/\.m?js$/.test(f))) {
   const result=spawnSync(process.execPath,['--check',file],{encoding:'utf8'});assert.equal(result.status,0,result.stderr);
 }
+const generated=spawnSync(process.execPath,[path.join(root,'scripts/build-workflow.mjs'),'--check'],{encoding:'utf8'});assert.equal(generated.status,0,generated.stderr);
 const provider=readFileSync(path.join(root,'src/providers.mjs'),'utf8');assert.equal((provider.match(/https:\/\/api\.anthropic\.com\/v1\/messages'/g)||[]).length,1);
 console.log(JSON.stringify({nodes:f.nodes.length,connections:Object.keys(f.connections).length,claudeNodes:1,noReturnLoop:true,syntax:'passed',n8nReference:'2.41.6',importedIntoUserInstance:false},null,2));

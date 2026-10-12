@@ -1,61 +1,61 @@
-# Relatório de validação — 11/10/2026
+# Validação atual — versão 3, 12/10/2026
 
-## Resultado e limites
+**57 testes automatizados aprovados, zero falhas.** Renderer exercitado em Chromium real com fixtures controladas. Não foram realizadas chamadas reais Apify/Gemini/Claude, mensagens Telegram ou publicações GitHub nesta revisão. As notas e propostas de patch das fixtures são mocks, não uma avaliação estética real dos modelos.
 
-Entrega validada por parsing/syntax, testes de unidade e integração com mocks, importação/execução local no n8n e renderização real de fixture em Chromium. **Não foi executado um job contra suas credenciais reais.** Não foram criados repositórios públicos, enviadas mensagens Telegram nem consumidas gerações Claude nesta sessão.
+## Resultados atuais
 
-| Verificação | Resultado |
+| Verificação | Resultado e evidência |
 |---|---|
-| JSON e estrutura n8n | 58 nós, nomes/IDs únicos, 47 origens de conexão válidas, expressões com referências existentes. |
-| Nós e geração | Tipos nativos; um nó Claude, retry desligado; nenhum ciclo alcança novamente esse nó. |
-| Importação original | Importado no CLI de n8n 2.41.6 em contêiner sem rede, credenciais ou ativação; exit 0. |
-| Orquestração n8n | Workflow adaptado somente para trocar Telegram/HTTP por mocks; sete etapas POST uma vez cada, duas consultas por etapa; exit 0. |
-| Testes automatizados | 26 testes de contratos, concorrência, rede simulada, imagens, GitHub simulado e HTTP local. |
-| Concorrência Claude | 40 promessas concorrentes e oito processos separados: contador físico simulado = 1. |
-| Renderer | Chromium 156.0.8078.4; Docker `network=none`, sem credenciais. |
-| Viewports | 360×844, 390×844, 768×900, 1440×900; DPR 1, pt-BR, America/Sao_Paulo, movimento reduzido. |
-| Screenshots | Oito arquivos reais da fixture: primeira dobra + página inteira em cada viewport. |
-| Navegador | Menu, Escape, foco devolvido, âncoras, CTA, overflow, console, requests/imagens e conteúdo sem JS. Fixture passou. |
-| axe | Nenhuma violação reportada na fixture nas quatro larguras. Isso não é garantia para sites futuros. |
-| Dependências | `npm ci` com versões fixadas e lockfile; `npm audit` na instalação testada: zero vulnerabilidades reportadas. |
-| Docker | Renderer e worker construídos; bases fixadas por versão e digest. |
+| Suíte de código | 57/57 aprovados: `evidencias/v3/testes.tap`. |
+| Workflow e sintaxe | 58 nós, 47 origens de conexão, um nó Claude sem retry/ciclo de retorno; `evidencias/v3/estrutura.json`. |
+| JSON versus gerador | Igualdade byte a byte por `node scripts/build-workflow.mjs --check`, incluída em `npm run check`. IDs determinísticos e finais de linha controlados. |
+| Concorrência | 40 promessas e oito processos inicializando o mesmo banco novo; contador simulado de geração = 1. O erro anterior `database is locked` não ocorreu após o ajuste. |
+| Estado e recuperação | Retomada torna a primeira etapa recuperável executável; concluídas ficam intactas. Testes de publicação falha, geração com resposta salva, ambiguidade e queda de processo. |
+| Referências | Payload multimodal inspecionado nos testes, todas as imagens selecionadas exigidas por ID/hash; logo/essenciais preservados pela seleção. |
+| Stream/JSON | SSE completo aceito; erro explícito e resposta parcial bloqueados sem segunda geração. Gemini JSON inválido tem um reparo limitado. |
+| Curadoria/briefing | 11→10 recursos sem esvaziar galeria; logo preservada; rejeitadas bloqueadas; crops mobile/desktop; direção inválida reavaliada; estrutura sem sequência universal; revisão de dependências. |
+| Fontes | Vinte famílias verificadas/instaladas no teste com licença, subconjuntos, pesos e estilos reais. |
+| Browser comparativo | Chromium 156.0.8078.4 local, DPR 1, pt-BR, America/Sao_Paulo. 320/390/768/1440, normal e reduced; desktop sem toque como contexto principal. |
+| Antes/depois | Mesma fixture e job: baseline reprovada; seis patches fixos simulados; final aprovada pelo navegador. 37 capturas iniciais e 35 finais, 9 verificações por versão e 36 caminhos de interação na final. |
+| Página longa/adicional | Duas páginas, 10 verificações, 58 capturas. Página principal com 14 seções e 9.871 px, faixas contíguas até o rodapé em 320/1440 e ambos os modos. `evidencias/v3/pagina-longa.json`. |
+| Gate visual/semântico | Falha high impede nota 97; afirmação sem fonte impede sucesso técnico; nota baixa pode gerar patch e nova avaliação. Problema no último lote visual não é apagado pela consolidação. |
+| Publicação | APIs simuladas verificam commit, bytes, fontes/JS/SVG/imagens, subcaminho, build, propagação, 404 e retomada sem novo repo/Claude. |
+| Dependências | Instalação com versões fixadas/lockfile; npm reportou zero vulnerabilidades na instalação realizada. |
+| Build worker/renderer v3 | **Não concluído:** ambos retornaram exit 1 porque `dockerDesktopLinuxEngine` está indisponível. Saída em `evidencias/v3/build-docker.json`. |
+| n8n atual | Validação estrutural realizada; importação/execução v3 no contêiner e na instância do usuário permanecem pendentes. |
 
-A última tentativa de reconstruir o worker após os reforços finais de validação encontrou o daemon Docker desligado/indisponível (`dockerDesktopLinuxEngine` ausente). As construções anteriores foram bem-sucedidas; o código final passou nos 26 testes e na checagem de sintaxe. É necessário executar o build do pacote final no host de implantação.
+O teste de SQLite foi realizado no Windows/Node 24.14.1 disponível. A implantação suportada continua sendo um worker por volume local Docker/Linux. Os oito processos testam contenção e reserva; não autorizam múltiplos servidores por volume. A confirmação no ambiente Linux de implantação permanece pendente junto do build.
 
-## Cenários solicitados
+## O que as capturas mostram
 
-1. **Acervo rico/carrosséis:** fixture com 18 posts × 5 filhos; 60 candidatos preservados; filho de índice 4 presente; nenhuma dependência de covers-first.
-2. **Poucas fotos/vertical/logo:** imagem vertical decodificada e logo PNG válida abaixo de 4 KB aceita.
-3. **Sem WhatsApp/endereço:** CTA Instagram; nenhuma inferência de DDI/DDD; contatos conflitantes removidos.
-4. **Privado/inexistente/insuficiente:** rejeitados antes de geração.
-5. **Download parcial/expirado/inválido/duplicado:** mock de falha + decode real; associação ID/legenda estável, SHA deduplica.
-6. **Filho posterior do carrossel:** seleção candidata inclui filhos além dos três originais. A superioridade estética depende da curadoria real Gemini, não é simulada como fato.
-7. **Sem hero fotográfico:** fixture tipográfica válida; código proíbe reaproveitar papel reject e exige coerência de heroMode.
-8. **Gemini inválido/truncado/429:** respostas simuladas bloqueadas; teste de transporte 429→200 respeita Retry-After; 401 não repete; limites de payload/budget verificados.
-9. **Nemotron:** desligado não chama endpoint; indisponível retorna null e permite caminho Gemini. Qualidade comparativa de texto requer avaliação real.
-10. **GitHub inválido:** falha de preflight simulada sem reserva Claude.
-11. **Claude truncado/timeout/persistência:** truncado permanece salvo e reprovado; timeout bloqueia repetição; resposta reaproveitada após reabrir o banco.
-12. **Duplicação/concorrência/retomada:** mesma mensagem mantém ID; novo message_id muda ID; etapas não executam duas vezes; contador de geração permanece um.
-13. **Auditoria impeditiva/patch inválido:** HTTP local não libera publish se audit falhar; patch exige hash/trecho exato, rejeita reconstrução; quality gate recusa aprovação ausente.
-14. **IA complementar:** não aplicável como chamada externa: geração opcional não foi implementada. O caminho entregue usa fotos reais/CSS; flag habilitada registra essa limitação, sem endpoint fictício.
-15. **Pages/subcaminho/pending/404/imagem ausente:** mocks confirmam recuperação de pending/404, bloqueio por ausência de imagem, build falho com repo preservado e retomada sem nova criação/ref mutation.
-16. **Três nichos:** cerâmica artesanal, barbearia e oficina automotiva com fontes/ofertas distintas. O briefing solicita três direções específicas; não existe template HTML de produção. As fixtures não medem a criatividade real dos modelos.
+Abra [a comparação interativa](evidencias/v3/comparacao.html). O título mobile deixa de ampliar o viewport; o CTA passa de 32 para 48 px; o recipiente e sua tampa aparecem sem o corte anterior; a lightbox mantém o foco. Dobra inicial tem scroll zero verificado antes/depois da captura. Todas as larguras finais passaram pelos checks aplicáveis, incluindo axe e movimento reduzido.
 
-## Evidências entregues
+O Chromium executou código real de fixture, mouse, teclado e toque. A fotografia é CC0, de BabelStone/Wikimedia, usada somente como material de teste e nunca como foto de produção ou fallback. A versão inicial recebeu 80 e a final 91 **no mock**; esses números não provam melhoria estética. As alterações observáveis nos screenshots e os defeitos detectados pelo browser são a evidência técnica.
 
-- `evidencias/n8n-report.json`: execução com mocks em n8n real.
-- `evidencias/render-report.json`: verificações do browser/axe e condições de captura.
-- `evidencias/screenshots/*.jpg`: imagens reais da fixture.
-- `evidencias/testes.tap`: saída da suíte automatizada final.
-- `evidencias/estrutura.json`: validação estática do workflow e sintaxe.
+As faixas são pareadas por página/largura/modo/y, e não por índice arbitrário. Uma versão mais curta pode não ter a última faixa da anterior. DPR/dispositivo são iguais; a baseline com overflow pode provocar zoom automático no browser mobile, registrado nos metadados. O teste não esconde essa falha ajustando o layout antes de capturar.
 
-Os screenshots são de uma página sintética de teste. Não são um exemplo gerado pelo Claude para um Instagram real, nem prova de resultado visual universal. Nenhuma nota visual Gemini foi inventada.
+Medições rAF/animação são diagnósticas em ambiente virtualizado. Não certificam fluidez de todo aparelho nem substituem observação de movimento em uso real. Axe não resolve sozinho contraste sobre fotografias ou toda a acessibilidade.
 
-## Validação restante no seu ambiente
+## Pendências externas exatas
 
-- Configurar `.env`, credencial Header Auth e Telegram, URL acessível do worker, volume persistente e repositório descartável de prova.
-- Confirmar as cotas/modelos com as contas reais; conferir Apify no perfil real; executar uma geração intencional e observar as auditorias produzidas por esse job.
-- Confirmar publicação/URL real em sua conta. Os testes existentes verificam protocolo e recuperação com mocks; não comprovam a disponibilidade de serviços externos na sua conta.
-- Conferir políticas do host Docker e do proxy HTTPS. A garantia de no máximo uma geração depende da preservação do ledger e da identidade do bot/chat/mensagem.
+1. Fazer o daemon Docker Linux funcionar no host escolhido e executar os dois builds, renderer isolado e smoke de importação/orquestração n8n. Não foi feito reset do Docker, exclusão de volumes nem substituição de configuração global.
+2. Configurar `.env`, credenciais Telegram/Header Auth no n8n, URL do worker, IDs autorizados e repositório descartável de prova. Confirmar modelos/cotas reais no preflight.
+3. Executar um pedido intencional com um perfil público real, avaliando seleção, briefing, a única criação Claude e a auditoria Gemini. Não há avaliação artística real do sistema multínicho nesta sessão.
+4. Confirmar as URLs reais de repositório/Pages e a inspeção pública complementar. Nenhuma URL de site gerado é inventada nesta entrega; o workflow produz esses valores durante execução bem-sucedida.
 
-Não foi realizada importação ou execução na sua instância n8n. A compatibilidade testada refere-se ao contêiner local de referência 2.41.6.
+O caminho nativo `--local-fixture` nunca é usado como fallback de produção para código gerado. A ausência de Docker não foi contornada removendo isolamento do caminho principal.
+
+## Reprodução
+
+```powershell
+npm ci
+npm test
+npm run check
+node scripts/render-comparison.mjs --local-fixture
+node scripts/render-coverage.mjs
+node scripts/collect-evidence.mjs
+```
+
+Com Docker disponível: `docker compose --profile build build renderer-image worker`, `npm run test:render`, `npm run test:n8n`. Depois siga o README para ativação e `AVALIACAO_VISUAL.md` para avaliação real autorizada.
+
+Arquivos em `evidencias/` fora de `v3/` são **históricos**. A prova antiga de importação n8n/Docker v1 e a suíte intermediária v2 com 41/42 não são apresentadas como validação do pacote atual.

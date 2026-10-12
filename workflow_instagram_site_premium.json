@@ -1,6 +1,6 @@
 {
   "id": "IGPremiumSingleClaudeV1",
-  "name": "Instagram → Site Premium v2 | fotos reais + criação única + revisão visual",
+  "name": "Instagram → Site Premium v3 | fotos reais + criação única + revisão visual",
   "nodes": [
     {
       "parameters": {
@@ -9,7 +9,7 @@
         ],
         "additionalFields": {}
       },
-      "id": "aa77de8d-da64-4e4b-b36b-68424ec4580e",
+      "id": "b527042e-9c3e-40cf-a4fb-ec1bd4b331d5",
       "name": "Telegram — receber perfil",
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
@@ -23,13 +23,13 @@
           "name": "Telegram account"
         }
       },
-      "webhookId": "48738ba0-6097-4ea3-a531-1d44e9f5bc2a"
+      "webhookId": "4b2e0a8d-8884-4f6e-a785-8cc4f5e39a62"
     },
     {
       "parameters": {
         "jsCode": "if ($input.all().length !== 1) throw new Error('Esperado um evento Telegram por execução.');\nconst event = $input.item.json;\n// Altere somente esta URL. n8n Cloud precisa de HTTPS acessível; localhost aponta para o próprio n8n.\nconst workerBaseUrl = 'http://host.docker.internal:8787';\nreturn [{ json: { event, workerBaseUrl } }];"
       },
-      "id": "07100bda-0ba7-4b6d-aa70-6e7d5c8dc7bc",
+      "id": "576ac62a-7443-4024-ac4f-6b3298eb67fa",
       "name": "Contexto — um evento por execução",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -57,7 +57,7 @@
           }
         }
       },
-      "id": "34117fea-eee5-4cd1-9db6-4810bee5dd4e",
+      "id": "5cd48477-18b6-4338-a476-e128a0c61d25",
       "name": "Worker — autorizar e recuperar job",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -85,7 +85,7 @@
           },
           "conditions": [
             {
-              "id": "298fba5b-953b-4f77-93f6-ab01929d2f6b",
+              "id": "85f5e4a0-b7c9-40c2-a021-9fef443ccfcd",
               "leftValue": "={{ $json.accepted === true && typeof $json.jobId === 'string' }}",
               "rightValue": "",
               "operator": {
@@ -99,7 +99,7 @@
         },
         "options": {}
       },
-      "id": "114cae0e-ccbb-4071-a485-4ffb5fc93d3b",
+      "id": "3f620de6-a16c-4aea-ac18-8dc01984d0bc",
       "name": "Trabalho autorizado?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -119,7 +119,7 @@
           },
           "conditions": [
             {
-              "id": "b48cba3c-f87a-48f6-bd0c-75f4d2cd1068",
+              "id": "1f9f84b3-8fc1-417d-a244-927ffc34e9dd",
               "leftValue": "={{ $json.notify === true && typeof $json.chatId === 'string' }}",
               "rightValue": "",
               "operator": {
@@ -133,7 +133,7 @@
         },
         "options": {}
       },
-      "id": "d6fa1954-aa6b-4d88-a429-3e4b8bd75839",
+      "id": "171c6d7a-fe71-457f-accd-57ee226d71de",
       "name": "Responder entrada inválida?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -150,7 +150,7 @@
           "appendAttribution": false
         }
       },
-      "id": "c8ce2035-8bdf-4770-b1fc-32ff51f237f8",
+      "id": "a1443582-c89c-4fa0-a39a-9594471b2bd6",
       "name": "Telegram — entrada inválida",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -184,7 +184,7 @@
           }
         }
       },
-      "id": "2925241e-4b35-4765-b2be-ac6d677c2dc2",
+      "id": "908794a7-43ef-488a-aebf-61c3b864656a",
       "name": "Validar configuração e publicação",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -205,7 +205,7 @@
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'preflight', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "705532e5-232d-406c-91a6-eca28e170fd2",
+      "id": "2ccf6694-9c04-4a15-a4a0-fd71ae0dd727",
       "name": "Contexto preflight",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -225,7 +225,7 @@
           },
           "conditions": [
             {
-              "id": "467a030e-d8c3-4f49-be9d-be5afc823bf9",
+              "id": "83e923aa-6e60-456d-a00d-db8039ab9627",
               "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
               "rightValue": "",
               "operator": {
@@ -239,7 +239,7 @@
         },
         "options": {}
       },
-      "id": "4b11239a-7ad3-4a5f-91bb-5c79a3173357",
+      "id": "15301e54-2f11-470d-a1f6-1ebecc8821f7",
       "name": "Falhou preflight?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -259,7 +259,7 @@
           },
           "conditions": [
             {
-              "id": "bc2dd025-7b0c-4383-a453-7d168e903af7",
+              "id": "76e5474e-c5ee-4e22-ae38-6b3d13fae5ac",
               "leftValue": "={{ $json.state === 'done' }}",
               "rightValue": "",
               "operator": {
@@ -273,7 +273,7 @@
         },
         "options": {}
       },
-      "id": "488ff98a-95dd-4eac-b59e-e6d6250b076d",
+      "id": "b8f8f882-d274-4c6c-a15e-f780aaa16070",
       "name": "Concluiu preflight?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -288,7 +288,7 @@
         "amount": 10,
         "unit": "seconds"
       },
-      "id": "3faacfb1-7897-45f8-a4ea-d027e99c1f3f",
+      "id": "e6cb1063-e79c-4ddc-a5ec-900f39fab5b2",
       "name": "Aguardar preflight",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -296,7 +296,7 @@
         1670,
         260
       ],
-      "webhookId": "63d39a0d-0343-4e15-8fad-7adf3afc54df"
+      "webhookId": "539b9de4-e67a-4f5c-afcc-809a5ebdb01d"
     },
     {
       "parameters": {
@@ -314,7 +314,7 @@
           }
         }
       },
-      "id": "61d725dd-ce47-44bc-86b5-b689ca4bf16e",
+      "id": "81ceb1f5-852a-4a86-a049-8f2c1fc93490",
       "name": "Consultar preflight",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -339,7 +339,7 @@
           "appendAttribution": false
         }
       },
-      "id": "c6726f2b-975c-4095-a9dc-a2418760e84f",
+      "id": "891ea766-000c-4926-a462-7d0cc3d112a2",
       "name": "Progresso preflight",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -375,7 +375,7 @@
           }
         }
       },
-      "id": "dc6bff6f-1554-4ed3-8e3d-5c62f4692cf9",
+      "id": "8c5875b2-deb1-48eb-ad01-32e721503aaa",
       "name": "Coletar e processar imagens",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -396,7 +396,7 @@
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'collect', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "284c4128-43f7-4127-a7df-9cece8f18870",
+      "id": "cbc58703-fea2-4b95-a1c1-a38517053ea3",
       "name": "Contexto collect",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -416,7 +416,7 @@
           },
           "conditions": [
             {
-              "id": "f959a1f0-64b5-42f5-b26a-2347352d9a44",
+              "id": "c5ab2d40-559b-4801-a121-41267690c2df",
               "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
               "rightValue": "",
               "operator": {
@@ -430,7 +430,7 @@
         },
         "options": {}
       },
-      "id": "64ee164a-d537-4410-b52e-85a8cc02658b",
+      "id": "02411bc1-3056-4c01-a62a-7f35b439f8e6",
       "name": "Falhou collect?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -450,7 +450,7 @@
           },
           "conditions": [
             {
-              "id": "423db51e-31a7-4a4f-85dd-b4824bce6ab9",
+              "id": "ac7be75c-3328-4d93-af3e-be07c232fdd6",
               "leftValue": "={{ $json.state === 'done' }}",
               "rightValue": "",
               "operator": {
@@ -464,7 +464,7 @@
         },
         "options": {}
       },
-      "id": "f6ab16f1-497b-4f99-b713-041e1467f910",
+      "id": "91e9acc1-14a5-4f33-abd9-d934f041e0c4",
       "name": "Concluiu collect?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -479,7 +479,7 @@
         "amount": 10,
         "unit": "seconds"
       },
-      "id": "79f2b26b-fc9a-4b04-8c61-b4077b28d094",
+      "id": "b5b67abd-d8fa-4095-aa45-ea0c821091be",
       "name": "Aguardar collect",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -487,7 +487,7 @@
         2850,
         260
       ],
-      "webhookId": "0804a99e-4a9f-409a-a2ae-e0bcc67a4eee"
+      "webhookId": "8715feea-ecb0-4c4d-a995-fcc2107a5433"
     },
     {
       "parameters": {
@@ -505,7 +505,7 @@
           }
         }
       },
-      "id": "cfbbed11-dd2d-4cc2-bff0-9a79294c485f",
+      "id": "e0c4e624-2265-45cb-a17e-8dbe9d3c720c",
       "name": "Consultar collect",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -530,7 +530,7 @@
           "appendAttribution": false
         }
       },
-      "id": "c4a936e1-38ac-439e-8940-20442a510c7b",
+      "id": "02ed036c-f58f-46d9-a4f2-15a522820a42",
       "name": "Progresso collect",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -566,7 +566,7 @@
           }
         }
       },
-      "id": "c9306f42-7cc0-4d8c-84dd-f34facc7177f",
+      "id": "24e3d807-9810-4825-ad61-f4a6989e4a64",
       "name": "Gemini — curadoria visual",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -587,7 +587,7 @@
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'curate', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "1331eec0-8a6b-47e4-b719-10ce645e309b",
+      "id": "f0fb71af-42a8-46f3-a902-8d273d0a07b1",
       "name": "Contexto curate",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -607,7 +607,7 @@
           },
           "conditions": [
             {
-              "id": "61eb8848-e499-40e4-9939-9fe0d29ec805",
+              "id": "44da18a3-a0e7-4262-a995-aed2539dde56",
               "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
               "rightValue": "",
               "operator": {
@@ -621,7 +621,7 @@
         },
         "options": {}
       },
-      "id": "8ac2e319-1b03-4ef7-bace-05fd45d4ace6",
+      "id": "de0ee7bd-8db7-4914-ad8a-a8f403ccb000",
       "name": "Falhou curate?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -641,7 +641,7 @@
           },
           "conditions": [
             {
-              "id": "dbcc3947-5756-4626-942d-5271129056e6",
+              "id": "02cc2f5f-c107-467c-a703-f04550d3279f",
               "leftValue": "={{ $json.state === 'done' }}",
               "rightValue": "",
               "operator": {
@@ -655,7 +655,7 @@
         },
         "options": {}
       },
-      "id": "c3fabdb0-6ab4-4da9-952f-a2540795a06e",
+      "id": "703e4006-7658-49aa-a316-c395e4e7f87e",
       "name": "Concluiu curate?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -670,7 +670,7 @@
         "amount": 10,
         "unit": "seconds"
       },
-      "id": "ef6e1fb5-75e9-4ed3-8216-1f9303788144",
+      "id": "e73a1e07-38aa-473c-a7e5-827d9b939cb1",
       "name": "Aguardar curate",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -678,7 +678,7 @@
         4030,
         260
       ],
-      "webhookId": "cb85adb4-4156-4c4a-b9e3-a903bf76bb0d"
+      "webhookId": "0cfe446f-d3df-487b-a4d8-609e28794d03"
     },
     {
       "parameters": {
@@ -696,7 +696,7 @@
           }
         }
       },
-      "id": "3fa7d34a-0b7d-46bf-acca-cb96b479158d",
+      "id": "a24ecc0b-80bc-486d-a77b-b05bf4bdacc4",
       "name": "Consultar curate",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -721,7 +721,7 @@
           "appendAttribution": false
         }
       },
-      "id": "46d3f079-03e8-4a96-a00a-93ae53532d23",
+      "id": "05363669-2bc5-4769-a9c9-9b86305005dd",
       "name": "Progresso curate",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -757,7 +757,7 @@
           }
         }
       },
-      "id": "56813183-3b19-4e87-927b-283397d27caa",
+      "id": "33915d04-b15f-457a-afa1-fc2df8129f16",
       "name": "Gemini — direção, copy e briefing",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -778,7 +778,7 @@
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'brief', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "96f9f780-ec1d-48f8-8492-b593a4f29c26",
+      "id": "30d8e459-f6a6-45f5-a465-0e1e75708864",
       "name": "Contexto brief",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -798,7 +798,7 @@
           },
           "conditions": [
             {
-              "id": "cf0d3caa-048b-459e-a257-25f33dc206bc",
+              "id": "2cce0045-2d97-4ae7-a805-f2f7025b7e40",
               "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
               "rightValue": "",
               "operator": {
@@ -812,7 +812,7 @@
         },
         "options": {}
       },
-      "id": "27f1a152-ef40-4f87-8fd7-82f4ec7d34da",
+      "id": "ee1cd0f7-c2f4-4e01-a1ec-2bbcd1eb1e8b",
       "name": "Falhou brief?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -832,7 +832,7 @@
           },
           "conditions": [
             {
-              "id": "12afa398-bdd5-45ce-8af5-5e90bb8d39df",
+              "id": "0f9fcc42-5d79-4fba-a6e4-3785c02b9321",
               "leftValue": "={{ $json.state === 'done' }}",
               "rightValue": "",
               "operator": {
@@ -846,7 +846,7 @@
         },
         "options": {}
       },
-      "id": "72177039-c133-44f4-b489-6c150f387ac1",
+      "id": "b6aa0555-a9f9-4004-a658-5ea26f2cf148",
       "name": "Concluiu brief?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -861,7 +861,7 @@
         "amount": 10,
         "unit": "seconds"
       },
-      "id": "bb19320d-51a5-46c7-a9b3-9c5bcb35191d",
+      "id": "64a6e5af-4d64-4802-a934-f5dd08913338",
       "name": "Aguardar brief",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -869,7 +869,7 @@
         5210,
         260
       ],
-      "webhookId": "8edb06ea-ad00-441f-9043-87ef640432bd"
+      "webhookId": "a105f735-4922-4c10-ae16-108554653ee3"
     },
     {
       "parameters": {
@@ -887,7 +887,7 @@
           }
         }
       },
-      "id": "90d3d484-0be4-48c1-8415-9586c685ef4f",
+      "id": "c41bd481-7a43-48ca-a656-31503edfa1ff",
       "name": "Consultar brief",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -912,7 +912,7 @@
           "appendAttribution": false
         }
       },
-      "id": "b314b20a-4072-4034-867f-0a64307d69c7",
+      "id": "cc5b7836-24c1-4ffc-a8f9-f385fbf480ec",
       "name": "Progresso brief",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -948,7 +948,7 @@
           }
         }
       },
-      "id": "bf826687-2c58-4b98-abc7-b99ee2e93ff8",
+      "id": "a3ada12b-c581-442e-a7db-e42acc1f68e5",
       "name": "Claude — geração única protegida",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -969,7 +969,7 @@
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'generate', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "fc5dfa8b-7058-4a27-8761-fc6c43e0b55a",
+      "id": "2e0b25a7-36ff-4586-a621-d28f593fd60e",
       "name": "Contexto generate",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -989,7 +989,7 @@
           },
           "conditions": [
             {
-              "id": "485b5e5e-b1f4-473f-b1e2-2b6d1aa8ac29",
+              "id": "ecd8899e-5fca-4bbd-a102-7f12eaa6346f",
               "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
               "rightValue": "",
               "operator": {
@@ -1003,7 +1003,7 @@
         },
         "options": {}
       },
-      "id": "940f0f09-9213-4247-9856-c5593e78e743",
+      "id": "d5c79088-17a8-46ef-a8c4-01b44c88afc7",
       "name": "Falhou generate?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -1023,7 +1023,7 @@
           },
           "conditions": [
             {
-              "id": "3dc35c29-d2db-45f8-bc63-2a5cd8d0ec4a",
+              "id": "2c7c8662-ce6c-486e-aef8-bc94b8beda9d",
               "leftValue": "={{ $json.state === 'done' }}",
               "rightValue": "",
               "operator": {
@@ -1037,7 +1037,7 @@
         },
         "options": {}
       },
-      "id": "aff84b7d-5ce2-46e2-9adf-a1ad8bbcfd8f",
+      "id": "b90e25f3-c05e-4127-a731-b852876924ce",
       "name": "Concluiu generate?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -1052,7 +1052,7 @@
         "amount": 10,
         "unit": "seconds"
       },
-      "id": "e91bc40f-3761-4810-93fd-48166b2c77a9",
+      "id": "8cfe647f-f508-4759-ad1b-9c19d3eab92d",
       "name": "Aguardar generate",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -1060,7 +1060,7 @@
         6390,
         260
       ],
-      "webhookId": "0b00be2d-834e-4e3f-bdfc-b8471c34b69a"
+      "webhookId": "313947bf-b5ca-44fd-acf1-55612e9e61bc"
     },
     {
       "parameters": {
@@ -1078,7 +1078,7 @@
           }
         }
       },
-      "id": "22b97c28-ffbd-4386-9d2e-3346e98fb448",
+      "id": "97b06583-705a-4d67-acc7-e1a1daf8eb5e",
       "name": "Consultar generate",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -1103,7 +1103,7 @@
           "appendAttribution": false
         }
       },
-      "id": "6bcb14a3-8cac-4490-801b-0f09e219e1bd",
+      "id": "33bddc71-5ac1-4643-a2ee-bfa72aa84e6c",
       "name": "Progresso generate",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -1139,7 +1139,7 @@
           }
         }
       },
-      "id": "b1a52cfa-a9b6-4c95-8471-5c8a752be5ce",
+      "id": "30db2d98-2087-4de4-a616-b243d0e0f497",
       "name": "Gemini — auditoria renderizada",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -1160,7 +1160,7 @@
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'audit', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "e303e37a-b3dc-468e-aee6-ed4b874e770c",
+      "id": "eded7640-3cc3-414c-a478-fb717eacd198",
       "name": "Contexto audit",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1180,7 +1180,7 @@
           },
           "conditions": [
             {
-              "id": "905f9101-1650-45ff-a1bd-64aa158845fe",
+              "id": "36086f29-1817-447d-a3e2-cc51e25c17df",
               "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
               "rightValue": "",
               "operator": {
@@ -1194,7 +1194,7 @@
         },
         "options": {}
       },
-      "id": "11bf0e89-13ce-4d53-862e-621f0344c11e",
+      "id": "1c98e8b7-d01b-450f-ac47-f9843c286247",
       "name": "Falhou audit?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -1214,7 +1214,7 @@
           },
           "conditions": [
             {
-              "id": "a91e55f9-87f3-4c28-aaf5-8893e280622e",
+              "id": "ac013b8b-55ff-48ea-ad98-05f2a9f31ee0",
               "leftValue": "={{ $json.state === 'done' }}",
               "rightValue": "",
               "operator": {
@@ -1228,7 +1228,7 @@
         },
         "options": {}
       },
-      "id": "4801db5e-6d87-443b-a4fb-043176d9899d",
+      "id": "405efc38-4bab-4a51-a478-89c3bc501059",
       "name": "Concluiu audit?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -1243,7 +1243,7 @@
         "amount": 10,
         "unit": "seconds"
       },
-      "id": "bcc2f7a8-628b-4fb1-ac61-a04fb86b8a17",
+      "id": "42f4c712-f7dc-4eb3-a5ad-7c647dab09fe",
       "name": "Aguardar audit",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -1251,7 +1251,7 @@
         7570,
         260
       ],
-      "webhookId": "9f0bd209-8d36-435c-8280-7c80048d732f"
+      "webhookId": "311350a6-a33d-494a-a4ea-a03fb05f1826"
     },
     {
       "parameters": {
@@ -1269,7 +1269,7 @@
           }
         }
       },
-      "id": "ec43762a-86bc-4824-bdfc-1051c7f59138",
+      "id": "f10f81eb-5890-4bd5-a29b-fcbdf155c0b7",
       "name": "Consultar audit",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -1294,7 +1294,7 @@
           "appendAttribution": false
         }
       },
-      "id": "7a25aca0-c2df-4589-8b6c-9d93ab76f440",
+      "id": "ccbeca62-abdb-4040-aa11-8c0908db863b",
       "name": "Progresso audit",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -1330,7 +1330,7 @@
           }
         }
       },
-      "id": "88fca33e-cd1b-442e-9658-be3c60202653",
+      "id": "35e691b0-67db-4baf-a274-0c47fa49a6b5",
       "name": "GitHub — commit e Pages",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -1351,7 +1351,7 @@
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'publish', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "4f49858f-ec32-4eed-967b-a75b65c0268d",
+      "id": "627deb1b-43e2-4ccd-abfd-395b53522a1b",
       "name": "Contexto publish",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1371,7 +1371,7 @@
           },
           "conditions": [
             {
-              "id": "f4f0a9d5-866d-42c5-869a-995ccb9f3e63",
+              "id": "8daa4a4c-ca64-41b4-a549-891b6651c950",
               "leftValue": "={{ $json.state === 'failed' || $json.state === 'interrupted' }}",
               "rightValue": "",
               "operator": {
@@ -1385,7 +1385,7 @@
         },
         "options": {}
       },
-      "id": "cac6b0cd-025a-4f1c-81b5-3c5b5da467c9",
+      "id": "3d887a8b-e526-4161-a53f-c0116a939131",
       "name": "Falhou publish?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -1405,7 +1405,7 @@
           },
           "conditions": [
             {
-              "id": "95bd6f19-7373-445e-9c8e-8be701aad138",
+              "id": "2edc077c-cfb7-45f1-a16b-28052a935087",
               "leftValue": "={{ $json.state === 'done' }}",
               "rightValue": "",
               "operator": {
@@ -1419,7 +1419,7 @@
         },
         "options": {}
       },
-      "id": "f9e293bc-9730-4fca-82f2-1a97ae8682af",
+      "id": "8269f961-1aad-4896-ac7e-9f5674cfe07c",
       "name": "Concluiu publish?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
@@ -1434,7 +1434,7 @@
         "amount": 10,
         "unit": "seconds"
       },
-      "id": "e21bf61b-a1cc-4255-adde-7687df08024c",
+      "id": "181401f7-b79d-4487-abaa-5f5fc9d4469f",
       "name": "Aguardar publish",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -1442,7 +1442,7 @@
         8750,
         260
       ],
-      "webhookId": "c90160d8-c394-4828-b92b-8586f68df536"
+      "webhookId": "0946e51a-1f92-46c8-a876-6b92e28adb8a"
     },
     {
       "parameters": {
@@ -1460,7 +1460,7 @@
           }
         }
       },
-      "id": "fcaacea6-6890-4905-8bbf-f83c1363c18b",
+      "id": "87552d29-d71b-4261-a9ca-0d9883a206f7",
       "name": "Consultar publish",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -1485,7 +1485,7 @@
           "appendAttribution": false
         }
       },
-      "id": "3b2deb33-2890-4a61-9738-4018e8d5ea86",
+      "id": "82abce1a-f2b7-4478-a81e-7003e99ebab9",
       "name": "Progresso publish",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -1510,7 +1510,7 @@
           "appendAttribution": false
         }
       },
-      "id": "8a3f6cbe-8653-4c2f-b5db-1013a7a94e75",
+      "id": "3bdadcdc-01a2-4d37-a47f-b67b80bca6fc",
       "name": "Telegram — diagnóstico",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -1534,7 +1534,7 @@
           "appendAttribution": false
         }
       },
-      "id": "5ee3e5eb-cd2e-48fc-8e6d-a92901cc9921",
+      "id": "a8ad00a1-6feb-4555-a747-6082089cf7e6",
       "name": "Telegram — resultado verificado",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
@@ -1552,11 +1552,11 @@
     },
     {
       "parameters": {
-        "content": "## Versão 2 — qualidade visual\nFotografias reais do Apify. Gemini cura os pixels e aprova o briefing. Claude recebe fotos + manifesto e cria uma única vez; trava SQLite persiste entre retomadas. HTML/CSS/JS/SVG autorais, fontes locais e biblioteca opcional preparada. Auditoria normal + reduced motion em 320/390/768/1440, cenários de teclado/mouse/toque e patches delimitados. SEO finalizado antes do hash.\n\nInstale o worker 2.0 e o renderer conforme README. Configure URL do worker no nó Contexto, credencial Authorization: Bearer TOKEN e Telegram. JSON não é autossuficiente. Não deixe o fluxo antigo ativo com o mesmo bot. /retomar JOB recupera o trabalho sem repetir Claude. Ver VALIDACAO.md para testes e limitações desta entrega.",
+        "content": "## Versão 3 — identidade, recortes e qualidade visual\nFotografias reais do Apify. Gemini cura os pixels e aprova o briefing. Claude recebe fotos + manifesto e cria uma única vez; trava SQLite persiste entre retomadas. HTML/CSS/JS/SVG autorais, fontes locais e biblioteca opcional preparada. Auditoria normal + reduced motion em 320/390/768/1440, cenários de teclado/mouse/toque e patches delimitados. SEO finalizado antes do hash.\n\nInstale o worker 3.0 e o renderer conforme README. Configure URL do worker no nó Contexto, credencial Authorization: Bearer TOKEN e Telegram. JSON não é autossuficiente. Não deixe o fluxo antigo ativo com o mesmo bot. /retomar JOB recupera o trabalho sem repetir Claude. Ver VALIDACAO.md para testes e limitações desta entrega.",
         "height": 420,
         "width": 900
       },
-      "id": "0a29bfa2-44ad-419f-9976-c9b3c3a46bd2",
+      "id": "87f04307-f383-41bf-ab58-d7f6a1cda5b6",
       "name": "Leia antes de ativar",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -2235,6 +2235,6 @@
     "timezone": "America/Sao_Paulo"
   },
   "pinData": {},
-  "versionId": "682c9e29-3480-4f3a-ab98-8555ad9126a1",
+  "versionId": "a8789e02-ad92-4009-a6a1-b283ef669ceb",
   "tags": []
 }

@@ -75,7 +75,7 @@ test('SSRF: IPs privados, metadata, IPv4 mapeado e host semelhante bloqueados',(
 test('contraste corrigido e fontes locais com licença e acentos',()=>{
   const colors={background:'#fffafa',surface:'#f8f8f8',text:'#eeeeee',muted:'#cccccc',accent:'#fffaaa',onAccent:'#fffffe',border:'#dddddd',focus:'#fffafa'};
   const result=fixColors(colors);assert(contrast(result.colors.text,result.colors.background)>=4.5);assert(contrast(result.colors.onAccent,result.colors.accent)>=4.5);
-  for(const pair of ['editorial','modern','technical']){const dir=temp(),fonts=installFonts(dir,pair);assert.equal(fonts.files.length,6);assert(fonts.files.some(f=>f.includes('latin-ext')));assert(existsSync(path.join(dir,'site',fonts.files[0])));}
+  for(const pair of ['editorial','modern','technical']){const dir=temp(),fonts=installFonts(dir,pair);assert.equal(fonts.files.length,pair==='technical'?8:10);assert(fonts.files.some(f=>f.includes('latin-ext')));assert(existsSync(path.join(dir,'site',fonts.files[0])));}
 });
 test('contrato estático válido e hero tipográfico sem fallback para imagem rejeitada',()=>{
   const {files,brief,interactions}=siteFixture();assert(validateSite(files,brief,[],interactions).passed);assert.equal(brief.assets.length,0);

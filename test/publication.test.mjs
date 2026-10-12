@@ -61,7 +61,7 @@ test('colisão com repositório de outro trabalho não altera seus arquivos',asy
   await assert.rejects(publishSite(m.p,m.files,m.approval,m.fetchPublic),e=>e.code==='REPO_CONFLICT');assert.equal(m.state.blobs,0);assert.equal(m.state.refWrites,0);m.p.store.close();
 });
 test('SQLite em oito processos concorrentes: contador físico do provedor permanece um',async()=>{
-  const root=mkdtempSync(path.resolve('test-output/process-'));new Store(root).close();
+  const root=mkdtempSync(path.resolve('test-output/process-')); // All eight processes initialize the brand-new database concurrently.
   const script=fileURLToPath(new URL('./claim-process.mjs',import.meta.url));
   await Promise.all(Array.from({length:8},()=>new Promise((resolve,reject)=>{const child=spawn(process.execPath,[script,root],{windowsHide:true,stdio:['ignore','ignore','pipe']});let errors='';child.stderr.on('data',b=>errors+=b);child.on('error',reject);child.on('close',code=>code===0?resolve():reject(Error(errors)));})));
   assert.equal(readFileSync(path.join(root,'requests.txt'),'utf8').trim().split('\n').length,1);

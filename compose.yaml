@@ -4,12 +4,12 @@ services:
     build:
       context: .
       dockerfile: renderer/Dockerfile
-    image: instagram-site-renderer:2.0.0
+    image: instagram-site-renderer:3.0.0
     network_mode: none
     entrypoint: ["node", "--version"]
   worker:
     build: .
-    image: instagram-site-worker:2.0.0
+    image: instagram-site-worker:3.0.0
     restart: "no"
     env_file: .env
     environment:

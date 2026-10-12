@@ -62,7 +62,7 @@
         ],
         "additionalProperties": false
       },
-      "maxItems": 9
+      "maxItems": 24
     },
     "navigation": {
       "type": "array",
@@ -82,7 +82,7 @@
         ],
         "additionalProperties": false
       },
-      "maxItems": 9
+      "maxItems": 24
     },
     "seo": {
       "type": "object",

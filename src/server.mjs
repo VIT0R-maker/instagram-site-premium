@@ -3,6 +3,7 @@ import path from 'node:path';
 import { mkdirSync, rmSync, existsSync, openSync, closeSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { Store } from './store.mjs';
+import { resumeJob } from './resume.mjs';
 import { Pipeline } from './pipeline.mjs';
 import { STAGES, STAGE_TEXT, Fault, must, authEqual, profileUrl, jobIdentity, safeError, readJson } from './core.mjs';
 
@@ -10,10 +11,12 @@ const packageRoot=fileURLToPath(new URL('../',import.meta.url));
 export function validateConfig(c) {
   must(c.schemaVersion==='2.0'&&!Object.hasOwn(c,'enableAiDecorativeImages')&&!Object.hasOwn(c,'geminiImageModel'),'CONFIG_MIGRATION','Execute npm run migrate:config -- caminho/config.json para migrar configuração v1 com backup.');
   for(const key of ['maxCandidateImages','expandedCandidateImages','analysisBatchSize','maxFinalists','maxSiteImages','maxJobDuration','maxActiveJobs','downloadConcurrency','geminiMaxCalls','apiAttempts','retentionDays'])must(Number.isInteger(c[key])&&c[key]>0,'CONFIG',`Parâmetro inválido: ${key}`);
-  must(c.analysisBatchSize<=20&&c.maxFinalists<=20&&c.maxCandidateImages<=c.expandedCandidateImages&&c.expandedCandidateImages<=160&&c.maxSiteImages<=20&&c.apiAttempts<=4&&Number.isInteger(c.maxAuditRounds)&&c.maxAuditRounds>=0&&c.maxAuditRounds<=8&&c.maxBriefReviewRounds>=0&&c.maxBriefReviewRounds<=4,'CONFIG_LIMIT','Configuração excede limites operacionais.');
-  must(c.claudeMaxImages>=c.maxSiteImages&&c.claudeMaxImages<=20&&c.claudeImageBase64Bytes<=8000000&&c.claudeRequestBytes<=24000000&&c.claudeReferenceMaxEdge<=2000&&c.claudeReferenceMinEdge>=512&&c.claudeReferenceMinEdge<=c.claudeReferenceMaxEdge,'CONFIG_VISION','Limites multimodais inválidos.');
+  must(c.analysisBatchSize<=c.geminiMaxImagesPerRequest&&c.maxFinalists<=c.geminiMaxImagesPerRequest&&c.maxCandidateImages<=c.expandedCandidateImages&&c.expandedCandidateImages<=160&&c.maxSiteImages<=64&&c.apiAttempts<=4&&Number.isInteger(c.maxAuditRounds)&&c.maxAuditRounds>=0&&c.maxAuditRounds<=8&&c.maxBriefReviewRounds>=0&&c.maxBriefReviewRounds<=4,'CONFIG_LIMIT','Configuração excede limites operacionais.');
+  must(c.claudeMaxImages>=c.maxSiteImages&&c.claudeMaxImages<=64&&c.claudeImageBase64Bytes<=8000000&&c.claudeRequestBytes<=24000000&&c.claudeReferenceMaxEdge<=2000&&c.claudeReferenceMinEdge>=512&&c.claudeReferenceMinEdge<=c.claudeReferenceMaxEdge,'CONFIG_VISION','Limites multimodais inválidos.');
   must(Number.isInteger(c.maxNoProgressRounds)&&c.maxNoProgressRounds>=1&&c.maxNoProgressRounds<=8&&c.maxPatchFraction>0&&c.maxPatchFraction<=.35&&c.maxCumulativePatchFraction>0&&c.maxCumulativePatchFraction<=.5,'CONFIG_AUDIT','Limites de reparo inválidos.');
-  must(Array.isArray(c.renderViewports)&&[320,390,768,1440].every(w=>c.renderViewports.includes(w))&&c.renderViewports.length<=6&&c.auditImageMaxEdge>=1200&&c.auditImageMaxEdge<=2000&&c.maxDetailShots>=2&&c.maxDetailShots<=16&&c.maxTemporalShots>=2,'CONFIG_RENDER','Viewports/detalhes/movimento obrigatórios ausentes.');
+  must(Array.isArray(c.renderViewports)&&[320,390,768,1440].every(w=>c.renderViewports.includes(w))&&c.renderViewports.length<=6&&c.auditImageMaxEdge>=1200&&c.auditImageMaxEdge<=2000&&c.maxTemporalShots>=2,'CONFIG_RENDER','Viewports/detalhes/movimento obrigatórios ausentes.');
+  must(c.geminiMaxImagesPerRequest>=c.maxFinalists&&c.geminiMaxImagesPerRequest<=100&&c.auditBatchImages>=1&&c.auditBatchImages<=c.geminiMaxImagesPerRequest&&c.auditMaxBatchCalls>=1&&c.auditMaxBatchCalls<=64&&c.auditTileHeight>=600&&c.auditTileHeight<=1600&&c.geminiJsonRepairAttempts>=0&&c.geminiJsonRepairAttempts<=2,'CONFIG_BATCH','Limites de análise dividida inválidos.');
+  must(c.maxExtendedPatchFraction>=c.maxPatchFraction&&c.maxExtendedPatchFraction<=.8&&c.maxExtendedCumulativePatchFraction<=.95,'CONFIG_PATCH','Limite excepcional de correção inválido.');
   must(c.geminiPayloadBytes<=16000000&&c.qualityThreshold>=85&&c.qualityThreshold<=100,'CONFIG_QUALITY','Limite de payload/qualidade fora do contrato.');
   must(/^[a-z0-9][a-z0-9-]{0,15}$/.test(c.repoPrefix),'CONFIG_PREFIX','Prefixo do repositório inválido.');
   return c;
@@ -24,12 +27,12 @@ export function createApp({config,env,store,pipeline,root}) {
     const record=stage?store.stage(job.id,stage):null;
     const failure=record?.result?JSON.parse(record.result):null;
     const pub=store.checkpoint(job.id,'publication'),repo=store.checkpoint(job.id,'repository'),cl=store.claude(job.id);
-    return {accepted:true,jobId:job.id,chatId:job.chat,username:job.username,stage:stage||null,state:record?.state||'pending',message:record?.state==='failed'?`${failure?.message || 'Falha na etapa.'}${cl&&!cl.response?' A reserva do Claude permanece consumida/ambígua.':''}${repo?' Repositório: '+repo.url:''}`:pub?.status==='published'?`Site publicado e verificado.\n${pub.siteUrl}\nRepositório: ${pub.repoUrl}\nJob: ${job.id}`:STAGE_TEXT[stage]||'Trabalho recebido.',repoUrl:repo?.url||null,siteUrl:pub?.status==='published'?pub.siteUrl:null,claudeState:cl?.state||'unused',code:failure?.code||null};
+    return {accepted:true,jobId:job.id,chatId:job.chat,username:job.username,stage:stage||null,state:record?.state||'pending',message:record?.state==='failed'?`${failure?.message || 'Falha na etapa.'}${cl&&!cl.response?' A reserva do Claude permanece consumida/ambígua.':''}${repo?' Repositório: '+repo.url:''}`:pub?.status==='published'?`Site publicado e verificado.\n${pub.siteUrl}\nRepositório: ${pub.repoUrl}\nJob: ${job.id}\nLimitações: ${(store.checkpoint(job.id,'brief')?.limitations||[]).join('; ').slice(0,1800)||'Nenhuma limitação adicional registrada.'}`:STAGE_TEXT[stage]||'Trabalho recebido.',repoUrl:repo?.url||null,siteUrl:pub?.status==='published'?pub.siteUrl:null,publicationState:pub?.status||((repo&&stage==='publish')?'pending':'not_published'),limitations:store.checkpoint(job.id,'brief')?.limitations||[],claudeState:cl?.state||'unused',code:failure?.code||null};
   }
   const server=http.createServer(async(req,res)=>{
     const send=(code,value)=>{res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
     try {
-      if(req.url==='/healthz'&&req.method==='GET'){send(200,{ok:true,version:'2.0.0'});return;}
+      if(req.url==='/healthz'&&req.method==='GET'){send(200,{ok:true,version:'3.0.0'});return;}
       must(authEqual(req.headers.authorization||'','Bearer '+env.WORKER_TOKEN),'AUTH','Autenticação do worker inválida.');
       const url=new URL(req.url,'http://worker');let body={};
       if(req.method==='POST'){let size=0;const chunks=[];for await(const chunk of req){size+=chunk.length;must(size<=24000,'BODY_SIZE','Corpo HTTP excede o limite.');chunks.push(chunk);}try{body=JSON.parse(Buffer.concat(chunks)||'{}');}catch{throw new Fault('BODY_JSON','Corpo JSON inválido.');}}
@@ -39,11 +42,7 @@ export function createApp({config,env,store,pipeline,root}) {
         try {
           let job;const resume=/^\/retomar\s+([a-f0-9]{24})$/.exec(String(m?.text||'').trim());
           if(resume) {
-            job=store.get(resume[1]);must(job.chat===chat,'JOB_OWNER','Trabalho pertence a outro chat.');
-            must(!store.checkpoint(job.id,'purged'),'RETENTION','Artefatos expiraram. O registro da reserva permanece, impedindo nova chamada.');
-            must(!active.has(job.id),'BUSY','Trabalho ainda em execução.');
-            for(const stage of STAGES)if(['failed','interrupted'].includes(store.stage(job.id,stage)?.state))store.resetStage(job.id,stage);
-            store.checkpoint(job.id,'deadline',Date.now()+config.maxJobDuration*1000);
+            job=store.get(resume[1]);resumeJob(store,job,chat,config,active.has(job.id));
           }else {
             must(Number.isSafeInteger(m?.message_id),'INPUT_EVENT','Mensagem Telegram sem message_id.');
             const profile=profileUrl(m.text),id=jobIdentity(env.TELEGRAM_BOT_ID,chat,m.message_id,env.JOB_HMAC_KEY);

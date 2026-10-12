@@ -3,6 +3,7 @@ import { readFileSync, existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { download } from './net.mjs';
 import { must, hash, atomic, Fault } from './core.mjs';
+import { planCrops } from './crops.mjs';
 
 export function normalizeProfile(details,posts,job,cap) {
   const p=details.find(x=>String(x.username).toLowerCase()===job.username);
@@ -96,7 +97,7 @@ export async function makeVariants(selected,assets,dir) {
       const bytes=await pipeline.toFormat(format,{quality:format==='avif'?60:84}).toBuffer();atomic(path.join(dir,'site',file),bytes);
       const info=await sharp(bytes).metadata();variants.push({path:file,width:info.width,height:info.height,mime:`image/${format}`,bytes:bytes.length,sha256:hash(bytes)});
     }
-    out.push({...choice,assetId:a.assetId,width:a.width,height:a.height,variants,provenance:a.provenance,hash:a.hash,context:a.visual.observable,alt:a.visual.alt,focalDesktop:a.visual.focalDesktop,focalMobile:a.visual.focalMobile,protectedBox:a.visual.protectedBox,protectedElements:a.visual.protectedElements,visual:a.visual});
+    out.push({...choice,assetId:a.assetId,width:a.width,height:a.height,variants,provenance:a.provenance,hash:a.hash,context:a.visual.observable,alt:a.visual.alt,focalDesktop:a.visual.focalDesktop,focalMobile:a.visual.focalMobile,protectedBox:a.visual.protectedBox,protectedElements:a.visual.protectedElements,cropPlan:planCrops(a,choice),visual:a.visual});
   }
   return out;
 }
