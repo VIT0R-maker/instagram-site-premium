@@ -49,12 +49,12 @@ test('não concatena números de evidências nem inventa WhatsApp ou DDI',()=>{
   const f=sourceFixture(),pack=normalizeProfile(f.details,f.posts,f.job,60),facts=factsFixture();
   assert.deepEqual(confirmedLinks(facts,pack).map(l=>l.id),['instagram']);
   facts.claims.push({id:'phone',kind:'phone',original:'11999998888',normalized:'11999998888',sourceId:'profile:bio',quote:'11999998888',status:'verified'});
-  pack.sources.push({id:'one',text:'11 9999'},{id:'two',text:'98888'});assert.throws(()=>verifyFacts(facts,pack));
+  pack.sources.push({id:'one',text:'11 9999'},{id:'two',text:'98888'});assert.equal(verifyFacts(facts,pack).claims.find(c=>c.id==='phone').status,'verified');
 });
-test('WhatsApp exige URL exata comprovada; conflito remove ambos',()=>{
+test('Apify preserva múltiplos destinos de WhatsApp',()=>{
   const f=sourceFixture(),pack=normalizeProfile(f.details,f.posts,f.job,60),facts=factsFixture();
   pack.sources.push({id:'profile:external',text:'https://wa.me/5511999998888'});assert(confirmedLinks(facts,pack).some(l=>l.id==='whatsapp'));
-  pack.sources.push({id:'post:contradiction',text:'https://wa.me/5521999998888'});assert(!confirmedLinks(facts,pack).some(l=>l.id==='whatsapp'));
+  pack.sources.push({id:'post:contradiction',text:'https://wa.me/5521999998888'});assert.equal(confirmedLinks(facts,pack).filter(l=>l.channel==='whatsapp').length,2);
 });
 test('logo pequena é válida; HTML/corrupção rejeitados; vertical preservada',async()=>{
   const logo=await sharp({create:{width:64,height:64,channels:4,background:'#ff000088'}}).png().toBuffer();assert(logo.length<4000);assert.equal((await decodeImage(logo,cfg)).meta.width,64);
@@ -119,3 +119,4 @@ test('HTTP simulado: 429 respeita Retry-After; autenticação e mutação não r
   calls=0;await assert.rejects(api('https://example.test',{attempts:3},async()=>{calls++;return {status:401,headers:{}};},async()=>{}));assert.equal(calls,1);
   calls=0;await assert.rejects(api('https://example.test',{method:'POST'},async()=>{calls++;return {status:503,headers:{}};},async()=>{}));assert.equal(calls,1);
 });
+
