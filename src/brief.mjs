@@ -8,7 +8,25 @@ export function verifyFacts(facts,pack) {
   for(const c of facts.claims) {
     must(!ids.has(c.id),'FACT_ID','ID de afirmação repetido.');ids.add(c.id);
     const s=sources.get(c.sourceId);
-    must(s && c.quote.length>1 && s.text.includes(c.quote) && c.quote.includes(c.original),'FACT_SOURCE','Afirmação não corresponde a trecho exato da fonte declarada.');
+        const sourceCheck = {
+      claimId: c.id,
+      kind: c.kind,
+      status: c.status,
+      sourceId: c.sourceId,
+      sourceExists: Boolean(s),
+      quoteLengthOk: c.quote.length > 1,
+      quoteFoundInSource: Boolean(s && s.text.includes(c.quote)),
+      originalFoundInQuote: c.quote.includes(c.original)
+    };
+
+    must(
+      sourceCheck.sourceExists &&
+      sourceCheck.quoteLengthOk &&
+      sourceCheck.quoteFoundInSource &&
+      sourceCheck.originalFoundInQuote,
+      'FACT_SOURCE',
+      'Evidência factual rejeitada: ' + JSON.stringify(sourceCheck)
+    );
         // FACT_CANONICAL: preservar o original ja conferido na fonte.
     c.normalized = c.original;
     if(['service','product','offer'].includes(c.kind))must(c.sourceId==='profile:bio'||c.sourceId.startsWith('post:'),'FACT_SERVICE','Serviço sem bio/legenda.');
