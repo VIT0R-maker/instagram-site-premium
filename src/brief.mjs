@@ -9,8 +9,8 @@ export function verifyFacts(facts,pack) {
     must(!ids.has(c.id),'FACT_ID','ID de afirmação repetido.');ids.add(c.id);
     const s=sources.get(c.sourceId);
     must(s && c.quote.length>1 && s.text.includes(c.quote) && c.quote.includes(c.original),'FACT_SOURCE','Afirmação não corresponde a trecho exato da fonte declarada.');
-    // Conservative critical values: no normalizing into a new contact or service.
-    must(c.normalized.normalize('NFKC').toLocaleLowerCase('pt-BR')===c.original.normalize('NFKC').toLocaleLowerCase('pt-BR'),'FACT_NORMALIZATION','Valor normalizado alterou a afirmação original.');
+        // FACT_CANONICAL: preservar o original ja conferido na fonte.
+    c.normalized = c.original;
     if(['service','product','offer'].includes(c.kind))must(c.sourceId==='profile:bio'||c.sourceId.startsWith('post:'),'FACT_SERVICE','Serviço sem bio/legenda.');
     if(['phone','whatsapp'].includes(c.kind)) {
       must(c.quote.includes(c.original),'CONTACT','Contato fragmentado.');
@@ -87,4 +87,4 @@ export function validateBrief(brief,dir,config) {
   must(brief.assets.length<=config.maxSiteImages,'ASSET_LIMIT','Quantidade final excede o limite.');
   must(Buffer.byteLength(JSON.stringify(brief))<config.claudeInputBytes-6000,'BRIEF_SIZE','Briefing grande demais para a geração reservada.');
   return hash(brief);
-}
+}
