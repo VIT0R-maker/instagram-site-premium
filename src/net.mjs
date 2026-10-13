@@ -36,6 +36,14 @@ export function retryDelay(header, attempt) {
   const seconds=Number(header); const parsed=Date.parse(header);
   return Math.min(60000, Math.max(0, header ? (Number.isFinite(seconds) ? seconds*1000 : (Number.isFinite(parsed) ? parsed-Date.now() : 0)) : 0, 1000 * 2 ** attempt));
 }
+// Mensagem de erro devolvida pela API (curta e com segredos mascarados) para facilitar o diagnóstico.
+function apiErrorDetail(r) {
+  try {
+    const j=JSON.parse(r.text);
+    const m=j?.error?.message ?? j?.message ?? (typeof j?.error==='string' ? j.error : '');
+    return String(m).replace(/(AIza|AQ\.|sk-ant-|ghp_|github_pat_|apify_api_|nvapi-)[A-Za-z0-9._-]+/g,'[redigido]').replace(/\s+/g,' ').slice(0,300);
+  } catch { return ''; }
+}
 export async function api(raw, opts={},transport=request,wait=sleep) {
   const attempts=opts.attempts ?? (opts.method && opts.method !== 'GET' ? 1 : 3);
   for(let i=0;i<attempts;i++) {
@@ -47,7 +55,10 @@ export async function api(raw, opts={},transport=request,wait=sleep) {
       return {data,headers:r.headers,status:r.status};
     }
     if(opts.accept?.includes(r.status)) return {data:null,headers:r.headers,status:r.status};
-    if(![429,500,502,503,504].includes(r.status) || i+1===attempts) throw new Fault(`HTTP_${r.status}`,`A API ${new URL(raw).hostname} respondeu HTTP ${r.status}.`, {status:r.status});
+    if(![429,500,502,503,504].includes(r.status) || i+1===attempts) {
+      const d=apiErrorDetail(r);
+      throw new Fault(`HTTP_${r.status}`,`A API ${new URL(raw).hostname} respondeu HTTP ${r.status}.${d?` Detalhe: ${d}`:''}`, {status:r.status});
+    }
     await wait(retryDelay(r.headers['retry-after'],i));
   }
 }
