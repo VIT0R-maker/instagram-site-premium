@@ -63,5 +63,6 @@
   "auditTileHeight": 1200,
   "fontReadyTimeoutMs": 12000,
   "maxExtendedPatchFraction": 0.75,
-  "maxExtendedCumulativePatchFraction": 0.9
+  "maxExtendedCumulativePatchFraction": 0.9,
+  "defaultPhoneCountryCode": "55"
 }

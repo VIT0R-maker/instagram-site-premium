@@ -42,6 +42,13 @@ export class Pipeline {
     }
     if(stage==='curate') {
       let pack=cp('collection');
+      // Rehydrate text from existing Apify checkpoints after policy updates, without a new scrape.
+      const savedDetails=cp('apify:details:1:dataset');
+      const savedPosts=cp(`apify:posts:${cfg.postsLimit}:dataset`);
+      if(savedDetails&&savedPosts) {
+        const refreshed=normalizeProfile(savedDetails,savedPosts,job,cfg.maxCandidateImages);
+        pack={...pack,profile:refreshed.profile,sources:refreshed.sources};save('collection',pack);
+      }
       let facts=verifyFacts(await p.gemini('facts',{profile:pack.profile,sources:pack.sources}),pack);save('facts',facts);
       async function analyze() {
         const contextHash=analysisContext(facts);
@@ -111,3 +118,4 @@ export class Pipeline {
     throw new Fault('STAGE','Etapa desconhecida.');
   }
 }
+
