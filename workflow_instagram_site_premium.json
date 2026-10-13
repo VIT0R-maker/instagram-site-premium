@@ -1,5 +1,4 @@
 {
-  "id": "IGPremiumSingleClaudeV1",
   "name": "Instagram → Site Premium v3 | fotos reais + criação única + revisão visual",
   "nodes": [
     {
@@ -9,33 +8,33 @@
         ],
         "additionalFields": {}
       },
-      "id": "b527042e-9c3e-40cf-a4fb-ec1bd4b331d5",
+      "id": "a218dfdf-cb59-48b7-8166-af8f4638f3da",
       "name": "Telegram — receber perfil",
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        0,
-        0
+        2416,
+        -2112
       ],
+      "webhookId": "4b2e0a8d-8884-4f6e-a785-8cc4f5e39a62",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
-      },
-      "webhookId": "4b2e0a8d-8884-4f6e-a785-8cc4f5e39a62"
+      }
     },
     {
       "parameters": {
-        "jsCode": "if ($input.all().length !== 1) throw new Error('Esperado um evento Telegram por execução.');\nconst event = $input.item.json;\n// Altere somente esta URL. n8n Cloud precisa de HTTPS acessível; localhost aponta para o próprio n8n.\nconst workerBaseUrl = 'http://host.docker.internal:8787';\nreturn [{ json: { event, workerBaseUrl } }];"
+        "jsCode": "if ($input.all().length !== 1) throw new Error('Esperado um evento Telegram por execução.');\nconst event = $input.item.json;\n// Altere somente esta URL. n8n Cloud precisa de HTTPS acessível; localhost aponta para o próprio n8n.\nconst workerBaseUrl = 'http://worker:8787';\nreturn [{ json: { event, workerBaseUrl } }];"
       },
-      "id": "576ac62a-7443-4024-ac4f-6b3298eb67fa",
+      "id": "216fcc7f-2ef8-46b7-80fb-9f1b48b18302",
       "name": "Contexto — um evento por execução",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        240,
-        0
+        2656,
+        -2112
       ]
     },
     {
@@ -48,31 +47,31 @@
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify($('Contexto — um evento por execução').item.json.event) }}",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "5cd48477-18b6-4338-a476-e128a0c61d25",
+      "id": "d551fe47-dcc8-4b42-8f1d-6fecc34b0d67",
       "name": "Worker — autorizar e recuperar job",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        480,
-        0
+        2896,
+        -2112
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -99,13 +98,13 @@
         },
         "options": {}
       },
-      "id": "3f620de6-a16c-4aea-ac18-8dc01984d0bc",
+      "id": "c9418f2b-f78b-4a08-8af2-9b3445fa71fb",
       "name": "Trabalho autorizado?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        720,
-        0
+        3136,
+        -2112
       ]
     },
     {
@@ -133,13 +132,13 @@
         },
         "options": {}
       },
-      "id": "171c6d7a-fe71-457f-accd-57ee226d71de",
+      "id": "01a140c1-91d3-4804-9c8c-25ae971566a2",
       "name": "Responder entrada inválida?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        960,
-        340
+        3376,
+        -1776
       ]
     },
     {
@@ -150,14 +149,15 @@
           "appendAttribution": false
         }
       },
-      "id": "a1443582-c89c-4fa0-a39a-9594471b2bd6",
+      "id": "465b1ea4-7734-4d6f-9c8c-c6cae9cbd2d6",
       "name": "Telegram — entrada inválida",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1200,
-        340
+        3616,
+        -1776
       ],
+      "webhookId": "2a820afe-7bac-41f6-aab8-2a5f1eaa1fc8",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
@@ -175,43 +175,43 @@
         "specifyBody": "json",
         "jsonBody": "={{ {} }}",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "908794a7-43ef-488a-aebf-61c3b864656a",
+      "id": "c127864b-0636-43b3-9dce-15093431ae38",
       "name": "Validar configuração e publicação",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1020,
-        0
+        3440,
+        -2112
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'preflight', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "2ccf6694-9c04-4a15-a4a0-fd71ae0dd727",
+      "id": "f5831508-64f6-434f-b25d-e5a4b597ea80",
       "name": "Contexto preflight",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1240,
-        0
+        3664,
+        -2112
       ]
     },
     {
@@ -239,13 +239,13 @@
         },
         "options": {}
       },
-      "id": "15301e54-2f11-470d-a1f6-1ebecc8821f7",
+      "id": "400f2d21-5b1b-497a-aa0c-fc1e940d7560",
       "name": "Falhou preflight?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1460,
-        0
+        3888,
+        -2112
       ]
     },
     {
@@ -273,63 +273,60 @@
         },
         "options": {}
       },
-      "id": "b8f8f882-d274-4c6c-a15e-f780aaa16070",
+      "id": "8b649a23-9483-443b-b8dc-2b9d62f3dbd9",
       "name": "Concluiu preflight?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1670,
-        0
+        4096,
+        -2112
       ]
     },
     {
       "parameters": {
-        "resume": "timeInterval",
-        "amount": 10,
-        "unit": "seconds"
+        "amount": 10
       },
-      "id": "e6cb1063-e79c-4ddc-a5ec-900f39fab5b2",
+      "id": "70c06817-dfe2-4fc1-a1a2-a021186916d2",
       "name": "Aguardar preflight",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1670,
-        260
+        4096,
+        -1856
       ],
       "webhookId": "539b9de4-e67a-4f5c-afcc-809a5ebdb01d"
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/preflight' }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "81ceb1f5-852a-4a86-a049-8f2c1fc93490",
+      "id": "bfd832c4-ffa7-41e9-9d01-8e8ce64b8c4a",
       "name": "Consultar preflight",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1460,
-        260
+        3888,
+        -1856
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -339,22 +336,23 @@
           "appendAttribution": false
         }
       },
-      "id": "891ea766-000c-4926-a462-7d0cc3d112a2",
+      "id": "1576bcf5-0b56-48ba-a5b2-c74d9b155efa",
       "name": "Progresso preflight",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1020,
-        -240
+        3440,
+        -2352
       ],
+      "retryOnFail": false,
+      "webhookId": "843015ad-c54a-495e-beab-98ad6b7203be",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
       },
-      "onError": "continueRegularOutput",
-      "retryOnFail": false
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -366,43 +364,43 @@
         "specifyBody": "json",
         "jsonBody": "={{ {} }}",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "8c5875b2-deb1-48eb-ad01-32e721503aaa",
+      "id": "f0804a0f-cd14-46b4-b694-6e09532faf42",
       "name": "Coletar e processar imagens",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2200,
-        0
+        4624,
+        -2112
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'collect', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "cbc58703-fea2-4b95-a1c1-a38517053ea3",
+      "id": "8bf8dd76-9254-4dde-85e2-2b33f01da006",
       "name": "Contexto collect",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2420,
-        0
+        4848,
+        -2112
       ]
     },
     {
@@ -430,13 +428,13 @@
         },
         "options": {}
       },
-      "id": "02411bc1-3056-4c01-a62a-7f35b439f8e6",
+      "id": "6a21e7a0-164e-47d8-a00b-f7017bbbd491",
       "name": "Falhou collect?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2640,
-        0
+        5056,
+        -2112
       ]
     },
     {
@@ -464,63 +462,60 @@
         },
         "options": {}
       },
-      "id": "91e9acc1-14a5-4f33-abd9-d934f041e0c4",
+      "id": "d1bdde70-c815-4ec7-a6ea-176c02f3e261",
       "name": "Concluiu collect?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2850,
-        0
+        5280,
+        -2112
       ]
     },
     {
       "parameters": {
-        "resume": "timeInterval",
-        "amount": 10,
-        "unit": "seconds"
+        "amount": 10
       },
-      "id": "b5b67abd-d8fa-4095-aa45-ea0c821091be",
+      "id": "71693b7a-0013-4d5f-bbff-de979a455607",
       "name": "Aguardar collect",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2850,
-        260
+        5280,
+        -1856
       ],
       "webhookId": "8715feea-ecb0-4c4d-a995-fcc2107a5433"
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/collect' }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "e0c4e624-2265-45cb-a17e-8dbe9d3c720c",
+      "id": "6feee9a7-386e-46d4-bff8-3a94f55cdc41",
       "name": "Consultar collect",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2640,
-        260
+        5056,
+        -1856
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -530,22 +525,23 @@
           "appendAttribution": false
         }
       },
-      "id": "02ed036c-f58f-46d9-a4f2-15a522820a42",
+      "id": "cfa616c7-4afe-4975-9d52-a309adfef610",
       "name": "Progresso collect",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2200,
-        -240
+        4624,
+        -2352
       ],
+      "retryOnFail": false,
+      "webhookId": "bfc8ca03-55ec-443a-8abc-bf62300ec586",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
       },
-      "onError": "continueRegularOutput",
-      "retryOnFail": false
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -557,43 +553,43 @@
         "specifyBody": "json",
         "jsonBody": "={{ {} }}",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "24e3d807-9810-4825-ad61-f4a6989e4a64",
+      "id": "46fe8300-2d5a-49dc-889f-6226eb39c400",
       "name": "Gemini — curadoria visual",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3380,
-        0
+        5808,
+        -2112
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'curate', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "f0fb71af-42a8-46f3-a902-8d273d0a07b1",
+      "id": "17cac9fb-3876-4de9-9ba6-40e83bc3c0b5",
       "name": "Contexto curate",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3600,
-        0
+        6016,
+        -2112
       ]
     },
     {
@@ -621,13 +617,13 @@
         },
         "options": {}
       },
-      "id": "de0ee7bd-8db7-4914-ad8a-a8f403ccb000",
+      "id": "4a7edb6b-878b-43ae-9ae8-c6662431e75a",
       "name": "Falhou curate?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        3820,
-        0
+        6240,
+        -2112
       ]
     },
     {
@@ -655,63 +651,60 @@
         },
         "options": {}
       },
-      "id": "703e4006-7658-49aa-a316-c395e4e7f87e",
+      "id": "97593b9f-a708-4bba-aa84-684d3cbbeedd",
       "name": "Concluiu curate?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        4030,
-        0
+        6448,
+        -2112
       ]
     },
     {
       "parameters": {
-        "resume": "timeInterval",
-        "amount": 10,
-        "unit": "seconds"
+        "amount": 10
       },
-      "id": "e73a1e07-38aa-473c-a7e5-827d9b939cb1",
+      "id": "2d7066aa-1b5a-4c27-864b-e20b1bf838de",
       "name": "Aguardar curate",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        4030,
-        260
+        6448,
+        -1856
       ],
       "webhookId": "0cfe446f-d3df-487b-a4d8-609e28794d03"
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/curate' }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "a24ecc0b-80bc-486d-a77b-b05bf4bdacc4",
+      "id": "eb241f94-6759-4130-9f5f-854cb035e3f9",
       "name": "Consultar curate",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3820,
-        260
+        6240,
+        -1856
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -721,22 +714,23 @@
           "appendAttribution": false
         }
       },
-      "id": "05363669-2bc5-4769-a9c9-9b86305005dd",
+      "id": "7b7abae8-260c-4dd6-bf41-488673548e75",
       "name": "Progresso curate",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        3380,
-        -240
+        5808,
+        -2352
       ],
+      "retryOnFail": false,
+      "webhookId": "5542ea8c-28f4-4e24-b84e-9b8e21977613",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
       },
-      "onError": "continueRegularOutput",
-      "retryOnFail": false
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -748,43 +742,43 @@
         "specifyBody": "json",
         "jsonBody": "={{ {} }}",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "33915d04-b15f-457a-afa1-fc2df8129f16",
+      "id": "51f6802c-b8ec-4a7b-a892-3dcdfa0cec61",
       "name": "Gemini — direção, copy e briefing",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4560,
-        0
+        6976,
+        -2112
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'brief', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "30d8e459-f6a6-45f5-a465-0e1e75708864",
+      "id": "42fd1958-9542-49d2-8969-7987249ec6f8",
       "name": "Contexto brief",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4780,
-        0
+        7200,
+        -2112
       ]
     },
     {
@@ -812,13 +806,13 @@
         },
         "options": {}
       },
-      "id": "ee1cd0f7-c2f4-4e01-a1ec-2bbcd1eb1e8b",
+      "id": "343467d8-45c0-455a-8610-85a69c3e943a",
       "name": "Falhou brief?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        5000,
-        0
+        7424,
+        -2112
       ]
     },
     {
@@ -846,63 +840,60 @@
         },
         "options": {}
       },
-      "id": "b6aa0555-a9f9-4004-a658-5ea26f2cf148",
+      "id": "7d4542d4-aca9-4f56-a5e1-e5ec6a5d1c93",
       "name": "Concluiu brief?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        5210,
-        0
+        7632,
+        -2112
       ]
     },
     {
       "parameters": {
-        "resume": "timeInterval",
-        "amount": 10,
-        "unit": "seconds"
+        "amount": 10
       },
-      "id": "64a6e5af-4d64-4802-a934-f5dd08913338",
+      "id": "8fcf8331-1a56-4635-b9c6-f56a86983b53",
       "name": "Aguardar brief",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        5210,
-        260
+        7632,
+        -1856
       ],
       "webhookId": "a105f735-4922-4c10-ae16-108554653ee3"
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/brief' }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "c41bd481-7a43-48ca-a656-31503edfa1ff",
+      "id": "fd522449-9e14-4816-bdc4-6a52b53d1852",
       "name": "Consultar brief",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        5000,
-        260
+        7424,
+        -1856
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -912,22 +903,23 @@
           "appendAttribution": false
         }
       },
-      "id": "cc5b7836-24c1-4ffc-a8f9-f385fbf480ec",
+      "id": "60cc4d0b-be4b-441f-a468-2a0b29a21cd8",
       "name": "Progresso brief",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        4560,
-        -240
+        6976,
+        -2352
       ],
+      "retryOnFail": false,
+      "webhookId": "cebfa79f-30ec-459c-9574-66751c6c55e6",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
       },
-      "onError": "continueRegularOutput",
-      "retryOnFail": false
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -939,43 +931,43 @@
         "specifyBody": "json",
         "jsonBody": "={{ {} }}",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "a3ada12b-c581-442e-a7db-e42acc1f68e5",
+      "id": "e3babee2-cf0e-445f-b5ee-aa56de1abd9d",
       "name": "Claude — geração única protegida",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        5740,
-        0
+        8160,
+        -2112
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'generate', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "2e0b25a7-36ff-4586-a621-d28f593fd60e",
+      "id": "4b352538-6627-4b71-9e35-ca28e6b39fd6",
       "name": "Contexto generate",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5960,
-        0
+        8384,
+        -2112
       ]
     },
     {
@@ -1003,13 +995,13 @@
         },
         "options": {}
       },
-      "id": "d5c79088-17a8-46ef-a8c4-01b44c88afc7",
+      "id": "9da07d99-5444-484b-8d6a-3e2605c391cb",
       "name": "Falhou generate?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        6180,
-        0
+        8608,
+        -2112
       ]
     },
     {
@@ -1037,63 +1029,60 @@
         },
         "options": {}
       },
-      "id": "b90e25f3-c05e-4127-a731-b852876924ce",
+      "id": "3011a064-0b65-4eff-82c5-1bd68ca2cafd",
       "name": "Concluiu generate?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        6390,
-        0
+        8816,
+        -2112
       ]
     },
     {
       "parameters": {
-        "resume": "timeInterval",
-        "amount": 10,
-        "unit": "seconds"
+        "amount": 10
       },
-      "id": "8cfe647f-f508-4759-ad1b-9c19d3eab92d",
+      "id": "c1d9bce5-3df5-400b-b9c8-24ecfc359c07",
       "name": "Aguardar generate",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        6390,
-        260
+        8816,
+        -1856
       ],
       "webhookId": "313947bf-b5ca-44fd-acf1-55612e9e61bc"
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/generate' }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "97b06583-705a-4d67-acc7-e1a1daf8eb5e",
+      "id": "aab9226f-d134-482b-8aa6-e70d6dc836c2",
       "name": "Consultar generate",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6180,
-        260
+        8608,
+        -1856
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1103,22 +1092,23 @@
           "appendAttribution": false
         }
       },
-      "id": "33bddc71-5ac1-4643-a2ee-bfa72aa84e6c",
+      "id": "ee8ca8d5-99fb-4a57-876a-f6b9f8b83de9",
       "name": "Progresso generate",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        5740,
-        -240
+        8160,
+        -2352
       ],
+      "retryOnFail": false,
+      "webhookId": "47694ac5-5ac7-4ca3-a6d3-82245db8a6c8",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
       },
-      "onError": "continueRegularOutput",
-      "retryOnFail": false
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1130,43 +1120,43 @@
         "specifyBody": "json",
         "jsonBody": "={{ {} }}",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "30db2d98-2087-4de4-a616-b243d0e0f497",
+      "id": "cdf0d6f4-8dd5-4719-b34f-a4fb4e93a3e5",
       "name": "Gemini — auditoria renderizada",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6920,
-        0
+        9344,
+        -2112
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'audit', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "eded7640-3cc3-414c-a478-fb717eacd198",
+      "id": "3465ee13-0935-4546-b2e2-1a21159dc82e",
       "name": "Contexto audit",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7140,
-        0
+        9568,
+        -2112
       ]
     },
     {
@@ -1194,13 +1184,13 @@
         },
         "options": {}
       },
-      "id": "1c98e8b7-d01b-450f-ac47-f9843c286247",
+      "id": "ece4541a-123a-490b-a590-a7df81c1bc4c",
       "name": "Falhou audit?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        7360,
-        0
+        9776,
+        -2112
       ]
     },
     {
@@ -1228,63 +1218,60 @@
         },
         "options": {}
       },
-      "id": "405efc38-4bab-4a51-a478-89c3bc501059",
+      "id": "0213af78-58d9-46c5-882a-d5a7939dce35",
       "name": "Concluiu audit?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        7570,
-        0
+        10000,
+        -2112
       ]
     },
     {
       "parameters": {
-        "resume": "timeInterval",
-        "amount": 10,
-        "unit": "seconds"
+        "amount": 10
       },
-      "id": "42f4c712-f7dc-4eb3-a5ad-7c647dab09fe",
+      "id": "28682a93-ea20-4aee-9bc9-a960e19abcd1",
       "name": "Aguardar audit",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        7570,
-        260
+        10000,
+        -1856
       ],
       "webhookId": "311350a6-a33d-494a-a4ea-a03fb05f1826"
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/audit' }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "f10f81eb-5890-4bd5-a29b-fcbdf155c0b7",
+      "id": "7d1c578e-a58e-45f8-9589-5d701929e7d4",
       "name": "Consultar audit",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        7360,
-        260
+        9776,
+        -1856
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1294,22 +1281,23 @@
           "appendAttribution": false
         }
       },
-      "id": "ccbeca62-abdb-4040-aa11-8c0908db863b",
+      "id": "ee81197c-b366-4f74-bd0b-49e5c017cd1d",
       "name": "Progresso audit",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        6920,
-        -240
+        9344,
+        -2352
       ],
+      "retryOnFail": false,
+      "webhookId": "e454bda4-efb9-4a0b-989d-9488d70e2ed1",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
       },
-      "onError": "continueRegularOutput",
-      "retryOnFail": false
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1321,43 +1309,43 @@
         "specifyBody": "json",
         "jsonBody": "={{ {} }}",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "35e691b0-67db-4baf-a274-0c47fa49a6b5",
+      "id": "41c4eebe-662b-4622-8cd1-ebd2e27effef",
       "name": "GitHub — commit e Pages",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        8100,
-        0
+        10528,
+        -2112
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
         "jsCode": "const raw = $input.item.json;\nconst job = $('Worker — autorizar e recuperar job').item.json;\nreturn [{json: {...raw, jobId: job.jobId, chatId: job.chatId, stage: 'publish', state: raw.state || 'failed', message: typeof raw.message === 'string' ? raw.message : 'Falha de comunicação com o worker. Use /retomar ' + job.jobId + ' após verificar a conexão.'}}];"
       },
-      "id": "627deb1b-43e2-4ccd-abfd-395b53522a1b",
+      "id": "470dc0e0-1c64-44ce-812e-aaa23344fc3b",
       "name": "Contexto publish",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8320,
-        0
+        10736,
+        -2112
       ]
     },
     {
@@ -1385,13 +1373,13 @@
         },
         "options": {}
       },
-      "id": "3d887a8b-e526-4161-a53f-c0116a939131",
+      "id": "8847363c-fdb2-4dee-b86f-330fc62235af",
       "name": "Falhou publish?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        8540,
-        0
+        10960,
+        -2112
       ]
     },
     {
@@ -1419,63 +1407,60 @@
         },
         "options": {}
       },
-      "id": "8269f961-1aad-4896-ac7e-9f5674cfe07c",
+      "id": "acc2f565-0700-4717-96db-b8cde40de507",
       "name": "Concluiu publish?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        8750,
-        0
+        11168,
+        -2112
       ]
     },
     {
       "parameters": {
-        "resume": "timeInterval",
-        "amount": 10,
-        "unit": "seconds"
+        "amount": 10
       },
-      "id": "181401f7-b79d-4487-abaa-5f5fc9d4469f",
+      "id": "6b233f6e-aca5-45f5-a605-8f5cddbb1605",
       "name": "Aguardar publish",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        8750,
-        260
+        11168,
+        -1856
       ],
       "webhookId": "0946e51a-1f92-46c8-a876-6b92e28adb8a"
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ $('Contexto — um evento por execução').item.json.workerBaseUrl + '/v1/jobs/' + $('Worker — autorizar e recuperar job').item.json.jobId + '/stages/publish' }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {
-          "timeout": 30000,
           "response": {
             "response": {
-              "responseFormat": "json",
-              "neverError": true
+              "neverError": true,
+              "responseFormat": "json"
             }
-          }
+          },
+          "timeout": 30000
         }
       },
-      "id": "87552d29-d71b-4261-a9ca-0d9883a206f7",
+      "id": "5504c99b-65e7-4c02-bcfc-13f9af814983",
       "name": "Consultar publish",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        8540,
-        260
+        10960,
+        -1856
       ],
       "retryOnFail": false,
-      "onError": "continueRegularOutput",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "CONFIGURE_WORKER_HEADER_AUTH",
-          "name": "Premium Worker — Authorization"
+          "id": "dhE1WsoDyHqNqIVF",
+          "name": "Header Auth account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1485,22 +1470,23 @@
           "appendAttribution": false
         }
       },
-      "id": "82abce1a-f2b7-4478-a81e-7003e99ebab9",
+      "id": "b497aad5-5b3b-48cf-ab05-17af4769b7f4",
       "name": "Progresso publish",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        8100,
-        -240
+        10528,
+        -2352
       ],
+      "retryOnFail": false,
+      "webhookId": "21fcb435-45c7-4cb0-8c75-b119e999c1aa",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
       },
-      "onError": "continueRegularOutput",
-      "retryOnFail": false
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1510,21 +1496,22 @@
           "appendAttribution": false
         }
       },
-      "id": "3bdadcdc-01a2-4d37-a47f-b67b80bca6fc",
+      "id": "4ed569c9-b2fe-4ba4-95c3-309a4735a3fb",
       "name": "Telegram — diagnóstico",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        4400,
-        600
+        6816,
+        -1520
       ],
+      "retryOnFail": false,
+      "webhookId": "0076ded0-bc85-4da5-8c93-8897f424b35c",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
-      },
-      "retryOnFail": false
+      }
     },
     {
       "parameters": {
@@ -1534,21 +1521,22 @@
           "appendAttribution": false
         }
       },
-      "id": "a8ad00a1-6feb-4555-a747-6082089cf7e6",
+      "id": "2e567f8a-0a6e-415e-8ae2-a0d51246be17",
       "name": "Telegram — resultado verificado",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        9500,
-        0
+        11920,
+        -2112
       ],
+      "retryOnFail": false,
+      "webhookId": "a25673ec-85f8-4b8b-9990-8bd55cc6d7f9",
       "credentials": {
         "telegramApi": {
           "id": "YRNI2jg5IlS3D55N",
           "name": "Telegram account"
         }
-      },
-      "retryOnFail": false
+      }
     },
     {
       "parameters": {
@@ -1556,16 +1544,17 @@
         "height": 420,
         "width": 900
       },
-      "id": "87f04307-f383-41bf-ab58-d7f6a1cda5b6",
+      "id": "fdf4299d-63d2-4ed7-bd85-171c850418df",
       "name": "Leia antes de ativar",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        0,
-        -400
+        2384,
+        -2592
       ]
     }
   ],
+  "pinData": {},
   "connections": {
     "Telegram — receber perfil": {
       "main": [
@@ -2228,13 +2217,13 @@
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "executionTimeout": 4200,
-    "saveDataErrorExecution": "all",
-    "saveDataSuccessExecution": "none",
-    "saveExecutionProgress": true,
-    "timezone": "America/Sao_Paulo"
+    "binaryMode": "separate"
   },
-  "pinData": {},
-  "versionId": "a8789e02-ad92-4009-a6a1-b283ef669ceb",
+  "versionId": "35403b63-16de-4912-99eb-72f54a6dd980",
+  "meta": {
+    "instanceId": "dff10bef6d2f8efbe858c5d1089f10b9b563fdea0e45ae6684ab8d7a660a507d"
+  },
+  "nodeGroups": [],
+  "id": "Rle6gja3ZVUcfCo4",
   "tags": []
 }
