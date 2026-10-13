@@ -6,23 +6,35 @@ export function verifyFacts(facts, pack) {
   const sources = new Map(pack.sources.map(s => [s.id, s]));
   const ids = new Set();
 
-  // OPTIONAL_CITY: omitir cidade sem evidencia literal valida.
+    // OPTIONAL_CONTACT_CITY: omitir informações opcionais sem evidência.
   facts.claims = facts.claims.filter(c => {
-    if (c.kind !== 'city') return true;
+    let note = null;
 
-    const source = sources.get(c.sourceId);
+    if (
+      c.kind === 'whatsapp' &&
+      !/whatsapp|whats\b|wa\.me\//i.test(c.quote)
+    ) {
+      note =
+        'Afirmação de WhatsApp omitida: a citação não identifica explicitamente esse canal.';
+    }
 
-    const proven =
-      source &&
-      c.quote.length > 1 &&
-      source.text.includes(c.quote) &&
-      c.original.length > 0 &&
-      c.quote.includes(c.original);
+    if (c.kind === 'city') {
+      const source = sources.get(c.sourceId);
 
-    if (proven) return true;
+      const proven =
+        source &&
+        c.quote.length > 1 &&
+        source.text.includes(c.quote) &&
+        c.original.length > 0 &&
+        c.quote.includes(c.original);
 
-    const note =
-      'Cidade omitida: a evidencia retornada nao comprova literalmente o valor informado.';
+      if (!proven) {
+        note =
+          'Cidade omitida: a evidencia retornada nao comprova literalmente o valor informado.';
+      }
+    }
+
+    if (note === null) return true;
 
     facts.limitations ??= [];
 
