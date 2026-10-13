@@ -17,8 +17,12 @@ export function normalizeProfile(details,posts,job,cap) {
   source('profile:external',p.externalUrl,job.profile);
   for(const [i,l] of (p.externalUrls || []).entries()) source(`profile:external:${i}`,typeof l==='string'?l:l.url,job.profile);
   const unique=new Map();
-  for(const post of [...posts,...(p.latestPosts || [])]) {
-    must(!post.ownerUsername || post.ownerUsername.toLowerCase()===job.username,'PROFILE_MISMATCH','Um post retornado pertence a outro perfil.');
+  // Posts em colaboração (ou fixados) podem ter outro dono. Eles são descartados, não usados como evidência.
+  // Só falha se a maioria dos posts vier de outro perfil (sinal de coleta errada).
+  const returned=[...posts,...(p.latestPosts || [])];
+  const own=returned.filter(post=>!post.ownerUsername || String(post.ownerUsername).toLowerCase()===job.username);
+  must(returned.length-own.length<=own.length,'PROFILE_MISMATCH','Os posts retornados pertencem majoritariamente a outro perfil.');
+  for(const post of own) {
     const id=String(post.id || post.shortCode || ''); if(id && !post.error) unique.set(id,post);
   }
   const ordered=[...unique.values()].sort((a,b)=>String(b.timestamp || '').localeCompare(String(a.timestamp || '')));

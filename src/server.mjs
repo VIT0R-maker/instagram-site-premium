@@ -91,7 +91,11 @@ async function main() {
   must(/^\d+$/.test(env.TELEGRAM_BOT_ID||'')&&env.ALLOWED_CHAT_IDS,'CONFIG_TELEGRAM','Configure bot ID e chats permitidos.');
   const root=path.resolve(env.DATA_DIR||path.join(packageRoot,'data'));mkdirSync(root,{recursive:true,mode:0o700});
   // OS process guard: one server per DB/volume. Stale PID lock requires explicit operator removal.
-  const lock=path.join(root,'worker.lock');const fd=openSync(lock,'wx',0o600);writeFileSync(fd,String(process.pid));closeSync(fd);
+  const lock=path.join(root,'worker.lock');let fd;
+  try{fd=openSync(lock,'wx',0o600);}catch(e){if(e.code==='EEXIST')throw new Fault('LOCK_STALE',`Já existe ${lock}. Se nenhum outro worker está rodando, remova-o e suba de novo.`);throw e;}
+  writeFileSync(fd,String(process.pid));closeSync(fd);
+  // Remove o lock em qualquer saída (inclusive falha de inicialização depois de criá-lo).
+  process.on('exit',()=>{try{rmSync(lock,{force:true});}catch{}});
   const store=new Store(root);store.recover();
   const pipeline=new Pipeline(config,env,store,root),app=createApp({config,env,store,pipeline,root});
   function cleanup(){const cutoff=Date.now()-config.retentionDays*86400000;
@@ -106,7 +110,7 @@ async function main() {
   }
   cleanup();const retention=setInterval(cleanup,3600000);
   app.server.listen(Number(env.PORT||8787),env.HOST||'127.0.0.1',()=>process.stdout.write('Worker pronto na porta configurada.\n'));
-  async function stop(){clearInterval(retention);for(const c of app.active.values())c.abort();app.server.close();setTimeout(()=>{store.close();rmSync(lock,{force:true});process.exit(0);},1500).unref();}
+  async function stop(){clearInterval(retention);for(const c of app.active.values())c.abort();app.server.close();setTimeout(()=>{store.close();rmSync(lock,{force:true});process.exit(0);},1500);}
   process.on('SIGTERM',stop);process.on('SIGINT',stop);
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))main().catch(e=>{process.stderr.write(JSON.stringify(safeError(e))+'\n');process.exitCode=1;});
