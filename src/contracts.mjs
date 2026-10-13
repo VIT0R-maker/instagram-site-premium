@@ -32,8 +32,59 @@ export function validate(kind,value) {
   return value;
 }
 export function apiSchema(schema) {
-  // Only the documented Gemini JSON Schema subset is sent; Ajv enforces the full one locally.
-  if(Array.isArray(schema)) return schema.map(apiSchema);
-  if(schema && typeof schema==='object') return Object.fromEntries(Object.entries(schema).filter(([k])=> !['additionalProperties','$schema'].includes(k)).map(([k,v])=>[k,k==='const'?v:apiSchema(v)]));
-  return schema;
+  if (schema === null || typeof schema !== 'object') return schema;
+  if (Array.isArray(schema)) return schema.map(apiSchema);
+
+  // Estas restricoes continuam obrigatorias no Ajv.
+  // Na requisicao ao Gemini, passam a ser orientacoes textuais.
+  const localOnly = new Set([
+    'minItems', 'maxItems', 'minLength', 'maxLength',
+    'minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum',
+    'multipleOf', 'pattern', 'uniqueItems'
+  ]);
+
+  const out = {};
+  const hints = [];
+
+  for (const [key, value] of Object.entries(schema)) {
+    if (key === '$schema' || key === 'additionalProperties') continue;
+
+    if (localOnly.has(key)) {
+      hints.push(key + '=' + JSON.stringify(value));
+      continue;
+    }
+
+    if (key === 'const') {
+      out.enum = [value];
+    } else if (
+      key === 'properties' ||
+      key === '$defs' ||
+      key === 'definitions'
+    ) {
+      // Nomes de campos nao devem ser tratados como palavras-chave.
+      out[key] = Object.fromEntries(
+        Object.entries(value).map(([name, child]) => [
+          name,
+          apiSchema(child)
+        ])
+      );
+    } else if (key === 'items' || key === 'not') {
+      out[key] = apiSchema(value);
+    } else if (
+      ['anyOf', 'oneOf', 'allOf', 'prefixItems'].includes(key)
+    ) {
+      out[key] = value.map(apiSchema);
+    } else {
+      out[key] = structuredClone(value);
+    }
+  }
+
+  if (hints.length) {
+    out.description = [
+      out.description,
+      'Regras verificadas pelo aplicativo: ' + hints.join('; ') + '.'
+    ].filter(Boolean).join(' ');
+  }
+
+  return out;
 }
