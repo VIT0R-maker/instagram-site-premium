@@ -10,19 +10,20 @@ export function normalizeProfile(details,posts,job,cap) {
   must(p && !p.error,'PROFILE_MISSING','Perfil inexistente ou coleta sem perfil correspondente.');
   must(p.private!==true && p.isPrivate!==true,'PROFILE_PRIVATE','O perfil é privado.');
   const sources=[];
-  const source=(id,text,url,date=null) => {if(typeof text==='string'&&text.trim())sources.push({id,text:text.slice(0,6000),url,date});};
+  const source=(id,text,url,date=null) => {if(typeof text==='string'&&text.trim())sources.push({id,text,url,date});};
   source('profile:name',p.fullName || p.username,job.profile);
   source('profile:bio',p.biography,job.profile);
   source('profile:category',p.businessCategoryName || p.categoryName,job.profile);
   source('profile:external',p.externalUrl,job.profile);
   for(const [i,l] of (p.externalUrls || []).entries()) source(`profile:external:${i}`,typeof l==='string'?l:l.url,job.profile);
+  for(const [i,l] of (p.bioLinks || []).entries()) source(`profile:biolink:${i}`,typeof l==='string'?l:l.url,job.profile);
+  for(const key of ['businessAddress','businessPhoneNumber','businessEmail','publicPhoneNumber','publicEmail','cityName']) {
+    if(p[key]!=null) source('profile:'+key,typeof p[key]==='string'?p[key]:JSON.stringify(p[key]),job.profile);
+  }
   const unique=new Map();
-  // Posts em colaboração (ou fixados) podem ter outro dono. Eles são descartados, não usados como evidência.
-  // Só falha se a maioria dos posts vier de outro perfil (sinal de coleta errada).
+  // Include collaborative/pinned posts returned by this profile's Apify request.
   const returned=[...posts,...(p.latestPosts || [])];
-  const own=returned.filter(post=>!post.ownerUsername || String(post.ownerUsername).toLowerCase()===job.username);
-  must(returned.length-own.length<=own.length,'PROFILE_MISMATCH','Os posts retornados pertencem majoritariamente a outro perfil.');
-  for(const post of own) {
+  for(const post of returned) {
     const id=String(post.id || post.shortCode || ''); if(id && !post.error) unique.set(id,post);
   }
   const ordered=[...unique.values()].sort((a,b)=>String(b.timestamp || '').localeCompare(String(a.timestamp || '')));
@@ -105,3 +106,4 @@ export async function makeVariants(selected,assets,dir) {
   }
   return out;
 }
+

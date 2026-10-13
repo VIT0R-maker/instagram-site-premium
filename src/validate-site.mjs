@@ -1,3 +1,4 @@
+import { missingBioContent } from './apify-content.mjs';
 import { parse, parseFragment } from 'parse5';
 import * as css from 'css-tree';
 import { parse as parseJS } from 'acorn';
@@ -140,6 +141,7 @@ export function diagnoseSite(files,brief,secretValues=[],interactions=[]) {
     check(new Set(t.paths.map(p=>p.input)).size===3,'INTERACTION_INPUTS','Declare teclado, mouse e toque para a interação implementada.','interactions','renderable',t.id);
     for(const p of t.paths){const actions=p.input==='keyboard'?['press']:p.input==='touch'?['tap']:['click','hover'];check(p.steps.some(s=>actions.includes(s.action))&&p.steps.some(s=>!['body','html',':root'].includes(s.expect.selector.trim())),'INTERACTION_PROOF','Cenário precisa executar a modalidade declarada e comprovar o componente.','interactions','renderable',t.id);}
   }
+  for(const missing of missingBioContent(files,brief))add('APIFY_CONTENT_MISSING','Incluir dado da biografia Apify: '+missing,'index.html','renderable',missing);
   return {passed:issues.length===0,safeToRender:!issues.some(i=>i.category!=='renderable'),fatal:issues.some(i=>i.category==='fatal'),issues,fileHashes:fileHashes(files),images:used.size,copy,backgrounds,semanticReviewRequired:true};
 }
 export function validateSite(files,brief,secrets=[],interactions=[]) {
@@ -157,3 +159,4 @@ export function applyPatches(files,patches,config={}) {
   }
   return out;
 }
+
