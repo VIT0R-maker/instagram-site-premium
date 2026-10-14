@@ -5,7 +5,7 @@
   "claudeModel": "claude-sonnet-5-5",
   "claudeMaxOutputTokens": 48000,
   "claudeTimeoutMs": 300000,
-  "claudeInputBytes": 120000,
+  "claudeInputBytes": 500000,
   "useNemotron": false,
   "nemotronModel": "nvidia/nemotron-3-super-120b-a12b",
   "postsLimit": 40,

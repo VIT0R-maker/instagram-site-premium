@@ -1,3 +1,4 @@
+import { compactBrief, briefSizeReport } from './brief-package.mjs';
 import { apifyContent, ensureBioCopy } from './apify-content.mjs';
 import { readFileSync } from 'node:fs';
 import { verifyFacts,confirmedLinks,fixColors,validateBrief } from './brief.mjs';
@@ -55,6 +56,16 @@ export async function buildBrief({p,pack,facts,selection,dir,cfg,job,cp,save}) {
       constraints:{immutable:['fatos e evidências','identidade comercial','contatos coletados pelo Apify','origem dos assets'],qualityRequired:['legibilidade','região protegida das fotos','responsividade','interações funcionais','fidelidade factual'],directionPreferences:['tipografia preparada','conceito escolhido','paleta observada'],creativeFreedom:['estrutura e ordem editorial','grid e proporções','SVG e detalhes','movimento','omitir recursos opcionais','reuso funcional']},
       job:{id:job.id,profile:job.profile,language:'pt-BR',status:'brief_approved'},business:facts.business,evidence:{claims:facts.claims,sources:pack.sources},brand:{...selection.identity,...color,typography:fonts},creativeDirection:chosen,assets,sections:copy.sections,navigation:copy.navigation,links,motion:{policy:chosen.motion,reducedMotion:'respeitar preferência sem ocultar conteúdo',contentVisibleByDefault:true},seo:copy.seo,
       technical:{format:'HTML/CSS/JS/SVG locais; contrato 2.0, até 16 arquivos autorais',fontsCss:fonts.css,dependencies:'fontes, fotos e biblioteca opcional preparadas',basePath:'./',allowedExtensions:['html','css','js','svg'],optionalRuntime:{path:'runtime.js',source:readFileSync(new URL('./runtime.js',import.meta.url),'utf8')},year:new Date().getUTCFullYear()},acceptance:{viewports:cfg.renderViewports,threshold:cfg.qualityThreshold,noCriticalIssues:true},limitations:[...facts.limitations,...selection.limitations,...copy.limitations]};
+    // Preserve source material privately; review and create from one compact projection.
+    save('briefFull',brief);
+    const fullBrief=brief;
+    brief=compactBrief(fullBrief);
+    const sizeReport=save('briefSize',briefSizeReport(fullBrief,brief,cfg));
+    // A transport budget failure cannot be repaired by rewriting customer-facing copy.
+    if(sizeReport.compactBytes>=sizeReport.limitBytes) {
+      save('briefReview',{approved:false,repairTargets:[],issues:[{severity:'high',component:'BRIEF_SIZE',evidence:JSON.stringify(sizeReport),description:'Pacote compacto excedeu o limite local; nenhuma informação foi descartada.',fix:'Ajustar claudeInputBytes após consultar briefSize.json.'}],reason:'Orçamento do pacote compacto'});
+      must(false,'BRIEF_SIZE',`Briefing compacto: ${sizeReport.compactBytes} bytes; limite: ${sizeReport.limitBytes}. Consulte briefSize.json e ajuste claudeInputBytes; não reescreva a copy.`);
+    }
     let nextReview;
     try{validateBrief(brief,dir,cfg);}catch(e){nextReview={approved:false,repairTargets:e.code==='ASSET_BUDGET'?['selection']:['copy'],issues:[{severity:'high',component:e.code,evidence:e.message,description:e.message,fix:'Corrigir a causa no briefing'}],reason:'Validação determinística'};}
     if(!nextReview)nextReview=await p.gemini('review',{brief,availableAssets:pack.assets.filter(a=>a.visual).map(a=>({assetId:a.assetId,...a.visual})),fontCatalog:FONT_CATALOG},images,'review',true);
@@ -64,4 +75,5 @@ export async function buildBrief({p,pack,facts,selection,dir,cfg,job,cp,save}) {
     state={round:round+1,targets:nextReview.repairTargets?.length?nextReview.repairTargets:['copy'],review:nextReview,facts,selection,assets,directions,copy};save('briefWork',state);
   }
 }
+
 
