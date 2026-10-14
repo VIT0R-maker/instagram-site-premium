@@ -47,7 +47,13 @@ export class Providers {
       const requestWire=JSON.stringify(body);must(Buffer.byteLength(requestWire)<=this.config.geminiPayloadBytes,'GEMINI_PAYLOAD','Reparo JSON excedeu limite de bytes.');
       const {data}=await this.transport.api(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{hosts:['generativelanguage.googleapis.com'],headers:{'x-goog-api-key':this.env.GEMINI_API_KEY},method:'POST',body:requestWire,attempts:this.config.apiAttempts,timeout:180000,signal:this.signal});
       this.store.event(this.job.id,'gemini_usage',{task,model,repair,usage:data.usageMetadata||null,payloadBytes:Buffer.byteLength(requestWire)});
-      const candidate=data.candidates?.[0];must(candidate?.finishReason==='STOP','GEMINI_STOP','Gemini recusou, truncou ou não concluiu a resposta.');
+      const candidate=data.candidates?.[0];
+      if(candidate?.finishReason!=='STOP') {
+        const detail={task,model,finishReason:candidate?.finishReason||'NO_CANDIDATE_OR_REASON',blockReason:data.promptFeedback?.blockReason||null,finishMessage:String(candidate?.finishMessage||'').slice(0,400),maxOutputTokens:body.generationConfig.maxOutputTokens,usage:data.usageMetadata||null};
+        this.store.checkpoint(this.job.id,'geminiLastFailure',detail);
+        this.store.event(this.job.id,'gemini_failure',detail);
+        throw new Fault('GEMINI_STOP','Gemini não concluiu: '+JSON.stringify({task:detail.task,finishReason:detail.finishReason,blockReason:detail.blockReason,maxOutputTokens:detail.maxOutputTokens})+'. Diagnóstico salvo em geminiLastFailure.');
+      }
       const raw=candidate.content?.parts?.filter(p=>!p.thought).map(p=>p.text||'').join('')||'';
       try {const value=JSON.parse(raw.replace(/^\s*```(?:json)?\s*/i,'').replace(/```\s*$/,''));validate(contract,value);this.store.checkpoint(this.job.id,key,value);return value;}
       catch(e){if(repair===(this.config.geminiJsonRepairAttempts??1))throw new Fault('GEMINI_JSON','Gemini não entregou JSON válido após reparo limitado.');
@@ -134,3 +140,4 @@ export class Providers {
     return validate('files',result);
   }
 }
+
