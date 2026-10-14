@@ -101,10 +101,10 @@ test('diagnóstico repair-first chega ao Gemini; patch JS revalida e renderiza s
   }},render:async()=>{renders++;return {passed:true,engine:'mock Chromium',tests:[],screenshots:[]};}});
   assert(result.approved);assert.equal(reviews,2);assert.equal(renders,1);assert(!h.store.claude(h.job.id));h.store.close();
 });
-test('afirmação comercial sem fonte bloqueia publicação mesmo com navegador verde',async()=>{
+test('observação semântica é informativa quando nota visual passa',async()=>{
   const x=siteFixture(),h=auditHarness();let calls=0;
   const args={...h,files:x.files,brief:x.brief,interactions:x.interactions,config:cfg,p:{env:{},gemini:async()=>{calls++;return review(95,{semanticReview:{approved:false,unsupportedClaims:[{text:'Garantia de dez anos',reason:'Sem evidência'}],equivalentCopy:[]}});}},render:async()=>({passed:true,tests:[],screenshots:[]})};
-  await assert.rejects(auditProject(args),e=>e.code==='AUDIT_REJECTED');await assert.rejects(auditProject(args),e=>e.code==='AUDIT_REJECTED');assert.equal(calls,1);assert(!h.cp('approval'));h.store.close();
+  assert((await auditProject(args)).approved);assert((await auditProject(args)).approved);assert.equal(calls,1);assert(h.cp('auditNotes').includes('Garantia de dez anos'));h.store.close();
 });
 test('fracionar reconstrução em patches pequenos não contorna o limite de preservação',()=>{
   const files={'small.js':Buffer.from('A'.repeat(90)+'B'.repeat(90)+'C'.repeat(90))},expectedHash=hash(files['small.js']);
@@ -120,3 +120,4 @@ test('coleta expandida reinterpreta fatos com as novas fontes textuais',async()=
   const pipeline=new Pipeline({...cfg,maxCandidateImages:1,expandedCandidateImages:2},{},store,root,{createProviders:()=>provider,fetchImage:async()=>readFileSync(new URL('./assets/jomon-cc0.jpg',import.meta.url))});
   await pipeline.run('curate',f.job);assert.equal(factsInputs.length,2);assert(!factsInputs[0].some(s=>s.id.startsWith('post:')));assert(factsInputs[1].some(s=>s.id.startsWith('post:')));assert(store.checkpoint(f.job.id,'facts'));store.close();
 });
+
