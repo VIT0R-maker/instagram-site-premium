@@ -24,7 +24,7 @@
   "maxOriginalBytesPerJob": 240000000,
   "maxImagePixels": 40000000,
   "geminiPayloadBytes": 16000000,
-  "geminiOutputTokens": 16000,
+  "geminiOutputTokens": 32000,
   "geminiMaxCalls": 180,
   "apiAttempts": 3,
   "apifyActor": "apify~instagram-scraper",
