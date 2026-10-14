@@ -119,7 +119,7 @@ export function diagnoseSite(files,brief,secretValues=[],interactions=[]) {
       }
       if(attr(n,'data-asset-id')) {
         const asset=brief.assets.find(a=>a.assetId===attr(n,'data-asset-id'));check(asset,'IMAGE_ID','ID de fundo/recorte desconhecido.',file);
-        if(asset){used.add(asset.assetId);check(attr(n,'aria-hidden')==='true'||!!attr(n,'aria-label')||!!textOf(n).trim(),'BACKGROUND_ALT','Foto informativa precisa de alternativa semântica; decorativa deve ser aria-hidden.',file,'renderable',asset.assetId);}
+        if(asset){used.add(asset.assetId);check(attr(n,'aria-hidden')==='true'||!!attr(n,'aria-label')||(tag==='img'&&typeof attr(n,'alt')==='string')||!!textOf(n).trim(),'BACKGROUND_ALT','Foto informativa precisa de alternativa semântica; decorativa deve ser aria-hidden.',file,'renderable',asset.assetId);}
       }
     }
     for(const n of nodes)if(attr(n,'href')?.startsWith('#')&&attr(n,'href')!=='#')check(ids.has(attr(n,'href').slice(1)),'ANCHOR_TARGET','Âncora inexistente.',file,'renderable',attr(n,'href'));
@@ -159,4 +159,5 @@ export function applyPatches(files,patches,config={}) {
   }
   return out;
 }
+
 

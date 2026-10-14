@@ -1,11 +1,13 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { diagnoseSite, applyPatches, fileHashes } from './validate-site.mjs';
+import { diagnoseSite, applyPatches, fileHashes, safePublicPath } from './validate-site.mjs';
 import { finalizeSeo } from './seo.mjs';
 import { renderIsolated } from './render.mjs';
 import { reviewRendered,repairManifest } from './audit-review.mjs';
 import { auditReferences } from './vision.mjs';
 import { atomic, must, hash, Fault } from './core.mjs';
+
+import { AUDIT_POLICY, visualScore, savedVisualCandidates, auditNotes, unsafePublication } from './audit-policy.mjs';
 
 const authorFiles=files=>Object.fromEntries(Object.entries(files).filter(([f])=>/\.(html|css|js|svg)$/.test(f)&&!/^lib\//.test(f)).map(([f,b])=>[f,b.toString()]));
 const technicalKeys=(diagnostic,render)=>[...diagnostic.issues.map(i=>`${i.code}:${i.file}:${i.component}`),...(render?.tests||[]).flatMap(t=>(t.errors||[]).map(e=>`${t.width}:${t.motion}:${t.page}:${e}`))];
@@ -16,13 +18,44 @@ export function progressEvidence(previous,current) {
   return {progress:removed.length>0||current.observedImprovements.length>0,removed,regressions,scoreDelta:current.score-previous.score};
 }
 export async function auditProject({files,brief,interactions,config,p,dir,job,signal,cp,save,render=renderIsolated}) {
-  const terminal=cp('auditTerminal');if(terminal)throw new Fault(terminal.code,terminal.message);
+  const terminal=cp('auditTerminal');
   const gate=(ok,code,message)=>{if(!ok){cp('auditTerminal',{code,message});throw new Fault(code,message);}};
   const snapshot=(round,value)=>{
     const hashes=fileHashes(value);for(const [f,b] of Object.entries(value))atomic(path.join(dir,'audit-versions',String(round),f),b);
     return {round,hashes,files:Object.keys(hashes)};
   };
   const restore=v=>Object.fromEntries(v.files.map(f=>{const b=readFileSync(path.join(dir,'audit-versions',String(v.round),f));must(hash(b)===v.hashes[f],'AUDIT_SNAPSHOT','Versão de auditoria alterada.');return [f,b];}));
+  const approve=(report,round,value,manifest,reused=false)=>{
+    const diagnostic=diagnoseSite(value,brief,Object.values(p.env||{}),manifest);
+    // File integrity and credential isolation are execution safeguards, not quality scores.
+    must(!unsafePublication(diagnostic),'SITE_FATAL','Artefato contém dados privados ou caminho público inválido.');
+    const score=visualScore(report.audit),hashes=fileHashes(value);
+    must(score!==null&&score>=config.qualityThreshold,'VISUAL_SCORE','Nota visual abaixo do mínimo.');
+    save('auditNotes',auditNotes({...report,deterministic:diagnostic},round,config.qualityThreshold,brief.limitations));
+    save('approvedInteractions',manifest);
+    for(const [f,b] of Object.entries(value))atomic(path.join(dir,'site',f),b);
+    save('comparison',{sameJob:true,claudeGenerations:1,policy:AUDIT_POLICY,reusedReview:reused,baseline:cp('auditBaseline'),final:{round,hashes},viewports:config.renderViewports,observedImprovements:report.audit.observedImprovements,baselineReport:'audit-0.json',finalReport:`audit-${round}.json`,limitations:['Aprovação por nota visual; demais observações constam no relatório Telegram.']});
+    if(terminal){cp('auditTerminalPrevious',terminal);cp('auditTerminal',null);}
+    return save('approval',{approved:true,schemaVersion:'2.0',policy:AUDIT_POLICY,score,filesHash:hash(hashes),files:Object.keys(hashes),round,renderer:report.render?.engine,interactionsHash:hash(manifest),reusedReview:reused,reviewedAt:new Date().toISOString()});
+  };
+  // Recover the best already-reviewed version before any new render/model call.
+  // Every byte must match the hashes in that round's report, not a later patch.
+  for(const candidate of savedVisualCandidates(cp,config)) {
+    const {report,round}=candidate,hashes=report.deterministic.fileHashes;
+    must(Object.keys(hashes).length>0&&Object.keys(hashes).every(safePublicPath),'AUDIT_SNAPSHOT','Manifesto da versão salva inválido.');
+    let value;
+    try{value=restore({round,hashes,files:Object.keys(hashes)});}catch(e){
+      if(e.code==='ENOENT')continue;
+      throw e;
+    }
+    let manifest=report.interactions;
+    if(!manifest){
+      manifest=interactions;
+      for(let prior=0;prior<round;prior++)manifest=repairManifest(manifest,cp(`audit-${prior}`)?.audit?.manifestRepairs||[]);
+    }
+    return approve(report,round,value,manifest,true);
+  }
+  if(terminal)throw new Fault(terminal.code,terminal.message);
   let state=cp('auditState');
   if(!state) {
     // Baseline contains the sole Claude output plus deterministic metadata, with no Gemini patch.
@@ -38,29 +71,24 @@ export async function auditProject({files,brief,interactions,config,p,dir,job,si
     const deterministic=diagnoseSite(files,brief,Object.values(p.env||{}),interactions);
     // Never pass leaked secrets or truncated output to another model as a repair request.
     save(`diagnostic-${round}`,deterministic);
-    gate(!deterministic.fatal,'SITE_FATAL','Site contém falha irrecuperável (segredo, origem ou estrutura incompleta). Veja diagnóstico privado; não haverá outra geração.');
+    gate(!unsafePublication(deterministic),'SITE_FATAL','Artefato contém dados privados ou caminho público inválido.');
     let rendered={passed:false,tests:[],screenshots:[],engine:null,skipped:'repair-first: corrigir antes de executar'};
     if(deterministic.safeToRender)rendered=await render(files,config,job.repo,signal,{interactions,assets:brief.assets});
     for(const [i,s] of rendered.screenshots.entries())atomic(path.join(dir,'screenshots',`${round}-${i}.jpg`),Buffer.from(s.data,'base64'));
-    const baselineShots=round>0?(cp('audit-0')?.render.screenshots||[]).map((s,i)=>({...s,i})).filter(s=>s.kind==='fold').slice(0,8).map(s=>({...s,label:'BASELINE SEM PATCH — '+s.label,data:readFileSync(path.join(dir,'screenshots',`0-${s.i}.jpg`)).toString('base64')})):[];
-    const shots=await auditReferences([...rendered.screenshots,...baselineShots],config);
+    const shots=await auditReferences(rendered.screenshots,config);
     const audit=await reviewRendered(p,{brief,mode:deterministic.safeToRender?'rendered':'repair-first',diagnostics:deterministic,tests:rendered.tests,interactions,fileHashes:deterministic.fileHashes,files:authorFiles(files),previous:state.previous,baseline:cp('audit-0')||null,patchBudget:{maxFractionPerFile:config.maxPatchFraction,maxCumulativeFraction:config.maxCumulativePatchFraction,extendedFraction:config.maxExtendedPatchFraction,extendedCumulativeFraction:config.maxExtendedCumulativePatchFraction,requiresExtendedJustification:true,cumulative:state.cumulative,remainingRounds:config.maxAuditRounds-round},interactionHashes:Object.fromEntries(interactions.map(i=>[i.id,hash(i)]))},shots,config);
-    const score=Object.values(audit.rubric).reduce((a,b)=>a+b,0)/6;
+    const score=visualScore(audit);
+    must(score!==null,'VISUAL_SCORE','Auditoria não retornou os seis critérios visuais válidos.');
     const current={score,technical:technicalKeys(deterministic,rendered),issues:audit.issues,observedImprovements:audit.observedImprovements};
     const progress=progressEvidence(state.previous,current);
-    const passed=deterministic.passed&&rendered.passed&&audit.semanticReview.approved&&!audit.semanticReview.unsupportedClaims.length&&score>=config.qualityThreshold&&!audit.issues.some(i=>['high','critical'].includes(i.severity));
-    const report={audit,score,passed,progress,deterministic,render:{...rendered,screenshots:rendered.screenshots.map(({data,...s})=>s)}};
+    const passed=score>=config.qualityThreshold;
+    const report={policy:AUDIT_POLICY,audit,score,passed,progress,interactions,deterministic,render:{...rendered,screenshots:rendered.screenshots.map(({data,...s})=>s)}};
     save(`audit-${round}`,report);
-    if(passed) {
-      save('approvedInteractions',interactions);
-      for(const [f,b]of Object.entries(files))atomic(path.join(dir,'site',f),b);
-      const hashes=fileHashes(files);
-      save('comparison',{sameJob:true,claudeGenerations:1,baseline:cp('auditBaseline'),final:{round,hashes},viewports:config.renderViewports,observedImprovements:audit.observedImprovements,baselineReport:'audit-0.json',finalReport:`audit-${round}.json`,limitations:['Notas e inspeção semântica são avaliações de modelo; métricas do navegador não garantem qualidade subjetiva.']});
-      return save('approval',{approved:true,schemaVersion:'2.0',score,filesHash:hash(hashes),files:Object.keys(hashes),round,renderer:rendered.engine,interactionsHash:hash(interactions),reviewedAt:new Date().toISOString()});
-    }
+    save('auditNotes',auditNotes(report,round,config.qualityThreshold,brief.limitations));
+    if(passed)return approve(report,round,files,interactions);
     state.noProgress=state.previous&&!progress.progress?state.noProgress+1:0;
-    gate(state.noProgress<config.maxNoProgressRounds,'AUDIT_NO_PROGRESS','Rodadas sem melhoria observável; publicação bloqueada, versões preservadas.');
-    gate(round<config.maxAuditRounds&&(audit.patches.length||audit.manifestRepairs?.length),'AUDIT_REJECTED','Site reprovado ou precisa de reconstrução. Não haverá outra geração.');
+    gate(state.noProgress<config.maxNoProgressRounds,'AUDIT_NO_PROGRESS',`Nota visual ${score.toFixed(2)} abaixo de ${config.qualityThreshold}, sem progresso; versões preservadas.`);
+    gate(round<config.maxAuditRounds&&(audit.patches.length||audit.manifestRepairs?.length),'AUDIT_REJECTED',`Nota visual ${score.toFixed(2)} abaixo de ${config.qualityThreshold}; sem novas correções disponíveis. Claude não será repetido.`);
     const extended=typeof audit.scopeJustification==='string'&&audit.scopeJustification.trim().length>=80&&audit.issues.some(i=>['medium','high','critical'].includes(i.severity));
     const patchConfig=extended?{...config,maxPatchFraction:config.maxExtendedPatchFraction||.75,maxRemovedFraction:config.maxExtendedPatchFraction||.75}:config;
     if(extended)save(`scope-extension-${round}`,{justification:audit.scopeJustification,issues:audit.issues,limits:patchConfig.maxPatchFraction});
@@ -74,3 +102,4 @@ export async function auditProject({files,brief,interactions,config,p,dir,job,si
   }
   gate(false,'AUDIT_BUDGET','Orçamento de auditoria esgotado; /retomar não reinicia as rodadas.');
 }
+

@@ -144,9 +144,10 @@
     {
       "parameters": {
         "chatId": "={{ $json.chatId }}",
-        "text": "={{ $json.message }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "465b1ea4-7734-4d6f-9c8c-c6cae9cbd2d6",
@@ -331,9 +332,10 @@
     {
       "parameters": {
         "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
-        "text": "={{ $json.message }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "1576bcf5-0b56-48ba-a5b2-c74d9b155efa",
@@ -520,9 +522,10 @@
     {
       "parameters": {
         "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
-        "text": "={{ $json.message }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "cfa616c7-4afe-4975-9d52-a309adfef610",
@@ -709,9 +712,10 @@
     {
       "parameters": {
         "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
-        "text": "={{ $json.message }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "7b7abae8-260c-4dd6-bf41-488673548e75",
@@ -898,9 +902,10 @@
     {
       "parameters": {
         "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
-        "text": "={{ $json.message }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "60cc4d0b-be4b-441f-a468-2a0b29a21cd8",
@@ -1087,9 +1092,10 @@
     {
       "parameters": {
         "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
-        "text": "={{ $json.message }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "ee8ca8d5-99fb-4a57-876a-f6b9f8b83de9",
@@ -1276,9 +1282,10 @@
     {
       "parameters": {
         "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
-        "text": "={{ $json.message }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "ee81197c-b366-4f74-bd0b-49e5c017cd1d",
@@ -1465,9 +1472,10 @@
     {
       "parameters": {
         "chatId": "={{ $('Worker — autorizar e recuperar job').item.json.chatId }}",
-        "text": "={{ $json.message }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "b497aad5-5b3b-48cf-ab05-17af4769b7f4",
@@ -1491,9 +1499,10 @@
     {
       "parameters": {
         "chatId": "={{ $json.chatId }}",
-        "text": "={{ 'Não foi possível concluir. Etapa: ' + $json.stage + '\\n' + $json.message + '\\nJob: ' + $json.jobId + '\\nRecuperação: /retomar ' + $json.jobId }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "4ed569c9-b2fe-4ba4-95c3-309a4735a3fb",
@@ -1501,8 +1510,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        6816,
-        -1520
+        5060,
+        700
       ],
       "retryOnFail": false,
       "webhookId": "0076ded0-bc85-4da5-8c93-8897f424b35c",
@@ -1516,9 +1525,10 @@
     {
       "parameters": {
         "chatId": "={{ $json.chatId }}",
-        "text": "={{ $json.message }}",
+        "text": "={{ String(($json.message) ?? \"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\") }}",
         "additionalFields": {
-          "appendAttribution": false
+          "appendAttribution": false,
+          "parse_mode": "HTML"
         }
       },
       "id": "2e567f8a-0a6e-415e-8ae2-a0d51246be17",
@@ -1526,8 +1536,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        11920,
-        -2112
+        10160,
+        700
       ],
       "retryOnFail": false,
       "webhookId": "a25673ec-85f8-4b8b-9990-8bd55cc6d7f9",
@@ -1552,6 +1562,90 @@
         2384,
         -2592
       ]
+    },
+    {
+      "id": "audit-notes-resultado",
+      "name": "Preparar resultado e relatório",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9500,
+        700
+      ],
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\nconst texts = [j.message, ...(j.auditMessages || [])];\nconst out = [];\nfor (const text of texts) {\n  let part = '';\n  for(const char of String(text || '')){\n    if(part.length + char.length > 3400){out.push({json:{chatId:j.chatId,message:part}});part='';}\n    part += char;\n  }\n  if(part)out.push({json:{chatId:j.chatId,message:part}});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "audit-parts-resultado",
+      "name": "Partes do resultado",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        9720,
+        700
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    },
+    {
+      "id": "audit-wait-resultado",
+      "name": "Intervalo do resultado",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        9940,
+        700
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 1,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "audit-notes-diagnóstico",
+      "name": "Preparar diagnóstico e relatório",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4400,
+        700
+      ],
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\nconst texts = ['Não foi possível concluir. Etapa: ' + j.stage + '\\n' + j.message + '\\nJob: ' + j.jobId + '\\nRecuperação: /retomar ' + j.jobId, ...(j.auditMessages || [])];\nconst out = [];\nfor (const text of texts) {\n  let part = '';\n  for(const char of String(text || '')){\n    if(part.length + char.length > 3400){out.push({json:{chatId:j.chatId,message:part}});part='';}\n    part += char;\n  }\n  if(part)out.push({json:{chatId:j.chatId,message:part}});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "audit-parts-diagnóstico",
+      "name": "Partes do diagnóstico",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4620,
+        700
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    },
+    {
+      "id": "audit-wait-diagnóstico",
+      "name": "Intervalo do diagnóstico",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4840,
+        700
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 1,
+        "unit": "seconds"
+      }
     }
   ],
   "pinData": {},
@@ -1649,7 +1743,7 @@
       "main": [
         [
           {
-            "node": "Telegram — diagnóstico",
+            "node": "Preparar diagnóstico e relatório",
             "type": "main",
             "index": 0
           }
@@ -1734,7 +1828,7 @@
       "main": [
         [
           {
-            "node": "Telegram — diagnóstico",
+            "node": "Preparar diagnóstico e relatório",
             "type": "main",
             "index": 0
           }
@@ -1819,7 +1913,7 @@
       "main": [
         [
           {
-            "node": "Telegram — diagnóstico",
+            "node": "Preparar diagnóstico e relatório",
             "type": "main",
             "index": 0
           }
@@ -1904,7 +1998,7 @@
       "main": [
         [
           {
-            "node": "Telegram — diagnóstico",
+            "node": "Preparar diagnóstico e relatório",
             "type": "main",
             "index": 0
           }
@@ -1989,7 +2083,7 @@
       "main": [
         [
           {
-            "node": "Telegram — diagnóstico",
+            "node": "Preparar diagnóstico e relatório",
             "type": "main",
             "index": 0
           }
@@ -2074,7 +2168,7 @@
       "main": [
         [
           {
-            "node": "Telegram — diagnóstico",
+            "node": "Preparar diagnóstico e relatório",
             "type": "main",
             "index": 0
           }
@@ -2159,7 +2253,7 @@
       "main": [
         [
           {
-            "node": "Telegram — diagnóstico",
+            "node": "Preparar diagnóstico e relatório",
             "type": "main",
             "index": 0
           }
@@ -2177,7 +2271,7 @@
       "main": [
         [
           {
-            "node": "Telegram — resultado verificado",
+            "node": "Preparar resultado e relatório",
             "type": "main",
             "index": 0
           }
@@ -2207,6 +2301,96 @@
         [
           {
             "node": "Contexto publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar resultado e relatório": {
+      "main": [
+        [
+          {
+            "node": "Partes do resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partes do resultado": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Intervalo do resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intervalo do resultado": {
+      "main": [
+        [
+          {
+            "node": "Telegram — resultado verificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram — resultado verificado": {
+      "main": [
+        [
+          {
+            "node": "Partes do resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar diagnóstico e relatório": {
+      "main": [
+        [
+          {
+            "node": "Partes do diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partes do diagnóstico": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Intervalo do diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intervalo do diagnóstico": {
+      "main": [
+        [
+          {
+            "node": "Telegram — diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram — diagnóstico": {
+      "main": [
+        [
+          {
+            "node": "Partes do diagnóstico",
             "type": "main",
             "index": 0
           }

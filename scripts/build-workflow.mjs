@@ -1,3 +1,4 @@
+import { installAuditNotifications } from './visual-notification-workflow.mjs';
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 let sequence=0;const randomUUID=()=>{const h=createHash('sha256').update('premium-v3:'+sequence++).digest('hex');return h.slice(0,8)+'-'+h.slice(8,12)+'-4'+h.slice(13,16)+'-a'+h.slice(17,20)+'-'+h.slice(20,32);};
@@ -43,8 +44,10 @@ add('Leia antes de ativar','stickyNote',{content:'## Instagram → site verifica
 nodes.find(n=>n.type==='n8n-nodes-base.stickyNote').parameters.content='## Versão 3 — identidade, recortes e qualidade visual\nFotografias reais do Apify. Gemini cura os pixels e aprova o briefing. Claude recebe fotos + manifesto e cria uma única vez; trava SQLite persiste entre retomadas. HTML/CSS/JS/SVG autorais, fontes locais e biblioteca opcional preparada. Auditoria normal + reduced motion em 320/390/768/1440, cenários de teclado/mouse/toque e patches delimitados. SEO finalizado antes do hash.\n\nInstale o worker 3.0 e o renderer conforme README. Configure URL do worker no nó Contexto, credencial Authorization: Bearer TOKEN e Telegram. JSON não é autossuficiente. Não deixe o fluxo antigo ativo com o mesmo bot. /retomar JOB recupera o trabalho sem repetir Claude. Ver VALIDACAO.md para testes e limitações desta entrega.';
 nodes.find(n=>n.type==='n8n-nodes-base.stickyNote').parameters.height=420;
 const workflow={id:'IGPremiumSingleClaudeV1',name:'Instagram → Site Premium v3 | fotos reais + criação única + revisão visual',nodes,connections,active:false,settings:{executionOrder:'v1',executionTimeout:4200,saveDataErrorExecution:'all',saveDataSuccessExecution:'none',saveExecutionProgress:true,timezone:'America/Sao_Paulo'},pinData:{},versionId:randomUUID(),tags:[]};
+installAuditNotifications(workflow);
 const output=JSON.stringify(workflow,null,2)+'\n';
 if(process.argv.includes('--check')){if(readFileSync(new URL('../workflow_instagram_site_premium.json',import.meta.url),'utf8')!==output)throw Error('JSON exportado diverge do gerador.');process.stdout.write('Gerador e JSON idênticos.\n');process.exit(0);}
 writeFileSync(root+'workflow_instagram_site_premium.json',output);
 writeFileSync(new URL('../workflow_instagram_site_premium.json',import.meta.url),JSON.stringify(workflow,null,2)+'\n');
 console.log(`Workflow gerado: ${nodes.length} nós.`);
+

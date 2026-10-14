@@ -73,15 +73,16 @@ test('retomada restaura somente primeira etapa pendente, mantém geração e ren
 test('retomada de geração recupera resposta recebida; ambiguidade permanece bloqueada',async()=>{
   const store=new Store(temp()),job={id:'job',chat:'1'};for(const s of STAGES.slice(0,4)){store.claimStage(job.id,s);store.finish(job.id,s,'done',{});}store.claimStage(job.id,'generate');store.finish(job.id,'generate','failed',{});store.reserveClaude(job.id);assert.throws(()=>resumeJob(store,job,'1',cfg),e=>e.code==='CLAUDE_AMBIGUOUS');store.saveClaude(job.id,'resposta completa',200,'mock');assert.equal(resumeJob(store,job,'1',cfg).stage,'generate');let sends=0;assert.equal((await invokeClaudeOnce(store,job.id,async()=>{sends++;})).response,'resposta completa');assert.equal(sends,0);store.close();
 });
-test('nota baixa permite patch e reavaliação; problema visual high bloqueia média alta',async()=>{
+test('nota baixa permite patch e reavaliação; severidade high vira relatório com média alta',async()=>{
   const dir=temp(),store=new Store(dir),x=siteFixture(),job={id:'quality',repo:'fixture'},cp=(k,v)=>v===undefined?store.checkpoint(job.id,k):store.checkpoint(job.id,k,v),save=(k,v)=>cp(k,v);x.brief.publication={url:'https://fixture.github.io/fixture/'};let calls=0,renders=0;
   const answer=n=>({score:n,rubric:scores(n),semanticReview:{approved:true,unsupportedClaims:[],equivalentCopy:[]},observedImprovements:n>=90?['Espaçamento corrigido no mesmo artefato']:[],issues:[],patches:[]});
   const p={env:{},gemini:async(_t,payload)=>{calls++;const r=answer(calls===1?80:92);if(calls===1)r.patches=[{file:'styles.css',expectedHash:payload.fileHashes['styles.css'],find:'margin:0;',replace:'margin:0;--reviewed-spacing:1;',reason:'Ajuste local de fixture'}];return r;}};
   const render=async()=>{renders++;return {passed:true,tests:[],screenshots:[],engine:'mock'};};
   assert((await auditProject({files:x.files,brief:x.brief,interactions:x.interactions,config:cfg,p,dir,job,cp,save,render})).approved);assert.equal(renders,2);assert.equal(calls,2);store.close();
   const map=new Map(),cp2=(k,v)=>v===undefined?map.get(k):(map.set(k,v),v),save2=(k,v)=>cp2(k,v);const p2={env:{},gemini:async()=>({...answer(97),issues:[{severity:'high',component:'hero',description:'Texto ilegível',evidence:'Foto cobre o título',viewport:'320',fix:'Corrigir contraste'}]})};
-  await assert.rejects(auditProject({files:x.files,brief:x.brief,interactions:x.interactions,config:cfg,p:p2,dir:temp(),job,cp:cp2,save:save2,render}),e=>e.code==='AUDIT_REJECTED');assert(!map.has('approval'));
+  assert((await auditProject({files:x.files,brief:x.brief,interactions:x.interactions,config:cfg,p:p2,dir:temp(),job,cp:cp2,save:save2,render})).approved);assert(map.get('auditNotes').includes('Texto ilegível'));
 });
 test('queda do processo recupera estágio, sem liberar reserva enviada',()=>{
   const dir=temp(),job={id:'crash',chat:'1'};let store=new Store(dir);for(const s of STAGES.slice(0,4)){store.claimStage(job.id,s);store.finish(job.id,s,'done',{});}store.claimStage(job.id,'generate');store.reserveClaude(job.id);store.sentClaude(job.id);store.close();store=new Store(dir);store.recover();assert.equal(store.stage(job.id,'generate').state,'interrupted');assert.throws(()=>resumeJob(store,job,'1',cfg),e=>e.code==='CLAUDE_AMBIGUOUS');assert.equal(store.claude(job.id).calls,1);store.close();
 });
+

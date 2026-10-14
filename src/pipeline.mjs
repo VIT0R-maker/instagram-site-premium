@@ -1,3 +1,4 @@
+import { AUDIT_POLICY, unsafePublication } from './audit-policy.mjs';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { buildBrief } from './briefing.mjs';
@@ -6,7 +7,7 @@ import { Providers } from './providers.mjs';
 import { normalizeProfile, processCandidates, pixels } from './images.mjs';
 import { verifyFacts, validateBrief } from './brief.mjs';
 import { publicationPreflight, publishSite } from './publish.mjs';
-import { validateSite } from './validate-site.mjs';
+import { validateSite, diagnoseSite } from './validate-site.mjs';
 import { auditProject } from './audit.mjs';
 import { claudeReferences } from './vision.mjs';
 import { verifyResources } from './resources.mjs';
@@ -111,11 +112,16 @@ export class Pipeline {
     if(stage==='publish') {
       const approval=cp('approval');must(approval?.approved,'QUALITY_GATE','Não existe aprovação obrigatória.');
       const files=Object.fromEntries(approval.files.map(f=>[f,readFileSync(path.join(dir,'site',f))]));
-      if(approval.schemaVersion==='2.0')validateSite(files,cp('brief'),Object.values(this.env),cp('approvedInteractions')||cp('generation').interactions);
+      if(approval.policy===AUDIT_POLICY){
+        must(approval.score>=cfg.qualityThreshold,'VISUAL_SCORE','Nota visual abaixo do mínimo.');
+        const diagnostic=diagnoseSite(files,cp('brief'),Object.values(this.env),cp('approvedInteractions')||cp('generation').interactions);
+        must(!unsafePublication(diagnostic),'SITE_FATAL','Artefatos públicos contêm dados privados ou caminho inválido.');
+      }else if(approval.schemaVersion==='2.0')validateSite(files,cp('brief'),Object.values(this.env),cp('approvedInteractions')||cp('generation').interactions);
       // A v1 approval remains byte-bound; do not mutate or regenerate historical artifacts.
       return publishSite(p,files,approval);
     }
     throw new Fault('STAGE','Etapa desconhecida.');
   }
 }
+
 

@@ -1,3 +1,4 @@
+import { telegramChunks } from './audit-policy.mjs';
 import http from 'node:http';
 import path from 'node:path';
 import { mkdirSync, rmSync, existsSync, openSync, closeSync, readFileSync, writeFileSync } from 'node:fs';
@@ -27,7 +28,10 @@ export function createApp({config,env,store,pipeline,root}) {
     const record=stage?store.stage(job.id,stage):null;
     const failure=record?.result?JSON.parse(record.result):null;
     const pub=store.checkpoint(job.id,'publication'),repo=store.checkpoint(job.id,'repository'),cl=store.claude(job.id);
-    return {accepted:true,jobId:job.id,chatId:job.chat,username:job.username,stage:stage||null,state:record?.state||'pending',message:record?.state==='failed'?`${failure?.message || 'Falha na etapa.'}${cl&&!cl.response?' A reserva do Claude permanece consumida/ambígua.':''}${repo?' Repositório: '+repo.url:''}`:pub?.status==='published'?`Site publicado e verificado.\n${pub.siteUrl}\nRepositório: ${pub.repoUrl}\nJob: ${job.id}\nLimitações: ${(store.checkpoint(job.id,'brief')?.limitations||[]).join('; ').slice(0,1800)||'Nenhuma limitação adicional registrada.'}`:STAGE_TEXT[stage]||'Trabalho recebido.',repoUrl:repo?.url||null,siteUrl:pub?.status==='published'?pub.siteUrl:null,publicationState:pub?.status||((repo&&stage==='publish')?'pending':'not_published'),limitations:store.checkpoint(job.id,'brief')?.limitations||[],claudeState:cl?.state||'unused',code:failure?.code||null};
+    let notes=store.checkpoint(job.id,'auditNotes')||'';
+    for(const value of Object.values(env))if(typeof value==='string'&&value.length>=8)notes=notes.split(value).join('[REDACTED]');
+    const auditMessages=(stage==='publish'&&record?.state==='done'||record?.state==='failed')?telegramChunks(notes):[];
+    return {auditMessages,accepted:true,jobId:job.id,chatId:job.chat,username:job.username,stage:stage||null,state:record?.state||'pending',message:record?.state==='failed'?`${failure?.message || 'Falha na etapa.'}${cl&&!cl.response?' A reserva do Claude permanece consumida/ambígua.':''}${repo?' Repositório: '+repo.url:''}`:pub?.status==='published'?`Site publicado. Nota visual: ${store.checkpoint(job.id,'approval')?.score?.toFixed(2)||'não informada'}/100.\n${pub.siteUrl}\nRepositório: ${pub.repoUrl}\nJob: ${job.id}\nLimitações: ${(store.checkpoint(job.id,'brief')?.limitations||[]).join('; ').slice(0,1800)||'Nenhuma limitação adicional registrada.'}`:STAGE_TEXT[stage]||'Trabalho recebido.',repoUrl:repo?.url||null,siteUrl:pub?.status==='published'?pub.siteUrl:null,publicationState:pub?.status||((repo&&stage==='publish')?'pending':'not_published'),limitations:store.checkpoint(job.id,'brief')?.limitations||[],claudeState:cl?.state||'unused',code:failure?.code||null};
   }
   const server=http.createServer(async(req,res)=>{
     const send=(code,value)=>{res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
@@ -114,3 +118,4 @@ async function main() {
   process.on('SIGTERM',stop);process.on('SIGINT',stop);
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))main().catch(e=>{process.stderr.write(JSON.stringify(safeError(e))+'\n');process.exitCode=1;});
+
