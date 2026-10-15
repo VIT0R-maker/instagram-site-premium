@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { request } from './net.mjs';
 import { must, Fault, hash, sleep } from './core.mjs';
 
-export async function publicationPreflight(p) {
+export async function publicationPreflight(p,wait=sleep) {
   const {data:user,headers}=await p.github('/user');
   must(user.type==='User'&&/^[a-zA-Z0-9-]+$/.test(user.login),'GITHUB_OWNER','É necessária uma conta pessoal GitHub autenticada.');
   const scopes=String(headers['x-oauth-scopes']||'').split(',').map(x=>x.trim());
@@ -11,8 +11,21 @@ export async function publicationPreflight(p) {
   must(/^[a-zA-Z0-9_.-]+$/.test(name||''),'GITHUB_PROBE','Configure o repositório descartável GITHUB_PROBE_REPO antes da geração.');
   const base=`/repos/${user.login}/${name}`;const {data:repo}=await p.github(base);
   must(repo.owner.login===user.login&&!repo.private&&repo.description==='instagram-site-premium permission probe'&&repo.permissions?.admin&&repo.permissions?.push,'GITHUB_PROBE','Repositório de prova sem marcador/permissões exigidos.');
-  const old=await p.github(base+'/contents/permission-check.txt',{accept:[404]});
-  await p.github(base+'/contents/permission-check.txt',{method:'PUT',body:{message:'chore: verify publisher permission',content:Buffer.from('Permission check '+new Date().toISOString()+'\n').toString('base64'),...(old.data?.sha?{sha:old.data.sha}:{})}});
+  const probeRoute=base+'/contents/permission-check.txt';
+  const content=Buffer.from('Permission check '+new Date().toISOString()+'\n').toString('base64');
+  // Jobs share this disposable probe. A concurrent write can invalidate its SHA
+  // between GET and PUT. Retry only this conflict, always after reading again.
+  for(let attempt=0;attempt<4;attempt++) {
+    const old=await p.github(probeRoute+'?ref='+encodeURIComponent(repo.default_branch),{accept:[404]});
+    try {
+      await p.github(probeRoute,{method:'PUT',attempts:1,body:{message:'chore: verify publisher permission',content,branch:repo.default_branch,...(old.data?.sha?{sha:old.data.sha}:{})}});
+      break;
+    } catch(e) {
+      if(e.code!=='HTTP_409')throw e;
+      if(attempt===3)throw new Fault('GITHUB_PROBE_CONFLICT','O arquivo permission-check.txt do repositorio de prova continuou mudando durante 4 tentativas. Aguarde outras execucoes terminarem e use /retomar neste mesmo job.',{status:409,probe:name});
+      await wait(500*2**attempt);
+    }
+  }
   const current=await p.github(base+'/pages',{accept:[404]});
   if(current.status===404)await p.github(base+'/pages',{method:'POST',body:{build_type:'legacy',source:{branch:repo.default_branch,path:'/'}}});
   else await p.github(base+'/pages',{method:'PUT',body:{build_type:'legacy',source:{branch:repo.default_branch,path:'/'}}});
